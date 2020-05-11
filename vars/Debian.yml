@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT
+---
+# Put internal variables here with Debian 10 specific values.
+
+__certificate_packages:
+  - python-cryptography
+  - python-dbus
+
+__certificate_default_directory: /etc/ssl

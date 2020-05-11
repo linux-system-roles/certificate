@@ -2,6 +2,8 @@
 ---
 # Put internal variables here with Red Hat Enterprise Linux 7 specific values.
 
-# Example:
-__template_packages: []
-__template_services: []
+__certificate_packages:
+  - python-cryptography
+  - python-dbus
+
+__certificate_default_directory: /etc/pki/tls

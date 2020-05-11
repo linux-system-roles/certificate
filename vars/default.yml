@@ -2,6 +2,8 @@
 ---
 # Put internal variables here with values for unrecognized distributions.
 
-# Example:
-__template_packages: []
-__template_services: []
+__certificate_packages:
+  - python3-cryptography
+  - python3-dbus
+
+__certificate_default_directory: /etc/pki/tls

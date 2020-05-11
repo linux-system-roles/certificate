@@ -1,7 +1,1 @@
-# SPDX-License-Identifier: MIT
----
-# Put internal variables here with CentOS 7 specific values.
-
-# Example:
-__template_packages: []
-__template_services: []
+RedHat-7.yml

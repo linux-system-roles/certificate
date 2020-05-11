@@ -47,3 +47,4 @@
 #   * .travis/runpytest.sh:
 #
 #       - RUN_PYTEST_SETUP_MODULE_UTILS
+LSR_EXTRA_PACKAGES="libdbus-1-dev"

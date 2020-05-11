@@ -1,0 +1,59 @@
+---
+- name: Set version specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "default.yml"
+
+- name: Ensure certificate role dependencies are installed
+  package:
+    name: "{{ __certificate_packages }}"
+    state: present
+
+- name: Install and configure required providers
+  vars:
+    __certificate_providers: |
+      {{
+        certificate_requests |
+        map(attribute='provider', default=__certificate_provider_default) |
+        unique |
+        list
+      }}
+  block:
+    - name: Ensure provider packages are installed
+      package:
+        name: |
+          {{ __certificate_provider_vars[__certificate_provider].packages }}
+        state: present
+      loop: "{{ __certificate_providers }}"
+      loop_control:
+        loop_var: __certificate_provider
+      when: |
+        __certificate_provider_vars[__certificate_provider].packages is defined
+
+    # While most Linux system roles have a list of services
+    #   this role doesn't need it. In fact some providers
+    #   won't have any service at all.
+    - name: Ensure provider service is running
+      service:
+        name: >-
+          {{ __certificate_provider_vars[__certificate_provider].service }}
+        state: started
+        enabled: yes
+      loop: "{{ __certificate_providers }}"
+      loop_control:
+        loop_var: __certificate_provider
+      when:
+        __certificate_provider_vars[__certificate_provider].service is defined
+
+- name: Ensure certificate requests
+  certificate_request:
+    name: "{{ item.name | default(omit) }}"
+    dns: "{{ item.dns | default(omit) }}"
+    ca: "{{ item.ca | default(omit) }}"
+    provider: "{{ item.provider | default(omit) }}"
+    directory: "{{ __certificate_default_directory }}"
+  loop: "{{ certificate_requests }}"
