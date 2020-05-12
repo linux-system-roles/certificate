@@ -127,3 +127,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# vim swap files
+*.swp
+*.swo
+
+# Ack grep rc file
+.ackrc
+
+# yamllint tmp output
+.yamllint
