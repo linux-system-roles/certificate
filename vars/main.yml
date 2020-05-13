@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: MIT
+---
+# Put the role's internal variables here that are not distribution specific.
+
+__certificate_provider_default: certmonger
