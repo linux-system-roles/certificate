@@ -48,3 +48,7 @@
 #
 #       - RUN_PYTEST_SETUP_MODULE_UTILS
 LSR_EXTRA_PACKAGES="libdbus-1-dev"
+
+LSR_ANSIBLES="ansible==2.8.* ansible==2.9.*"
+
+RUN_BLACK_EXCLUDE='/(\.[^.].*|tests/roles|molecule)/'
