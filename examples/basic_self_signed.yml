@@ -9,4 +9,4 @@
         ca: self-sign
 
   roles:
-    - certificate
+    - linux-system-roles.certificate

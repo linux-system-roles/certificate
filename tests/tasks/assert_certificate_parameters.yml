@@ -1,0 +1,53 @@
+---
+- name: Retrieve certificate file stats
+  stat:
+    path: "{{ cert['path'] }}"
+  register: result
+
+- name: Verify if certificate file exists
+  assert:
+    that:
+      - result.stat.exists
+    fail_msg: "Certificate file '{{ cert['path'] }}' does not exist."
+
+- name: Retrieve key file stats
+  stat:
+    path: "{{ cert['key_path'] }}"
+  register: result
+
+- name: Verify if key file exists
+  assert:
+    that:
+      - result.stat.exists
+    fail_msg: "Key file '{{ cert['key_path'] }}' does not exist."
+
+- name: Retrieve certificate subject
+  shell: >-
+    openssl x509 -in {{ cert['path'] }} -noout -subject |
+    sed 's/ = /=/g' |
+    sed 's/^subject=\(.*\)$/\1/'
+  register: result
+  changed_when: false
+
+- name: Verify certificate subject
+  assert:
+    that:
+      - cert['subject'] == result.stdout
+    fail_msg: "{{ cert['subject'] }} != {{ result.stdout }}"
+
+- name: Retrieve certificate Subject Alternative Name (SAN)
+  shell: >-
+    openssl x509 -in {{ cert['path'] }} -noout -text |
+    grep 'Subject Alternative Name' -A1 |
+    tail -1 |
+    tr , '\n' |
+    sed 's/^\s\+//g'
+  register: result
+  changed_when: false
+
+- name: Verify certificate SAN
+  assert:
+    that:
+      - (cert['subject_alt_name'] | sort) == (result.stdout_lines | sort)
+    fail_msg: >-
+      {{ cert['subject_alt_name'] | sort }} != {{ result.stdout_lines | sort }}

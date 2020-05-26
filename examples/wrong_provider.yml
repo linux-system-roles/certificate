@@ -10,4 +10,4 @@
         provider: fake-provider
 
   roles:
-    - certificate
+    - linux-system-roles.certificate

@@ -1,0 +1,26 @@
+---
+- name: Test issuing certificate with nonexistent provider
+  hosts: all
+  become: true
+  vars:
+    certificate_requests:
+      - name: mycert
+        dns: www.example.com
+        ca: self-sign
+        provider: fake-provider
+
+  tasks:
+    - vars:
+        expected_error_msg: >-
+          Ensure certificate requests Chosen provider
+           'fake-provider' is not available.
+      block:
+        - import_role:
+            name: linux-system-roles.certificate
+        - fail:
+            msg: "Certificate issued with nonexistent provider 'fake-provider'."
+      rescue:
+        - name:
+          assert:
+            that:
+              - ansible_failed_task.name == "Ensure certificate requests"

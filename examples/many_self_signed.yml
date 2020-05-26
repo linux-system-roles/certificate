@@ -8,11 +8,11 @@
         dns: www.example.com
         ca: self-sign
       - name: /tmp/other-cert
-        dns: www.example.com
+        dns: www.example.org
         ca: self-sign
       - name: /tmp/another-cert
-        dns: www.example.com
+        dns: www.example.net
         ca: self-sign
 
   roles:
-    - certificate
+    - linux-system-roles.certificate
