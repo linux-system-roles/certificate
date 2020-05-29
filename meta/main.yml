@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: MIT
+---
+galaxy_info:
+  author: Sergio Oliveira Campos <seocam@redhat.com>
+  description: Role for managing TLS/SSL certificate issuance and renewal
+  company: Red Hat, Inc.
+  license: MIT
+  min_ansible_version: 2.7
+  platforms:
+    - name: Fedora
+      versions:
+        - 31
+        - 32
+    - name: EL
+      versions:
+        - 7
+        - 8
+
+  galaxy_tags:
+    - centos
+    - fedora
+    - certificate
+    - tls
+    - ssl
+    - redhat
+    - rhel
+    - certmonger
+    - system
+
+dependencies: []

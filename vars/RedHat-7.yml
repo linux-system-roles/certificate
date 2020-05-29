@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT
+---
+# Put internal variables here with Red Hat Enterprise Linux 7 specific values.
+
+__certificate_packages:
+  - python-cryptography
+  - python-dbus
+
+__certificate_default_directory: /etc/pki/tls

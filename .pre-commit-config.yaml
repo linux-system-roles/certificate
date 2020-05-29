@@ -1,0 +1,35 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/psf/black
+    rev: 19.10b0
+    hooks:
+      - id: black
+        language_version: python3
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: flake8
+      - id: detect-private-key
+      - id: debug-statements
+      - id: check-docstring-first
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 5.0.2
+    hooks:
+      - id: pydocstyle
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.23.0
+    hooks:
+      - id: yamllint
+        entry: yamllint -c .yamllint.yml
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [file, python]
