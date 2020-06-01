@@ -40,6 +40,14 @@ options:
         certificate. Also can provide the default value for
         I(common_name).
     required: false
+  owner:
+    description:
+      - User name (or user id) for the certificate and key files.
+    required: false
+  group:
+    description:
+      - Group name (or group id) for the certificate and key files.
+    required: false
   common_name:
     description:
       - Common Name requested for the certificate subject.
@@ -113,6 +121,15 @@ EXAMPLES = """
     dns: www.example.com
     key_size: 4096
     ca: self-sign
+
+# Define certificate owner and group
+- name: Ensure user and group for certificate
+  certificate_request:
+    name: single-example
+    dns: www.example.com
+    owner: ftp
+    group: ftp
+    ca: self-sign
 """
 
 RETURN = ""
@@ -152,6 +169,8 @@ class CertificateRequestModule(AnsibleModule):
             directory=dict(type="str", default="/etc/pki/tls"),
             provider=dict(type="str", default="certmonger"),
             key_size=dict(type="int", default=2048),
+            owner=dict(type="str"),
+            group=dict(type="str"),
         )
 
     @property

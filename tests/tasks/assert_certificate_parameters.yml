@@ -10,6 +10,18 @@
       - result.stat.exists
     fail_msg: "Certificate file '{{ cert['path'] }}' does not exist."
 
+- name: Verify certificate file owner and group
+  assert:
+    that:
+      - (cert['owner'] | default('root')) in
+        [result.stat.pw_name, result.stat.uid]
+      - (cert['group'] | default('root')) in
+        [result.stat.gr_name, result.stat.gid]
+    fail_msg: >-
+      {{ result.stat.pw_name }}:{{ result.stat.gr_name }} !=
+      {{ cert['owner'] | default('root') }}:
+      {{ cert['group'] | default('root') }}
+
 - name: Retrieve key file stats
   stat:
     path: "{{ cert['key_path'] }}"
@@ -20,6 +32,18 @@
     that:
       - result.stat.exists
     fail_msg: "Key file '{{ cert['key_path'] }}' does not exist."
+
+- name: Verify key file owner and group
+  assert:
+    that:
+      - (cert['owner'] | default('root')) in
+        [result.stat.pw_name, result.stat.uid]
+      - (cert['group'] | default('root')) in
+        [result.stat.gr_name, result.stat.gid]
+    fail_msg: >-
+      {{ result.stat.pw_name }}:{{ result.stat.gr_name }} !=
+      {{ cert['owner'] | default('root') }}:
+      {{ cert['group'] | default('root') }}
 
 - name: Retrieve certificate subject
   shell: >-

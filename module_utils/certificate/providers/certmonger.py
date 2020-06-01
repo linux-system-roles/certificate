@@ -157,5 +157,6 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         # Set certificate key size
         command += ["-g", str(self.module.params.get("key_size"))]
 
+        self.module.debug("Certmonger command: {}".format(command))
         self._run_command(command, check_rc=True)
         self.changed = True
