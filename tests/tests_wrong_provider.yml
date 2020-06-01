@@ -12,15 +12,17 @@
   tasks:
     - vars:
         expected_error_msg: >-
-          Ensure certificate requests Chosen provider
-           'fake-provider' is not available.
+          Chosen provider 'fake-provider' is not available.
       block:
         - import_role:
             name: linux-system-roles.certificate
         - fail:
             msg: "Certificate issued with nonexistent provider 'fake-provider'."
       rescue:
-        - name:
+        - name: assert...
           assert:
             that:
-              - ansible_failed_task.name == "Ensure certificate requests"
+              - ansible_failed_result.results.0.msg  == expected_error_msg
+            fail_msg: >-
+              '{{ ansible_failed_result.results.0.msg }}' !=
+              '{{ expected_error_msg }}'

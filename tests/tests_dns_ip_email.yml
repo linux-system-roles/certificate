@@ -1,0 +1,48 @@
+---
+- name: Issue certificate with dns, ip and email in SAN
+  hosts: all
+  become: true
+  vars:
+    certificate_requests:
+      - name: mycert
+        common_name: My Certificate with SAN
+        dns:
+          - sub1.example.com
+          - www.example.com
+          - sub2.example.com
+          - sub3.example.com
+        ip:
+          - 192.0.2.12
+          - 198.51.100.65
+          - 2001:db8::2:1
+        email:
+          - sysadmin@example.com
+          - support@example.com
+        ca: self-sign
+  roles:
+    - linux-system-roles.certificate
+
+- name: Verify certificate
+  hosts: all
+  become: true
+  vars:
+    certificates:
+      - path: /etc/pki/tls/certs/mycert.crt
+        key_path: /etc/pki/tls/private/mycert.key
+        subject: CN=My Certificate with SAN
+        subject_alt_name:
+          - DNS:sub1.example.com
+          - DNS:www.example.com
+          - DNS:sub2.example.com
+          - DNS:sub3.example.com
+          - email:sysadmin@example.com
+          - email:support@example.com
+          - IP Address:192.0.2.12
+          - IP Address:198.51.100.65
+          - IP Address:2001:DB8:0:0:0:0:2:1
+  tasks:
+    - name: Verify each certificate
+      include_tasks: tasks/assert_certificate_parameters.yml
+      loop: "{{ certificates }}"
+      loop_control:
+        loop_var: cert

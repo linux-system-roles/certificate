@@ -53,6 +53,9 @@
   certificate_request:
     name: "{{ item.name | default(omit) }}"
     dns: "{{ item.dns | default(omit) }}"
+    ip: "{{ item.ip | default(omit) }}"
+    email: "{{ item.email | default(omit) }}"
+    common_name: "{{ item.common_name | default(omit) }}"
     ca: "{{ item.ca | default(omit) }}"
     provider: "{{ item.provider | default(omit) }}"
     directory: "{{ __certificate_default_directory }}"
