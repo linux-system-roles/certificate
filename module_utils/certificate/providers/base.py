@@ -1,4 +1,5 @@
 import os
+import ipaddress
 
 from abc import ABCMeta, abstractmethod
 
@@ -36,10 +37,14 @@ class CertificateProxy:
         # pylint: disable=protected-access
         cert_like = cls(module)
 
-        map_attrs = ["dns", "ip"]
+        map_attrs = ["dns", "ip", "email"]
         info = {k: v for k, v in params.items() if k in map_attrs}
 
         info["common_name"] = cert_like._get_common_name_from_params(params)
+        if info.get("ip"):
+            info["ip"] = [
+                ipaddress.ip_address(six.ensure_text(ip)) for ip in info["ip"] if ip
+            ]
 
         cert_like.cert_data = info
         return cert_like
@@ -48,7 +53,8 @@ class CertificateProxy:
     def _get_common_name_from_params(params):
         """Infer the best `common_name` from given parameters.
 
-        If `common_name` is not provided use the first `dns` or first `ip`.
+        If `common_name` is not provided use the first `dns`, `ip` or `email`,
+        respectively.
         """
         common_name = params.get("common_name")
         if common_name is None:
@@ -59,6 +65,10 @@ class CertificateProxy:
             ip = params.get("ip")
             if ip:
                 return ip[0]
+
+            email = params.get("email")
+            if email:
+                return email[0]
 
         return common_name
 
@@ -99,6 +109,7 @@ class CertificateProxy:
 
         info["dns"] = self._get_san_values(x509.DNSName)
         info["ip"] = self._get_san_values(x509.IPAddress)
+        info["email"] = self._get_san_values(x509.RFC822Name)
         info["common_name"] = self._get_subject_values(NameOID.COMMON_NAME)
 
         return info
@@ -112,6 +123,11 @@ class CertificateProxy:
     def ip(self):
         """Return the IP(s) in the certificate."""
         return self.cert_data.get("ip") or []
+
+    @property
+    def email(self):
+        """Return the Email(s) in the certificate."""
+        return self.cert_data.get("email") or []
 
     @property
     def common_name(self):

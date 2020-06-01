@@ -1,0 +1,23 @@
+---
+- hosts: all
+  become: true
+  vars:
+    certificate_requests:
+      - name: mycert
+        common_name: My Certificate with SAN
+        dns:
+          - sub1.example.com
+          - www.example.com
+          - sub2.example.com
+          - sub3.example.com
+        ip:
+          - 192.0.2.12
+          - 198.51.100.65
+          - 2001:db8::2:1
+        email:
+          - sysadmin@example.com
+          - support@example.com
+        ca: self-sign
+
+  roles:
+    - linux-system-roles.certificate

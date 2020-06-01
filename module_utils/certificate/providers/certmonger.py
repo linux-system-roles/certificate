@@ -110,6 +110,7 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
 
     def request_certificate(self):
         """Issue or update a certificate using certmonger."""
+        # pylint: disable=useless-else-on-loop
         getcert_bin = self.module.get_bin_path("getcert", required=True)
         command = [getcert_bin]
 
@@ -136,6 +137,18 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         # Set Domains
         for dns in self.csr.dns:
             command += ["-D", dns]
+        else:
+            command += ["-D", ""]
+
+        for ip in self.csr.ip:
+            command += ["-A", str(ip)]
+        else:
+            command += ["-A", ""]
+
+        for email in self.csr.email:
+            command += ["-E", email]
+        else:
+            command += ["-E", ""]
 
         if not self.exists_in_certmonger:
             # Don't attempt to renew when near to expiration

@@ -26,7 +26,23 @@ options:
     description:
       - Domain (or list of domains) to be included in the
         certificate. Also can provide the default value for
-        common_name.
+        I(common_name).
+    required: false
+  ip:
+    description:
+      - IP (or list of IPs) to be included in the certificate.
+        IPs can be IPv4, IPv6 or both. Also can provide the
+        default value for I(common_name).
+    required: false
+  email:
+    description:
+      - Email (or list of emails) to be included in the
+        certificate. Also can provide the default value for
+        I(common_name).
+    required: false
+  common_name:
+    description:
+      - Common Name requested for the certificate subject.
     required: false
   ca:
     description:
@@ -65,6 +81,25 @@ EXAMPLES = """
       - www.example.com
       - example.com
     ca: self-sign
+
+# Certificate for IPs
+- name: Ensure certificate exists for multiple IPs
+  certificate_request:
+    name: ip-example
+    ip:
+      - 192.0.2.12
+      - 198.51.100.65
+      - 2001:db8::2:1
+    ca: self-sign
+
+# Certificate for Emails
+- name: Ensure certificate exists for multiple Emails
+  certificate_request:
+    name: email-example
+    email:
+      - sysadmin@example.com
+      - support@example.com
+    ca: self-sign
 """
 
 RETURN = ""
@@ -97,6 +132,9 @@ class CertificateRequestModule(AnsibleModule):
         return dict(
             name=dict(type="str", required=True),
             dns=dict(type="list"),
+            ip=dict(type="list"),
+            email=dict(type="list"),
+            common_name=dict(type="str"),
             ca=dict(type="str", required=True),
             directory=dict(type="str", default="/etc/pki/tls"),
             provider=dict(type="str", default="certmonger"),
