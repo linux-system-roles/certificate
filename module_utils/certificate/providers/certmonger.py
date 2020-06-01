@@ -154,5 +154,8 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
             # Don't attempt to renew when near to expiration
             command += ["-R"]
 
+        # Set certificate key size
+        command += ["-g", str(self.module.params.get("key_size"))]
+
         self._run_command(command, check_rc=True)
         self.changed = True
