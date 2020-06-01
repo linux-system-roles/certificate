@@ -44,6 +44,11 @@ options:
     description:
       - Common Name requested for the certificate subject.
     required: false
+  key_size:
+    description:
+      - Generate keys with a specific keysize in bits.
+    required: false
+    default: 2048
   ca:
     description:
       - CA that will issue the certificate. The available options
@@ -100,6 +105,14 @@ EXAMPLES = """
       - sysadmin@example.com
       - support@example.com
     ca: self-sign
+
+# Choose certificate key size
+- name: Ensure key size for certificate is 4096
+  certificate_request:
+    name: single-example
+    dns: www.example.com
+    key_size: 4096
+    ca: self-sign
 """
 
 RETURN = ""
@@ -138,6 +151,7 @@ class CertificateRequestModule(AnsibleModule):
             ca=dict(type="str", required=True),
             directory=dict(type="str", default="/etc/pki/tls"),
             provider=dict(type="str", default="certmonger"),
+            key_size=dict(type="int", default=2048),
         )
 
     @property

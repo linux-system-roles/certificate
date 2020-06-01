@@ -59,4 +59,5 @@
     ca: "{{ item.ca | default(omit) }}"
     provider: "{{ item.provider | default(omit) }}"
     directory: "{{ __certificate_default_directory }}"
+    key_size: "{{ item.key_size | default(omit) }}"
   loop: "{{ certificate_requests }}"
