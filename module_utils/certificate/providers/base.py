@@ -283,26 +283,53 @@ class CertificateRequestBaseProvider:
             changed=self.changed, msg=self.message,
         )
 
+    def _set_user_and_group_if_different(self):
+        file_attrs = {
+            "path": self.certificate_file_path,
+            "owner": self.module.params.get("owner"),
+            "group": self.module.params.get("group"),
+            "mode": None,
+            "attributes": None,
+            "secontext": [],
+        }
+        cert_diff = {}
+        self.changed = self.module.set_fs_attributes_if_different(
+            file_attrs, self.changed, cert_diff,
+        )
+        self.module.debug("Certificate fs attribute diff: {}".format(cert_diff))
+
+        file_attrs["path"] = self.certificate_key_path
+        key_diff = {}
+        self.changed = self.module.set_fs_attributes_if_different(
+            file_attrs, self.changed, key_diff,
+        )
+        self.module.debug("Certificate Key fs attribute diff: {}".format(key_diff))
+
+        return cert_diff or key_diff
+
     def run(self, check_mode=False):
         """Entry point for the providers called from the actual Ansible module."""
         if check_mode:
             self.message += "(Check mode) "
 
+        issue_or_update_cert = False
         self.message += "Certificate "
         if not self.existing_certificate:
             self.message += "requested (new)."
+            issue_or_update_cert = True
         else:
             if self.cert_needs_update:
                 self.message += "requested (update)."
+                issue_or_update_cert = True
             else:
                 self.message += "is up-to-date."
-                # If the cert exists and does not require updates we are done
-                self._exit_success()
 
-        if check_mode:
-            self._exit_success()
+        if issue_or_update_cert and not check_mode:
+            self.request_certificate()
 
-        self.request_certificate()
+        updated_fs_attrs = self._set_user_and_group_if_different()
+        if updated_fs_attrs:
+            self.message += " File attributes updated."
         self._exit_success()
 
     def get_existing_certificate_pem_data(self):

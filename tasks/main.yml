@@ -56,6 +56,8 @@
     ip: "{{ item.ip | default(omit) }}"
     email: "{{ item.email | default(omit) }}"
     common_name: "{{ item.common_name | default(omit) }}"
+    owner: "{{ item.owner | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
     ca: "{{ item.ca | default(omit) }}"
     provider: "{{ item.provider | default(omit) }}"
     directory: "{{ __certificate_default_directory }}"

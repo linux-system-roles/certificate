@@ -1,0 +1,32 @@
+---
+- name: Issue certificate setting user/group
+  hosts: all
+  become: true
+  vars:
+    certificate_requests:
+      - name: mycert
+        dns: www.example.com
+        owner: ftp
+        group: ftp
+        ca: self-sign
+  roles:
+    - linux-system-roles.certificate
+
+- name: Verify certificate
+  hosts: all
+  become: true
+  vars:
+    certificates:
+      - path: /etc/pki/tls/certs/mycert.crt
+        key_path: /etc/pki/tls/private/mycert.key
+        subject: CN=www.example.com
+        subject_alt_name:
+          - DNS:www.example.com
+        owner: ftp
+        group: ftp
+  tasks:
+    - name: Verify each certificate
+      include_tasks: tasks/assert_certificate_parameters.yml
+      loop: "{{ certificates }}"
+      loop_control:
+        loop_var: cert
