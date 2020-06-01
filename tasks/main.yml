@@ -60,6 +60,7 @@
     group: "{{ item.group | default(omit) }}"
     ca: "{{ item.ca | default(omit) }}"
     provider: "{{ item.provider | default(omit) }}"
+    principal: "{{ item.principal | default(omit) }}"
     directory: "{{ __certificate_default_directory }}"
     key_size: "{{ item.key_size | default(omit) }}"
   loop: "{{ certificate_requests }}"

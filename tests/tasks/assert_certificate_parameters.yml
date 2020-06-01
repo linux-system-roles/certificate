@@ -65,7 +65,8 @@
     grep 'Subject Alternative Name' -A1 |
     tail -1 |
     tr , '\n' |
-    sed 's/^\s\+//g'
+    sed 's/^\s\+//g' |
+    grep -v "othername"
   register: result
   changed_when: false
 

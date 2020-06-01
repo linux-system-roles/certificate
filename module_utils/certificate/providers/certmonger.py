@@ -158,5 +158,12 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         command += ["-g", str(self.module.params.get("key_size"))]
 
         self.module.debug("Certmonger command: {}".format(command))
+
+        # Set Kerberos principal
+        for principal in self.csr.principal:
+            command += ["-K", principal]
+        else:
+            command += ["-K", ""]
+
         self._run_command(command, check_rc=True)
         self.changed = True

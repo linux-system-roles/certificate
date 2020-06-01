@@ -9,10 +9,77 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509.oid import NameOID
 
+from pyasn1.codec.der import decoder
+from pyasn1.type import char, namedtype, tag, univ
+
 from ansible.module_utils import six
 
 if six.PY2:
     FileNotFoundError = IOError  # pylint: disable=redefined-builtin
+
+
+class _PrincipalName(univ.Sequence):
+    componentType = namedtype.NamedTypes(
+        namedtype.NamedType(
+            "name-type",
+            univ.Integer().subtype(
+                explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 0)
+            ),
+        ),
+        namedtype.NamedType(
+            "name-string",
+            univ.SequenceOf(char.GeneralString()).subtype(
+                explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 1)
+            ),
+        ),
+    )
+
+
+class _KRB5PrincipalName(univ.Sequence):
+    componentType = namedtype.NamedTypes(
+        namedtype.NamedType(
+            "realm",
+            char.GeneralString().subtype(
+                explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 0)
+            ),
+        ),
+        namedtype.NamedType(
+            "principalName",
+            _PrincipalName().subtype(
+                explicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 1)
+            ),
+        ),
+    )
+
+
+class KRB5PrincipalName(x509.OtherName):
+    """Kerberos Principal x509 OtherName implementation."""
+
+    # pylint: disable=too-few-public-methods
+
+    oid = "1.3.6.1.5.2.2"
+
+    def __init__(self, type_id, value):
+        super(KRB5PrincipalName, self).__init__(type_id, value)
+        self.name = self._decode_krb5principalname(value)
+
+    @staticmethod
+    def _decode_krb5principalname(data):
+        # pylint: disable=unsubscriptable-object
+        principal = decoder.decode(data, asn1Spec=_KRB5PrincipalName())[0]
+        realm = six.ensure_text(
+            str(principal["realm"]).replace("\\", "\\\\").replace("@", "\\@")
+        )
+        name = principal["principalName"]["name-string"]
+        name = u"/".join(
+            six.ensure_text(str(n))
+            .replace("\\", "\\\\")
+            .replace("/", "\\/")
+            .replace("@", "\\@")
+            for n in name
+        )
+        name = u"%s@%s" % (name, realm)
+        return name
 
 
 class CertificateProxy:
@@ -37,7 +104,7 @@ class CertificateProxy:
         # pylint: disable=protected-access
         cert_like = cls(module)
 
-        map_attrs = ["dns", "ip", "email"]
+        map_attrs = ["dns", "ip", "email", "principal"]
         info = {k: v for k, v in params.items() if k in map_attrs}
 
         info["common_name"] = cert_like._get_common_name_from_params(params)
@@ -111,7 +178,7 @@ class CertificateProxy:
         info["ip"] = self._get_san_values(x509.IPAddress)
         info["email"] = self._get_san_values(x509.RFC822Name)
         info["common_name"] = self._get_subject_values(NameOID.COMMON_NAME)
-
+        info["principal"] = self._get_san_values(x509.OtherName, KRB5PrincipalName)
         return info
 
     @property
@@ -134,16 +201,33 @@ class CertificateProxy:
         """Return the certificate common_name."""
         return self.cert_data.get("common_name")
 
+    @property
+    def principal(self):
+        """Return the Kerberos principal."""
+        return self.cert_data.get("principal") or []
+
     def _get_subject_values(self, oid):
         values = self._x509_obj.subject.get_attributes_for_oid(oid)
         if values:
             return values[0].value
         return None
 
-    def _get_san_values(self, san_type):
+    def _get_san_values(self, san_type, san_class=None):
         if not self._subject_alternative_names:
             return []
-        return self._subject_alternative_names.value.get_values_for_type(san_type)
+        san_values = self._subject_alternative_names.value.get_values_for_type(
+            san_type,
+        )
+        if san_values and san_class:
+            values = []
+            for obj in san_values:
+                if obj.type_id.dotted_string == san_class.oid:
+                    name = san_class(obj.type_id, obj.value).name
+                    if name not in values:
+                        values.append(name)
+            san_values = values
+
+        return san_values
 
     @property
     def _subject_alternative_names(self):

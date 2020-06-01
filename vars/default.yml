@@ -3,6 +3,7 @@
 # Put internal variables here with values for unrecognized distributions.
 
 __certificate_packages:
+  - python3-pyasn1
   - python3-cryptography
   - python3-dbus
 
