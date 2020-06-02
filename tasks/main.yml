@@ -63,4 +63,6 @@
     principal: "{{ item.principal | default(omit) }}"
     directory: "{{ __certificate_default_directory }}"
     key_size: "{{ item.key_size | default(omit) }}"
+    key_usage: "{{ item.key_usage | default(omit) }}"
+    extended_key_usage: "{{ item.extended_key_usage | default(omit) }}"
   loop: "{{ certificate_requests }}"

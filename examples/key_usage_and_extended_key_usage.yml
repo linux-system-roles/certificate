@@ -1,0 +1,19 @@
+---
+- hosts: all
+  become: true
+
+  vars:
+    certificate_requests:
+      - name: mycert
+        dns: www.example.com
+        key_usage:
+          - digitalSignature
+          - nonRepudiation
+          - keyEncipherment
+        extended_key_usage:
+          - id-kp-clientAuth
+          - id-kp-serverAuth
+        ca: self-sign
+
+  roles:
+    - linux-system-roles.certificate

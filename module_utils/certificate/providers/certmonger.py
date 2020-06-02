@@ -165,5 +165,15 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         else:
             command += ["-K", ""]
 
+        # Set key_usage
+        for key_usage in self.csr.key_usage:
+            command += ["-u", key_usage]
+
+        # Set extended_key_usage
+        for extended_key_usage in self.csr.extended_key_usage:
+            command += ["-U", extended_key_usage]
+        else:
+            command += ["-U", ""]
+
         self._run_command(command, check_rc=True)
         self.changed = True

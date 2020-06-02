@@ -7,7 +7,7 @@ from pprint import pformat
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-from cryptography.x509.oid import NameOID
+from cryptography.x509.oid import NameOID, ObjectIdentifier
 
 from pyasn1.codec.der import decoder
 from pyasn1.type import char, namedtype, tag, univ
@@ -16,6 +16,10 @@ from ansible.module_utils import six
 
 if six.PY2:
     FileNotFoundError = IOError  # pylint: disable=redefined-builtin
+
+IPSEC_END_SYSTEM = ObjectIdentifier("1.3.6.1.5.5.7.3.5")
+IPSEC_TUNNEL = ObjectIdentifier("1.3.6.1.5.5.7.3.6")
+IPSEC_USER = ObjectIdentifier("1.3.6.1.5.5.7.3.7")
 
 
 class _PrincipalName(univ.Sequence):
@@ -93,6 +97,31 @@ class CertificateProxy:
     can be useful for idempotency purposes of a certificate.
     """
 
+    EXTENDED_KEY_USAGES_OID_MAP = {
+        "id-kp-serverAuth": x509.oid.ExtendedKeyUsageOID.SERVER_AUTH,
+        "id-kp-clientAuth": x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH,
+        "id-kp-codeSigning": x509.oid.ExtendedKeyUsageOID.CODE_SIGNING,
+        "id-kp-emailProtection": x509.oid.ExtendedKeyUsageOID.EMAIL_PROTECTION,
+        "id-kp-timeStamping": x509.oid.ExtendedKeyUsageOID.TIME_STAMPING,
+        "id-kp-OCSPSigning": x509.oid.ExtendedKeyUsageOID.OCSP_SIGNING,
+        "anyExtendedKeyUsage": x509.oid.ExtendedKeyUsageOID.ANY_EXTENDED_KEY_USAGE,
+        "id-kp-ipsecEndSystem": IPSEC_END_SYSTEM,
+        "id-kp-ipsecTunnel": IPSEC_TUNNEL,
+        "id-kp-ipsecUser": IPSEC_USER,
+    }
+
+    KEY_USAGE_ATTR_MAP = {
+        "digital_signature": "digitalSignature",
+        "content_commitment": "nonRepudiation",
+        "key_encipherment": "keyEncipherment",
+        "data_encipherment": "dataEncipherment",
+        "key_agreement": "keyAgreement",
+        "key_cert_sign": "keyCertSign",
+        "crl_sign": "cRLSign",
+        "encipher_only": "encipherOnly",
+        "decipher_only": "decipherOnly",
+    }
+
     def __init__(self, module):
         self.cert_data = {}
         self._x509_obj = None
@@ -104,13 +133,27 @@ class CertificateProxy:
         # pylint: disable=protected-access
         cert_like = cls(module)
 
-        map_attrs = ["dns", "ip", "email", "principal"]
+        map_attrs = [
+            "dns",
+            "ip",
+            "email",
+            "key_usage",
+            "extended_key_usage",
+            "principal",
+        ]
         info = {k: v for k, v in params.items() if k in map_attrs}
 
         info["common_name"] = cert_like._get_common_name_from_params(params)
+
         if info.get("ip"):
             info["ip"] = [
                 ipaddress.ip_address(six.ensure_text(ip)) for ip in info["ip"] if ip
+            ]
+
+        if info.get("extended_key_usage"):
+            info["extended_key_usage"] = [
+                cls._get_extended_key_usage_object_identifier(eku).dotted_string
+                for eku in info["extended_key_usage"]
             ]
 
         cert_like.cert_data = info
@@ -179,6 +222,8 @@ class CertificateProxy:
         info["email"] = self._get_san_values(x509.RFC822Name)
         info["common_name"] = self._get_subject_values(NameOID.COMMON_NAME)
         info["principal"] = self._get_san_values(x509.OtherName, KRB5PrincipalName)
+        info["key_usage"] = self._get_key_usage()
+        info["extended_key_usage"] = self._get_extended_key_usage()
         return info
 
     @property
@@ -195,6 +240,16 @@ class CertificateProxy:
     def email(self):
         """Return the Email(s) in the certificate."""
         return self.cert_data.get("email") or []
+
+    @property
+    def key_usage(self):
+        """Return the Key Usage in the certificate."""
+        return self.cert_data.get("key_usage") or []
+
+    @property
+    def extended_key_usage(self):
+        """Return the Extended Key Usage in the certificate."""
+        return self.cert_data.get("extended_key_usage") or []
 
     @property
     def common_name(self):
@@ -229,15 +284,51 @@ class CertificateProxy:
 
         return san_values
 
+    def _get_key_usage(self):
+        if not self._key_usage_ext:
+            return []
+
+        key_usages = []
+        for attr, key_usage in self.KEY_USAGE_ATTR_MAP.items():
+            try:
+                key_usage_enabled = getattr(self._key_usage_ext.value, attr)
+            except ValueError:
+                pass
+            else:
+                if key_usage_enabled:
+                    key_usages.append(key_usage)
+        return key_usages
+
+    @classmethod
+    def _get_extended_key_usage_object_identifier(cls, eku):
+        oid = cls.EXTENDED_KEY_USAGES_OID_MAP.get(eku)
+        if not oid:
+            oid = ObjectIdentifier(eku)
+        return oid
+
+    def _get_extended_key_usage(self):
+        if not self._extended_key_usage_ext:
+            return []
+        return [eku.dotted_string for eku in self._extended_key_usage_ext.value]
+
     @property
     def _subject_alternative_names(self):
+        return self._get_x509_ext(x509.oid.ExtensionOID.SUBJECT_ALTERNATIVE_NAME)
+
+    @property
+    def _key_usage_ext(self):
+        return self._get_x509_ext(x509.oid.ExtensionOID.KEY_USAGE)
+
+    @property
+    def _extended_key_usage_ext(self):
+        return self._get_x509_ext(x509.oid.ExtensionOID.EXTENDED_KEY_USAGE)
+
+    def _get_x509_ext(self, ext_oid):
         try:
-            san = self._x509_obj.extensions.get_extension_for_oid(
-                x509.oid.ExtensionOID.SUBJECT_ALTERNATIVE_NAME,
-            )
+            ext = self._x509_obj.extensions.get_extension_for_oid(ext_oid)
         except x509.ExtensionNotFound:
             return []
-        return san
+        return ext
 
     def __eq__(self, other):
         """Compare two instances of CertificateProxy for idempotency purposes."""

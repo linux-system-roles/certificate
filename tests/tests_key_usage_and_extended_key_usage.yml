@@ -1,0 +1,47 @@
+---
+- name: Issue simple self-signed certificate
+  hosts: all
+  become: true
+
+  vars:
+    certificate_requests:
+      - name: mycert
+        dns: www.example.com
+        key_usage:
+          - digitalSignature
+          - nonRepudiation
+          - keyEncipherment
+        extended_key_usage:
+          - id-kp-clientAuth
+          - id-kp-serverAuth
+          - id-kp-ipsecTunnel
+          - 1.3.6.1.5.2.3.5
+        ca: self-sign
+  roles:
+    - linux-system-roles.certificate
+
+- name: Verify certificate
+  hosts: all
+  become: true
+  vars:
+    certificates:
+      - path: /etc/pki/tls/certs/mycert.crt
+        key_path: /etc/pki/tls/private/mycert.key
+        subject: CN=www.example.com
+        subject_alt_name:
+          - DNS:www.example.com
+        key_usage:
+          - Digital Signature
+          - Non Repudiation
+          - Key Encipherment
+        extended_key_usage:
+          - TLS Web Client Authentication
+          - TLS Web Server Authentication
+          - IPSec Tunnel
+          - Signing KDC Response
+  tasks:
+    - name: Verify each certificate
+      include_tasks: tasks/assert_certificate_parameters.yml
+      loop: "{{ certificates }}"
+      loop_control:
+        loop_var: cert
