@@ -74,6 +74,10 @@ options:
         if I(name) is not an absolute path.
     required: false
     default: /etc/pki/tls
+  principal:
+    description:
+      - Kerberos principal.
+    required: false
 author:
   - Sergio Oliveira Campos (@seocam)
 """
@@ -130,6 +134,14 @@ EXAMPLES = """
     owner: ftp
     group: ftp
     ca: self-sign
+
+# Certificate with Kerberos principal
+- name: Ensure certificate exists with principal
+  certificate_request:
+    name: single-example
+    dns: www.example.com
+    principal: HTTP/www.example.com@EXAMPLE.com
+    ca: self-sign
 """
 
 RETURN = ""
@@ -171,6 +183,7 @@ class CertificateRequestModule(AnsibleModule):
             key_size=dict(type="int", default=2048),
             owner=dict(type="str"),
             group=dict(type="str"),
+            principal=dict(type="list"),
         )
 
     @property

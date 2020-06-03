@@ -1,3 +1,4 @@
 # SPDX-License-Identifier: MIT
 
 dbus-python
+pyasn1

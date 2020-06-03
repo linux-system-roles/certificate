@@ -3,6 +3,7 @@
 # Put internal variables here with Red Hat Enterprise Linux 7 specific values.
 
 __certificate_packages:
+  - python-pyasn1
   - python-cryptography
   - python-dbus
 
