@@ -115,6 +115,30 @@ options:
         to be issued.
     required: false
     default: true
+  country:
+    description:
+      - Country requested for the certificate subject.
+    required: false
+  state:
+    description:
+      - State requested for the certificate subject.
+    required: false
+  locality:
+    description:
+      - Locality requested for the certificate subject (usually city).
+    required: false
+  organization:
+    description:
+      - Organization requested for the certificate subject.
+    required: false
+  organizational_unit:
+    description:
+      - Organizational unit requested for the certificate subject.
+    required: false
+  contact_email:
+    description:
+      - Contact email requested for the certificate subject.
+    required: false
 
 author:
   - Sergio Oliveira Campos (@seocam)
@@ -211,6 +235,18 @@ EXAMPLES = """
     wait: no
     ca: self-sign
 
+# Certificate with more subject data
+- name: Ensure certificate exists with subject data
+  certificate_request:
+    name: single-with-subject
+    dns: www.example.com
+    country: US
+    state: NC
+    locality: Raleigh
+    organization: Red Hat
+    organizational_unit: Linux
+    contact_email: admin@example.com
+    ca: self-sign
 """
 
 RETURN = ""
@@ -269,6 +305,12 @@ class CertificateRequestModule(AnsibleModule):
             ip=dict(type="list"),
             email=dict(type="list"),
             common_name=dict(type="str"),
+            country=dict(type="str"),
+            state=dict(type="str"),
+            locality=dict(type="str"),
+            organization=dict(type="str"),
+            organizational_unit=dict(type="str"),
+            contact_email=dict(type="str"),
             ca=dict(type="str", required=True),
             directory=dict(type="str", default="/etc/pki/tls"),
             provider=dict(type="str", default="certmonger"),

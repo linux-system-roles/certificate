@@ -49,15 +49,18 @@
   shell: >-
     openssl x509 -in {{ cert['path'] }} -noout -subject |
     sed 's/ = /=/g' |
-    sed 's/^subject=\(.*\)$/\1/'
+    sed 's/^subject=\(.*\)$/\1/' |
+    sed 's/,\s/\n/g' |
+    sed 's/^\s\+//g'
   register: result
   changed_when: false
 
 - name: Verify certificate subject
   assert:
     that:
-      - cert['subject'] == result.stdout
-    fail_msg: "{{ cert['subject'] }} != {{ result.stdout }}"
+      - cert['subject'] == result.stdout_lines
+    fail_msg: >-
+      {{ cert['subject'] }} != {{ result.stdout_lines }}
 
 - name: Retrieve certificate Subject Alternative Name (SAN)
   shell: >-

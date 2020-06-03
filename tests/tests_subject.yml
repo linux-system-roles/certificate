@@ -7,8 +7,14 @@
     certificate_requests:
       - name: mycert
         dns: www.example.com
+        common_name: '# \\Every"thing+that,ne;eds<escap>ing\0 '
+        country: US
+        state: NC
+        locality: Raleigh
+        organization: Red Hat
+        organizational_unit: Linux
+        contact_email: admin@example.com
         ca: self-sign
-        auto_renew: no
   roles:
     - linux-system-roles.certificate
 
@@ -20,10 +26,15 @@
       - path: /etc/pki/tls/certs/mycert.crt
         key_path: /etc/pki/tls/private/mycert.key
         subject:
-          - CN=www.example.com
+          - C=US
+          - ST=NC
+          - L=Raleigh
+          - O=Red Hat
+          - OU=Linux
+          - emailAddress=admin@example.com
+          - CN="# \\\\Every\"thing+that,ne;eds<escap>ing\\0 "
         subject_alt_name:
           - DNS:www.example.com
-        auto_renew: no
   tasks:
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml

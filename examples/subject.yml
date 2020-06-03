@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: true
+
+  vars:
+    certificate_requests:
+      - name: mycert
+        dns: www.example.com
+        country: US
+        state: NC
+        locality: Raleigh
+        organization: Red Hat
+        organizational_unit: Linux
+        ca: self-sign
+
+  roles:
+    - linux-system-roles.certificate

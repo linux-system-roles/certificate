@@ -22,6 +22,29 @@ IPSEC_TUNNEL = ObjectIdentifier("1.3.6.1.5.5.7.3.6")
 IPSEC_USER = ObjectIdentifier("1.3.6.1.5.5.7.3.7")
 
 
+def _escape_dn_value(val):
+    """Escape special characters in RFC4514 Distinguished Name value."""
+    if not val:
+        return ""
+
+    # See https://tools.ietf.org/html/rfc4514#section-2.4
+    val = val.replace("\\", "\\\\")
+    val = val.replace('"', '\\"')
+    val = val.replace("+", "\\+")
+    val = val.replace(",", "\\,")
+    val = val.replace(";", "\\;")
+    val = val.replace("<", "\\<")
+    val = val.replace(">", "\\>")
+    val = val.replace("\0", "\\00")
+
+    if val[0] in ("#", " "):
+        val = "\\" + val
+    if val[-1] == " ":
+        val = val[:-1] + "\\ "
+
+    return val
+
+
 class _PrincipalName(univ.Sequence):
     componentType = namedtype.NamedTypes(
         namedtype.NamedType(
@@ -122,6 +145,16 @@ class CertificateProxy:
         "decipher_only": "decipherOnly",
     }
 
+    SUBJECT_SHORT_PARAM_MAP = {
+        "country": "C",
+        "state": "ST",
+        "locality": "L",
+        "organization": "O",
+        "organizational_unit": "OU",
+        "contact_email": "emailAddress",
+        "common_name": "CN",
+    }
+
     def __init__(self, module):
         self.cert_data = {}
         self._x509_obj = None
@@ -144,8 +177,7 @@ class CertificateProxy:
         ]
         info = {k: v for k, v in params.items() if k in map_attrs}
 
-        info["common_name"] = cert_like._get_common_name_from_params(params)
-
+        info["subject"] = cls._get_subject_from_params(params)
         if info.get("ip"):
             info["ip"] = [
                 ipaddress.ip_address(six.ensure_text(ip)) for ip in info["ip"] if ip
@@ -223,11 +255,43 @@ class CertificateProxy:
         info["dns"] = self._get_san_values(x509.DNSName)
         info["ip"] = self._get_san_values(x509.IPAddress)
         info["email"] = self._get_san_values(x509.RFC822Name)
-        info["common_name"] = self._get_subject_values(NameOID.COMMON_NAME)
         info["principal"] = self._get_san_values(x509.OtherName, KRB5PrincipalName)
         info["key_usage"] = self._get_key_usage()
         info["extended_key_usage"] = self._get_extended_key_usage()
+        info["subject"] = self._get_subject_from_x509()
         return info
+
+    @classmethod
+    def _get_subject_from_params(cls, params):
+        subject = {k: v for k, v in params.items() if k in cls.SUBJECT_SHORT_PARAM_MAP}
+        subject["common_name"] = cls._get_common_name_from_params(params)
+        return cls._format_subject(**subject)
+
+    @classmethod
+    def _format_subject(cls, **kwargs):
+        # Ideally we should be using cryptography.x509.Name.rfc4514_string()
+        #   but since the method is only available for cryptography >= 2.5,
+        #   we are building the string manually using _escape_dn_value.
+        subject = []
+        for param_name, short_name in cls.SUBJECT_SHORT_PARAM_MAP.items():
+            value = kwargs.get(param_name)
+            if value:
+                subject.append("{}={}".format(short_name, _escape_dn_value(value)))
+        return ",".join(subject)
+
+    def _get_subject_from_x509(self):
+        subject = {
+            "country": self._get_subject_values(NameOID.COUNTRY_NAME),
+            "state": self._get_subject_values(NameOID.STATE_OR_PROVINCE_NAME),
+            "locality": self._get_subject_values(NameOID.LOCALITY_NAME),
+            "organization": self._get_subject_values(NameOID.ORGANIZATION_NAME),
+            "organizational_unit": self._get_subject_values(
+                NameOID.ORGANIZATIONAL_UNIT_NAME
+            ),
+            "contact_email": self._get_subject_values(NameOID.EMAIL_ADDRESS),
+            "common_name": self._get_subject_values(NameOID.COMMON_NAME),
+        }
+        return self._format_subject(**subject)
 
     @property
     def auto_renew(self):
@@ -263,6 +327,11 @@ class CertificateProxy:
     def common_name(self):
         """Return the certificate common_name."""
         return self.cert_data.get("common_name")
+
+    @property
+    def subject(self):
+        """Return the certificate subject."""
+        return self.cert_data.get("subject") or ""
 
     @property
     def principal(self):

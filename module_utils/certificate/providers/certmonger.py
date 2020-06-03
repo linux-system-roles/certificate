@@ -167,8 +167,8 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
             command += ["request"]
 
         # Set common name
-        if self.csr.common_name:
-            command += ["-N", self.csr.common_name]
+        if self.csr.subject:
+            command += ["-N", self.csr.subject]
 
         # Set CA
         command += ["-c", self._get_certmonger_ca_from_params()]
