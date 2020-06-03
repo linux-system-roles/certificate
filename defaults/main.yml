@@ -4,3 +4,4 @@
 # This file also serves as a documentation for such a variables.
 
 certificate_requests: []
+certificate_wait: yes
