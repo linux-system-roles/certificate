@@ -103,6 +103,12 @@ options:
     default:
       - id-kp-serverAuth
       - id-kp-clientAuth
+  auto_renew:
+    description:
+      - Indicates if the certificate should be renewed
+        automatically before it expires.
+    required: false
+    default: true
 author:
   - Sergio Oliveira Campos (@seocam)
 """
@@ -181,6 +187,14 @@ EXAMPLES = """
       - id-kp-clientAuth
       - id-kp-serverAuth
     ca: self-sign
+
+# Don't renew certificate automatically
+- name: Issue cert without auto-renew
+  certificate_request:
+    name: mycert
+    dns: www.example.com
+    auto_renew: no
+    ca: self-sign
 """
 
 RETURN = ""
@@ -250,6 +264,7 @@ class CertificateRequestModule(AnsibleModule):
                 type="list", choices=KEY_USAGE_CHOICES, default=KEY_USAGE_DEFAULTS
             ),
             extended_key_usage=dict(type="list", default=EXTENDED_KEY_USAGE_DEFAULTS),
+            auto_renew=dict(type="bool", default=True),
         )
 
     @property

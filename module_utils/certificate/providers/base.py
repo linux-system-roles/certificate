@@ -140,6 +140,7 @@ class CertificateProxy:
             "key_usage",
             "extended_key_usage",
             "principal",
+            "auto_renew",
         ]
         info = {k: v for k, v in params.items() if k in map_attrs}
 
@@ -183,7 +184,7 @@ class CertificateProxy:
         return common_name
 
     @classmethod
-    def load_from_pem(cls, module, cert_pem=None, csr_pem=None):
+    def load_from_pem(cls, module, cert_pem=None, csr_pem=None, auto_renew=False):
         """Return a CertificateProxy object initialized from PEM data.
 
         The argument `cert_pem` it's a certificate in PEM format. The argument
@@ -207,7 +208,9 @@ class CertificateProxy:
             return None
 
         cert_like = cls(module)
-        cert_like.cert_data = cert_like._get_info_from_x509(x509_obj)
+        info = cert_like._get_info_from_x509(x509_obj)
+        info["auto_renew"] = auto_renew
+        cert_like.cert_data = info
         return cert_like
 
     def _get_info_from_x509(self, x509_obj):
@@ -225,6 +228,11 @@ class CertificateProxy:
         info["key_usage"] = self._get_key_usage()
         info["extended_key_usage"] = self._get_extended_key_usage()
         return info
+
+    @property
+    def auto_renew(self):
+        """Return the auto_renew flag for the certificate."""
+        return self.cert_data.get("auto_renew") or False
 
     @property
     def dns(self):
@@ -423,9 +431,10 @@ class CertificateRequestBaseProvider:
             else:
                 csr_pem = self.get_existing_csr_pem_data()
                 cert_pem = self.get_existing_certificate_pem_data()
+                auto_renew = self.get_existing_certificate_auto_renew_flag()
 
                 self._existing_certificate = self.certificate_proxy_class.load_from_pem(
-                    self.module, cert_pem, csr_pem,
+                    self.module, cert_pem, csr_pem, auto_renew,
                 )
         return self._existing_certificate
 
@@ -517,6 +526,11 @@ class CertificateRequestBaseProvider:
                 return cert_file.read().encode("utf-8")
         except FileNotFoundError:
             return False
+
+    @abstractmethod
+    def get_existing_certificate_auto_renew_flag(self):
+        """Check if the existing certificate is configured for auto renew."""
+        raise NotImplementedError
 
     @abstractmethod
     def get_existing_csr_pem_data(self):
