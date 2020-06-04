@@ -78,6 +78,31 @@ options:
     description:
       - Kerberos principal.
     required: false
+  key_usage:
+    description:
+      - Allowed Key Usage for the certificate.
+    choices:
+      - digitalSignature
+      - nonRepudiation
+      - keyEncipherment
+      - dataEncipherment
+      - keyAgreement
+      - keyCertSign
+      - cRLSign
+      - encipherOnly
+      - decipherOnly
+    required: false
+    default:
+      - digitalSignature
+      - keyEncipherment
+  extended_key_usage:
+    description:
+      - Extended Key Usage attributes to be present in the
+        certificate request.
+    required: false
+    default:
+      - id-kp-serverAuth
+      - id-kp-clientAuth
 author:
   - Sergio Oliveira Campos (@seocam)
 """
@@ -142,12 +167,49 @@ EXAMPLES = """
     dns: www.example.com
     principal: HTTP/www.example.com@EXAMPLE.com
     ca: self-sign
+
+# Setting key_usage and extended_key_usage
+- name: Key with specific values for key_usage and extended_key_usage
+  certificate_request:
+    name: mycert
+    dns: www.example.com
+    key_usage:
+      - digitalSignature
+      - nonRepudiation
+      - keyEncipherment
+    extended_key_usage:
+      - id-kp-clientAuth
+      - id-kp-serverAuth
+    ca: self-sign
 """
 
 RETURN = ""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.certificate.providers import PROVIDERS
+
+
+KEY_USAGE_CHOICES = [
+    "digitalSignature",
+    "nonRepudiation",
+    "keyEncipherment",
+    "dataEncipherment",
+    "keyAgreement",
+    "keyCertSign",
+    "cRLSign",
+    "encipherOnly",
+    "decipherOnly",
+]
+
+KEY_USAGE_DEFAULTS = [
+    "digitalSignature",
+    "keyEncipherment",
+]
+
+EXTENDED_KEY_USAGE_DEFAULTS = [
+    "id-kp-serverAuth",
+    "id-kp-clientAuth",
+]
 
 
 class CertificateRequestModule(AnsibleModule):
@@ -184,6 +246,10 @@ class CertificateRequestModule(AnsibleModule):
             owner=dict(type="str"),
             group=dict(type="str"),
             principal=dict(type="list"),
+            key_usage=dict(
+                type="list", choices=KEY_USAGE_CHOICES, default=KEY_USAGE_DEFAULTS
+            ),
+            extended_key_usage=dict(type="list", default=EXTENDED_KEY_USAGE_DEFAULTS),
         )
 
     @property

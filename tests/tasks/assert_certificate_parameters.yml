@@ -91,3 +91,49 @@
       - (result.stdout | int) == (cert["key_size"] | default(2048) | int)
     fail_msg: |
       key_size {{ result.stdout }} != {{ cert['key_size'] | default(2048) }}
+
+- name: Retrieve certificate Key Usage
+  shell: >-
+    openssl x509 -in {{ cert['path'] }} -noout -ext keyUsage |
+    grep 'Key Usage' -A1 |
+    tail -1 |
+    tr , '\n' |
+    sed 's/^\s\+//g'
+  register: result
+  changed_when: false
+
+- name: Verify certificate Key Usage
+  vars:
+    default_ku:
+      - Digital Signature
+      - Key Encipherment
+  assert:
+    that:
+      - (cert['key_usage'] | default(default_ku)) == result.stdout_lines
+    fail_msg: >-
+      {{ cert['key_usage'] | default(default_ku) }} !=
+      {{ result.stdout_lines }}
+
+- name: Retrieve certificate Extended Key Usage
+  shell: >-
+    openssl x509 -in {{ cert['path'] }} -noout -ext extendedKeyUsage |
+    grep 'Extended Key Usage' -A1 |
+    tail -1 |
+    tr , '\n' |
+    sed 's/^\s\+//g'
+  register: result
+  changed_when: false
+
+- name: Verify certificate Extended Key Usage
+  vars:
+    default_eku:
+      - TLS Web Server Authentication
+      - TLS Web Client Authentication
+  assert:
+    that:
+      - (
+          cert['extended_key_usage'] | default(default_eku)
+        ) == result.stdout_lines
+    fail_msg: >-
+      {{ cert['extended_key_usage'] | default(default_eku) }} !=
+      {{ result.stdout_lines }}
