@@ -70,6 +70,10 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
             return None
         return csr.encode("utf-8")
 
+    def get_existing_certificate_auto_renew_flag(self):
+        """Check if the existing certificate is configured for auto renew."""
+        return bool(int(self._certmonger_metadata.get("autorenew", "0")))
+
     def _get_certmonger_ca_from_params(self):
         ca = self.module.params.get("ca")
         if ca == "self-sign":
@@ -107,6 +111,33 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         if self._certmonger_metadata:
             return True
         return False
+
+    def set_auto_renew(self, auto_renew):
+        """Set the auto_renew flag using the appropriate getcert command."""
+        if not self.exists_in_certmonger:
+            # When creating a new cert just set the auto/no-auto renew param
+            if auto_renew:
+                command = ["-r"]
+            else:
+                command = ["-R"]
+            return command
+
+        # If certificate exists in certmonger it will require a different
+        #   command to update the auto_renew flag
+        getcert_bin = self.module.get_bin_path("getcert", required=True)
+        track_command = [
+            getcert_bin,
+            "start-tracking",
+            "-f",
+            self.certificate_file_path,
+        ]
+        if auto_renew:
+            track_command += ["-r"]
+        else:
+            track_command += ["-R"]
+        self._run_command(track_command, check_rc=True)
+
+        return []
 
     def request_certificate(self):
         """Issue or update a certificate using certmonger."""
@@ -150,9 +181,8 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         else:
             command += ["-E", ""]
 
-        if not self.exists_in_certmonger:
-            # Don't attempt to renew when near to expiration
-            command += ["-R"]
+        # Set auto_renew
+        command += self.set_auto_renew(self.csr.auto_renew)
 
         # Set certificate key size
         command += ["-g", str(self.module.params.get("key_size"))]

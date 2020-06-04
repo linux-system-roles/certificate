@@ -137,3 +137,19 @@
     fail_msg: >-
       {{ cert['extended_key_usage'] | default(default_eku) }} !=
       {{ result.stdout_lines }}
+
+- name: Retrieve auto-renew flag
+  shell: >-
+    getcert list -f {{ cert['path'] }} |
+    grep 'auto-renew' |
+    sed 's/^\s\+auto-renew: //g'
+  register: result
+  changed_when: false
+
+- name: Verify certificate auto-renew flag
+  assert:
+    that:
+      - (cert['auto_renew'] | default('yes') | bool) == (result.stdout | bool)
+    fail_msg: >-
+      {{ cert['auto_renew'] | default('yes') | bool }} !=
+      {{ result.stdout | bool }}

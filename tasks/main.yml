@@ -65,4 +65,5 @@
     key_size: "{{ item.key_size | default(omit) }}"
     key_usage: "{{ item.key_usage | default(omit) }}"
     extended_key_usage: "{{ item.extended_key_usage | default(omit) }}"
+    auto_renew: "{{ item.auto_renew | default(omit) }}"
   loop: "{{ certificate_requests }}"
