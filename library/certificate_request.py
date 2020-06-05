@@ -109,6 +109,13 @@ options:
         automatically before it expires.
     required: false
     default: true
+  wait:
+    description:
+      - If the role should block while waiting for the certificate
+        to be issued.
+    required: false
+    default: true
+
 author:
   - Sergio Oliveira Campos (@seocam)
 """
@@ -195,6 +202,15 @@ EXAMPLES = """
     dns: www.example.com
     auto_renew: no
     ca: self-sign
+
+# Not wait for certificate to be issued
+- name: Ensure certificate exists but don't wait for it
+  certificate_request:
+    name: single-example
+    dns: www.example.com
+    wait: no
+    ca: self-sign
+
 """
 
 RETURN = ""
@@ -265,6 +281,7 @@ class CertificateRequestModule(AnsibleModule):
             ),
             extended_key_usage=dict(type="list", default=EXTENDED_KEY_USAGE_DEFAULTS),
             auto_renew=dict(type="bool", default=True),
+            wait=dict(type="bool", default=True),
         )
 
     @property

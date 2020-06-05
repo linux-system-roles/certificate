@@ -1,0 +1,13 @@
+---
+- hosts: all
+  become: true
+
+  vars:
+    certificate_wait: no
+    certificate_requests:
+      - name: mycert
+        dns: www.example.com
+        ca: self-sign
+
+  roles:
+    - linux-system-roles.certificate

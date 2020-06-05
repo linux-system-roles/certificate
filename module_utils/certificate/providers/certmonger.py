@@ -139,6 +139,22 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
 
         return []
 
+    def _set_user_and_group_if_different(self):
+        if self.module.params.get("wait"):
+            return super(
+                CertificateRequestCertmongerProvider, self,
+            )._set_user_and_group_if_different()
+
+        if self.module.params.get("owner") or self.module.params.get("group"):
+            self.module.fail_json(
+                msg=(
+                    "Cannot set 'owner' or 'group' when "
+                    "'wait=no' and provider='certmonger'."
+                )
+            )
+
+        return False
+
     def request_certificate(self):
         """Issue or update a certificate using certmonger."""
         # pylint: disable=useless-else-on-loop
@@ -157,8 +173,9 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         # Set CA
         command += ["-c", self._get_certmonger_ca_from_params()]
 
-        # Wait for cert
-        command += ["-w"]
+        # Wait for cert if required
+        if self.module.params["wait"]:
+            command += ["-w"]
 
         # Set certificate locations
         if not self.exists_in_certmonger:
