@@ -2,7 +2,7 @@
 - name: Clone ansible-freeipa repo
   git:
     repo: https://github.com/freeipa/ansible-freeipa
-    version: v0.1.10
+    version: v0.1.12
     dest: /tmp/freeipa-repo
   delegate_to: 127.0.0.1
   become: false
@@ -21,6 +21,11 @@
 - name: Set hostname
   hostname:
     name: ipaserver.test.local
+
+- name: Ensure nss package is up-to-date
+  package:
+    name: nss
+    state: latest
 
 - include_role:
     name: ipaserver
