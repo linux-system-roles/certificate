@@ -27,7 +27,8 @@
     certificates:
       - path: /etc/pki/tls/certs/mycert.crt
         key_path: /etc/pki/tls/private/mycert.key
-        subject: CN=www.example.com
+        subject:
+          - CN=www.example.com
         subject_alt_name:
           - DNS:www.example.com
         key_usage:

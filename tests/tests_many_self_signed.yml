@@ -23,17 +23,20 @@
     certificates:
       - path: /etc/pki/tls/certs/mycert.crt
         key_path: /etc/pki/tls/private/mycert.key
-        subject: CN=www.example.com
+        subject:
+          - CN=www.example.com
         subject_alt_name:
           - DNS:www.example.com
       - path: /tmp/other-cert.crt
         key_path: /tmp/other-cert.key
-        subject: CN=www.example.org
+        subject:
+          - CN=www.example.org
         subject_alt_name:
           - DNS:www.example.org
       - path: /tmp/another-cert.crt
         key_path: /tmp/another-cert.key
-        subject: CN=www.example.net
+        subject:
+          - CN=www.example.net
         subject_alt_name:
           - DNS:www.example.net
   tasks:
