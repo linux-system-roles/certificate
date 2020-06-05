@@ -1,11 +1,22 @@
 ---
+- name: Set __is_beaker_env
+  set_fact:
+    __is_beaker_env: "{{ lookup('env', 'BEAKERLIB') != '' }}"
+
+- name: Install ansible-freeipa
+  package:
+    name: ansible-freeipa
+  delegate_to: 127.0.0.1
+  when: __is_beaker_env
+
 - name: Clone ansible-freeipa repo
   git:
     repo: https://github.com/freeipa/ansible-freeipa
-    version: v0.1.10
+    version: v0.1.12
     dest: /tmp/freeipa-repo
   delegate_to: 127.0.0.1
   become: false
+  when: not __is_beaker_env
 
 - name: Create role symlinks
   file:
@@ -17,13 +28,49 @@
   loop:
     - ipaserver
     - ipaclient
+  when: not __is_beaker_env
 
 - name: Set hostname
   hostname:
     name: ipaserver.test.local
 
-- include_role:
-    name: ipaserver
+- name: Ensure nss package is up-to-date
+  package:
+    name: nss
+    state: latest
+  when: ansible_facts.os_family == "RedHat"
+
+- name: Run IPA server install
+  block:
+    - include_role:
+        name: ipaserver
+  rescue:
+    - name: FAILURE - check entropy
+      command: cat /proc/sys/kernel/random/entropy_avail
+    - name: FAILURE - get logs for debugging
+      archive:
+        dest: /tmp/ipalogs.tgz
+        path:
+          - /var/log/messages
+          - /var/log/ipaserver-install.log
+          - /var/log/ipaclient-install.log
+          - /var/log/pki
+    - name: FAILURE - grab archive
+      fetch:
+        src: /tmp/ipalogs.tgz
+        dest: "{{ local_log_dir }}/ipalogs.tgz"
+        flat: true
+    - name: FAILURE - unpack archive
+      unarchive:
+        src: "{{ local_log_dir }}/ipalogs.tgz"
+        dest: "{{ local_log_dir }}"
+        mode: 0644
+        list_files: true
+        remote_src: true
+      delegate_to: 127.0.0.1
+    - fail:
+        msg: failed
+
   vars:
     ipaserver_setup_dns: yes
     ipaserver_auto_forwarders: yes
@@ -31,3 +78,5 @@
     ipadm_password: SomeDMpassword
     ipaserver_domain: test.local
     ipaserver_realm: TEST.LOCAL
+    ipaserver_no_dnssec_validation: yes
+    local_log_dir: "{{ lookup('env', 'TEST_ARTIFACTS') | d('/tmp', true) }}"
