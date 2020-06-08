@@ -9,6 +9,9 @@
         dns: www.example.com
         ca: self-sign
         auto_renew: no
+      - name: /tmp/defaultcert
+        dns: www.example.com
+        ca: self-sign
   roles:
     - linux-system-roles.certificate
 
@@ -24,6 +27,13 @@
         subject_alt_name:
           - DNS:www.example.com
         auto_renew: no
+      - path: /tmp/defaultcert.crt
+        key_path: /tmp/defaultcert.key
+        subject:
+          - CN=www.example.com
+        subject_alt_name:
+          - DNS:www.example.com
+        auto_renew: yes
   tasks:
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml
