@@ -1,3 +1,5 @@
+from distutils.version import StrictVersion
+
 import dbus
 
 from .base import CertificateRequestBaseProvider
@@ -52,6 +54,26 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         super(CertificateRequestCertmongerProvider, self).__init__(*args, **kwargs)
         self._certmonger_dbus = CertmongerDBus()
         self._certmonger_metadata = self._get_certmonger_request()
+        self._version = None
+
+    @property
+    def certmonger_version(self):
+        """Return the certmonger version (the first found in PATH)."""
+        if self._version is None:
+            certmonger_bin = self.module.get_bin_path("certmonger", required=True)
+            certmonger_version_cmd = [certmonger_bin, "--version"]
+            ret, out, err = self._run_command(certmonger_version_cmd, check_rc=False)
+            if ret == 0 and not err:
+                version_str = out.split(" ")[1]
+                self._version = StrictVersion(version_str)
+            else:
+                self.module.fail_json(
+                    msg="Could not get certmonger version using '{}'".format(
+                        " ".join(certmonger_version_cmd),
+                    )
+                )
+
+        return self._version
 
     def module_input_validation(self):
         """Validate module input."""
@@ -233,7 +255,9 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         command += self.set_auto_renew(self.csr.auto_renew)
 
         # Set certificate key size
-        command += ["-g", str(self.module.params.get("key_size"))]
+        allow_key_size_update = self.certmonger_version >= StrictVersion("0.79.0")
+        if not self.exists_in_certmonger or allow_key_size_update:
+            command += ["-g", str(self.module.params.get("key_size"))]
 
         self.module.debug("Certmonger command: {}".format(command))
 
