@@ -1,3 +1,4 @@
+import hashlib
 import os
 import ipaddress
 
@@ -13,6 +14,7 @@ from pyasn1.codec.der import decoder
 from pyasn1.type import char, namedtype, tag, univ
 
 from ansible.module_utils import six
+from ansible.module_utils._text import to_bytes
 
 if six.PY2:
     FileNotFoundError = IOError  # pylint: disable=redefined-builtin
@@ -456,6 +458,7 @@ class CertificateRequestBaseProvider:
 
         self._existing_certificate = None
         self._csr = None
+        self._request_id = None
 
     def _run_command(self, *args, **kwargs):
         """Proxy run_command from Ansible module.
@@ -526,6 +529,32 @@ class CertificateRequestBaseProvider:
         """Path where key should be placed."""
         return self._get_store_location(key=True)
 
+    def _get_hook_script_path(self, dirname):
+        script_name = "{cert_name}-{request_id}.sh".format(
+            cert_name=os.path.basename(self.module.params.get("name")),
+            request_id=self.request_id,
+        )
+        provider_config_directory = self.module.params.get("provider_config_directory")
+        return os.path.join(provider_config_directory, dirname, script_name)
+
+    @property
+    def pre_run_script_path(self):
+        """Path to pre-run script."""
+        return self._get_hook_script_path("pre-scripts")
+
+    @property
+    def post_run_script_path(self):
+        """Path to post-run script."""
+        return self._get_hook_script_path("post-scripts")
+
+    def _convert_hook_param_to_script(self, param_name):
+        param = self.module.params.get(param_name)
+        if not param:
+            return None
+
+        script = ["#!/bin/bash", "", param]
+        return "\n".join(script)
+
     @property
     def cert_needs_update(self):
         """Verify if the existing certificate needs to be updated."""
@@ -585,6 +614,11 @@ class CertificateRequestBaseProvider:
             else:
                 self.message += "is up-to-date."
 
+        hooks_updated = self.create_or_update_hook_scripts(check_mode)
+        if hooks_updated:
+            self.message += " Pre/Post run hooks updated."
+            issue_or_update_cert = True
+
         if issue_or_update_cert and not check_mode:
             self.request_certificate()
 
@@ -592,6 +626,59 @@ class CertificateRequestBaseProvider:
         if updated_fs_attrs:
             self.message += " File attributes updated."
         self._exit_success()
+
+    def _write_param_to_file_if_diff(self, param_name, filepath, check_mode):
+        param = self._convert_hook_param_to_script(param_name)
+        file_exists = os.path.exists(filepath)
+
+        # Remove script if param is empty
+        if not param:
+            if file_exists:
+                os.unlink(filepath)
+                return True
+            return False
+
+        # Calculate file SHA1
+        file_sha1 = ""
+        if file_exists:
+            file_sha1 = self.module.sha1(filepath)
+
+        # Calculate pamam SHA1
+        param_sha1 = hashlib.sha1(to_bytes(param)).hexdigest()
+
+        # if file and param are the same just return
+        if param_sha1 == file_sha1:
+            return False
+
+        # Changes needs to be performed.
+
+        # If check mode return withot modifications
+        if check_mode:
+            return True
+
+        # Perform the actual changes
+        with open(filepath, "w") as script_fp:
+            script_fp.write(param)
+
+        self.module.set_mode_if_different(filepath, "770", True)
+
+        return True
+
+    def create_or_update_hook_scripts(self, check_mode):
+        """Create or update pre/post run scripts.
+
+        Create the pre/post run scripts if they don't exist.
+        If it exists use SHA1 sum to verify if the files need update.
+        In case the script exists and is not longer needed it will be
+        removed.
+        """
+        run_before_changed = self._write_param_to_file_if_diff(
+            "run_before", self.pre_run_script_path, check_mode
+        )
+        run_after_changed = self._write_param_to_file_if_diff(
+            "run_after", self.post_run_script_path, check_mode
+        )
+        return run_before_changed or run_after_changed
 
     def get_existing_certificate_pem_data(self):
         """Read the PEM data for a certificate from it's file.
@@ -603,6 +690,18 @@ class CertificateRequestBaseProvider:
                 return cert_file.read().encode("utf-8")
         except FileNotFoundError:
             return False
+
+    @property
+    def request_id(self):
+        """Return an unique identifier for this certificate request.
+
+        This property caches the result of the method `_get_request_id`.
+        """
+        if not self._request_id:
+            self._request_id = hashlib.sha1(
+                to_bytes(self.certificate_file_path)
+            ).hexdigest()[:7]
+        return self._request_id
 
     @abstractmethod
     def get_existing_csr_pem_data(self):

@@ -253,5 +253,15 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         else:
             command += ["-U", ""]
 
+        if self.module.params.get("run_before"):
+            command += ["-B", self.pre_run_script_path]
+        else:
+            command += ["-B", ""]
+
+        if self.module.params.get("run_after"):
+            command += ["-C", self.post_run_script_path]
+        else:
+            command += ["-C", ""]
+
         self._run_command(command, check_rc=True)
         self.changed = True

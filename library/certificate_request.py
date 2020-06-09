@@ -74,6 +74,11 @@ options:
         if I(name) is not an absolute path.
     required: false
     default: /etc/pki/tls
+  provider_config_directory:
+    description:
+      - Directory where pre/post run scripts will be stored.
+    required: false
+    default: /etc/certmonger
   principal:
     description:
       - Kerberos principal.
@@ -138,6 +143,14 @@ options:
   contact_email:
     description:
       - Contact email requested for the certificate subject.
+    required: false
+  run_before:
+    description:
+      - Command that should run before saving the certificate.
+    required: false
+  run_after:
+    description:
+      - Command that should run after saving the certificate.
     required: false
 
 author:
@@ -247,6 +260,17 @@ EXAMPLES = """
     organizational_unit: Linux
     contact_email: admin@example.com
     ca: self-sign
+
+# Run commands before and after certificate is issued
+- name: Issue cert without auto-renew
+  certificate_request:
+    name: /tmp/cert-place/mycert
+    dns: www.example.com
+    run_before: >
+      mkdir /tmp/cert-place/
+    run_after: >
+      touch /tmp/cert-place/certificate_updated
+    ca: self-sign
 """
 
 RETURN = ""
@@ -313,6 +337,7 @@ class CertificateRequestModule(AnsibleModule):
             contact_email=dict(type="str"),
             ca=dict(type="str", required=True),
             directory=dict(type="str", default="/etc/pki/tls"),
+            provider_config_directory=dict(type="str", default="/etc/certmonger"),
             provider=dict(type="str", default="certmonger"),
             key_size=dict(type="int", default=2048),
             owner=dict(type="str"),
@@ -324,6 +349,8 @@ class CertificateRequestModule(AnsibleModule):
             extended_key_usage=dict(type="list", default=EXTENDED_KEY_USAGE_DEFAULTS),
             auto_renew=dict(type="bool", default=True),
             wait=dict(type="bool", default=True),
+            run_before=dict(type="str"),
+            run_after=dict(type="str"),
         )
 
     @property
