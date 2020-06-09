@@ -1,4 +1,16 @@
 ---
+- name: Ensure UID and GID exists
+  hosts: all
+  become: true
+  tasks:
+    - name: Ensure user exists
+      user:
+        name: user1
+        uid: 1040
+    - name: Ensure group "somegroup" exists
+      group:
+        name: somegroup
+        gid: 1041
 - name: Issue certificate setting user/group
   hosts: all
   become: true
@@ -9,6 +21,12 @@
         owner: ftp
         group: ftp
         ca: self-sign
+      - name: certid
+        dns: www.example.com
+        owner: 1040
+        group: 1041
+        ca: self-sign
+
   roles:
     - linux-system-roles.certificate
 
@@ -25,6 +43,14 @@
           - DNS:www.example.com
         owner: ftp
         group: ftp
+      - path: /etc/pki/tls/certs/certid.crt
+        key_path: /etc/pki/tls/private/certid.key
+        subject:
+          - CN=www.example.com
+        subject_alt_name:
+          - DNS:www.example.com
+        owner: 1040
+        group: 1041
   tasks:
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml
