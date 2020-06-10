@@ -34,6 +34,58 @@
       when: |
         __certificate_provider_vars[__certificate_provider].packages is defined
 
+    - name: Ensure pre-scripts hooks directory exists
+      file:
+        name: >-
+          {{ __certificate_provider_vars[
+            __certificate_provider
+          ].config_dir }}/pre-scripts
+        owner: >-
+          {{ __certificate_provider_vars[
+            __certificate_provider
+          ].hooks_dirs_owner }}
+        group: >-
+          {{ __certificate_provider_vars[
+            __certificate_provider
+          ].hooks_dirs_group }}
+        mode: >-
+          {{ __certificate_provider_vars[
+            __certificate_provider
+          ].hooks_dirs_mode }}
+        state: directory
+      loop: "{{ __certificate_providers }}"
+      loop_control:
+        loop_var: __certificate_provider
+      when: |
+        __certificate_provider_vars[__certificate_provider].config_dir
+        is defined
+
+    - name: Ensure post-scripts hooks directory exists
+      file:
+        name: >-
+          {{ __certificate_provider_vars[
+            __certificate_provider
+          ].config_dir }}/post-scripts
+        owner: >-
+          {{ __certificate_provider_vars[
+            __certificate_provider
+          ].hooks_dirs_owner }}
+        group: >-
+          {{ __certificate_provider_vars[
+            __certificate_provider
+          ].hooks_dirs_group }}
+        mode: >-
+          {{ __certificate_provider_vars[
+            __certificate_provider
+          ].hooks_dirs_mode }}
+        state: directory
+      loop: "{{ __certificate_providers }}"
+      loop_control:
+        loop_var: __certificate_provider
+      when: |
+        __certificate_provider_vars[__certificate_provider].config_dir
+        is defined
+
     # While most Linux system roles have a list of services
     #   this role doesn't need it. In fact some providers
     #   won't have any service at all.
@@ -61,6 +113,11 @@
     provider: "{{ item.provider | default(omit) }}"
     principal: "{{ item.principal | default(omit) }}"
     directory: "{{ __certificate_default_directory }}"
+    provider_config_directory: >-
+      {{ __certificate_provider_vars[item.provider].config_dir
+         if item.provider is defined
+           and item.provider in __certificate_provider_vars
+         else omit }}
     key_size: "{{ item.key_size | default(omit) }}"
     key_usage: "{{ item.key_usage | default(omit) }}"
     extended_key_usage: "{{ item.extended_key_usage | default(omit) }}"
@@ -72,5 +129,7 @@
     organization: "{{ item.organization | default(omit) }}"
     organizational_unit: "{{ item.organizational_unit | default(omit) }}"
     contact_email: "{{ item.contact_email | default(omit) }}"
+    run_before: "{{ item.run_before | default(omit) }}"
+    run_after: "{{ item.run_after | default(omit) }}"
     ca: "{{ item.ca | default(omit) }}"
   loop: "{{ certificate_requests }}"

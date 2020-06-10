@@ -9,3 +9,7 @@ __certificate_provider_vars:
     packages:
       - certmonger
     service: certmonger
+    config_dir: /etc/certmonger/
+    hooks_dirs_owner: root
+    hooks_dirs_group: root
+    hooks_dirs_mode: "0700"
