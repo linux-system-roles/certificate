@@ -1,0 +1,33 @@
+---
+- name: Clone ansible-freeipa repo
+  git:
+    repo: https://github.com/freeipa/ansible-freeipa
+    version: v0.1.10
+    dest: /tmp/freeipa-repo
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create role symlinks
+  file:
+    src: "/tmp/freeipa-repo/roles/{{ item }}/"
+    dest: "{{ playbook_dir }}/roles/{{ item }}"
+    state: link
+  delegate_to: 127.0.0.1
+  become: false
+  loop:
+    - ipaserver
+    - ipaclient
+
+- name: Set hostname
+  hostname:
+    name: ipaserver.test.local
+
+- include_role:
+    name: ipaserver
+  vars:
+    ipaserver_setup_dns: yes
+    ipaserver_auto_forwarders: yes
+    ipaadmin_password: SomeADMINpassword
+    ipadm_password: SomeDMpassword
+    ipaserver_domain: test.local
+    ipaserver_realm: TEST.LOCAL

@@ -137,3 +137,7 @@ dmypy.json
 
 # yamllint tmp output
 .yamllint
+
+# Ignore role links
+tests/roles/ipaclient
+tests/roles/ipaserver

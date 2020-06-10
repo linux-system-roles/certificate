@@ -568,6 +568,8 @@ class CertificateRequestBaseProvider:
 
     def run(self, check_mode=False):
         """Entry point for the providers called from the actual Ansible module."""
+        self.module_input_validation()
+
         if check_mode:
             self.message += "(Check mode) "
 
@@ -603,15 +605,24 @@ class CertificateRequestBaseProvider:
             return False
 
     @abstractmethod
+    def get_existing_csr_pem_data(self):
+        """Read the PEM data for a CSR.
+
+        Must be implemented by the provider.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     def get_existing_certificate_auto_renew_flag(self):
         """Check if the existing certificate is configured for auto renew."""
         raise NotImplementedError
 
     @abstractmethod
-    def get_existing_csr_pem_data(self):
-        """Read the PEM data for a CSR.
+    def module_input_validation(self):
+        """Validate module input params.
 
-        Must be implemented by the provider.
+        Validates the input parameters and it's combinations.
+        Needs to be implemented by each provider.
         """
         raise NotImplementedError
 

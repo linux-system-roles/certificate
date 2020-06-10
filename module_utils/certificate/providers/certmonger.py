@@ -53,6 +53,35 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         self._certmonger_dbus = CertmongerDBus()
         self._certmonger_metadata = self._get_certmonger_request()
 
+    def module_input_validation(self):
+        """Validate module input."""
+        principal = self.module.params.get("principal") or []
+        ca = self.module.params.get("ca")
+
+        # 'IPA' CA requires principal to be set
+        if ca.lower() == "ipa" and not principal:
+            self.module.fail_json(
+                msg=("Principal parameter is mandatory for 'ipa' CA.")
+            )
+
+        # Validate principal format
+        for single_principal in principal:
+            try:
+                primary, instance_realm = single_principal.split("/")
+                instance, realm = instance_realm.split("@")
+            except ValueError:
+                invalid_principal = True
+            else:
+                invalid_principal = False
+
+            if invalid_principal or not all([primary, instance, realm]):
+                self.module.fail_json(
+                    msg=(
+                        "Invalid principal '{}'. It should be formatted as "
+                        "'primary/instance@REALM'".format(single_principal)
+                    )
+                )
+
     def _get_certmonger_request(self):
         """Search for certificate metadata in Certmonger using DBUS."""
         for request in self._certmonger_dbus.get_requests():
@@ -78,6 +107,8 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         ca = self.module.params.get("ca")
         if ca == "self-sign":
             ca = "local"
+        elif ca.upper() == "IPA":
+            ca = "IPA"
         return ca
 
     def _get_certmonger_ca_for_existing_cert(self):
