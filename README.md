@@ -7,7 +7,6 @@ Linux system role to issue and renew SSL certificates.
 Basic usage:
 
 ```yaml
-
 ---
 - hosts: webserver
 
@@ -18,12 +17,11 @@ Basic usage:
         ca: self-sign
 
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 On a RPM-based system this will place the certificate in `/etc/pki/tls/certs/mycert.crt`
 and the key in `/etc/pki/tls/private/mycert.key`.
-
 
 ## Variables
 
@@ -60,7 +58,7 @@ Alternative Names (SAN).
 | group                | Group name (or group id) for the certificate and key files.                                       | str         | no       | *Group running Ansible* |
 | key\_size            | Generate keys with a specific keysize in bits.                                                    | int         | no       | 2048 - See [key\_size](#key_size) |
 | common\_name         | Common Name requested for the certificate subject.                                                | str         | no       | See [common\_name](#common_name)  |
-| country              | Country requested for the certificate subject.                                                    | str         | no       | -                       |
+| country              | Country code requested for the certificate subject.                                               | str         | no       | -                       |
 | state                | State requested for the certificate subject.                                                      | str         | no       | -                       |
 | locality             | Locality requested for the certificate subject (usually city).                                    | str         | no       | -                       |
 | organization         | Organization requested for the certificate subject.                                               | str         | no       | -                       |
@@ -145,13 +143,13 @@ stored in shell script files that later will be executed by the provider.
 
 | CA               | Providers   | CA description                                  | Requirements                                    |
 |------------------|-------------|-------------------------------------------------|-------------------------------------------------|
-| self&#x2011;sign | certmonger* | Issue self-signed certificates from a local CA. |                                                 |
+| self-sign | certmonger* | Issue self-signed certificates from a local CA. |                                                 |
 | ipa              | certmonger* | Issue certificates using the FreeIPA CA.        | Host needs to be enrolled in a FreeIPA server.  |
 
  *\* Default provider.*
 
 CA represents the CA certificates that will be used to issue and sign the
-requested certificate. Provider it's the method used to send the certificate
+requested certificate. Provider represents the method used to send the certificate
 request to the CA and then retrieve the signed certificate.
 
 If a user chooses `self-sign` CA, with `certmonger` as provider and, later on
@@ -170,7 +168,6 @@ directory for the distribution.
 
 
 ```yaml
-
 ---
 - hosts: webserver
 
@@ -181,7 +178,7 @@ directory for the distribution.
         ca: self-sign
 
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 The directories for each distribution are:
@@ -202,7 +199,6 @@ The example bellow will create a certificate file in
 `/another/path/mycert.crt` and a key file in `/another/path/mycert.key`.
 
 ```yaml
-
 ---
 - hosts: webserver
   vars:
@@ -212,13 +208,12 @@ The example bellow will create a certificate file in
         ca: self-sign
 
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 ### Certificates with multiple DNS, IP and Email
 
 ```yaml
-
 ---
 - hosts: webserver
   vars:
@@ -239,14 +234,13 @@ The example bellow will create a certificate file in
         ca: self-sign
 
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 
 ### Setting common subject options
 
 ```yaml
-
 ---
 - hosts: webserver
   vars:
@@ -262,14 +256,13 @@ The example bellow will create a certificate file in
         organizational_unit: platform
         email: admin@example.com
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 
 ### Setting the certificate key size
 
 ```yaml
-
 ---
 - hosts: webserver
   vars:
@@ -279,7 +272,7 @@ The example bellow will create a certificate file in
         ca: self-sign
         key_size: 4096
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 
@@ -287,7 +280,6 @@ The example bellow will create a certificate file in
 
 
 ```yaml
-
 ---
 - hosts: webserver
   vars:
@@ -303,7 +295,7 @@ The example bellow will create a certificate file in
           - id-kp-clientAuth
           - id-kp-serverAuth
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 
@@ -314,7 +306,6 @@ Because of that it's also possible to request the certificate but not
 actually wait for it.
 
 ```yaml
-
 ---
 - hosts: webserver
   vars:
@@ -324,14 +315,13 @@ actually wait for it.
         dns: www.example.com
         ca: self-sign
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 
 ### Set a principal
 
 ```yaml
-
 ---
 - hosts: webserver
   vars:
@@ -342,7 +332,7 @@ actually wait for it.
         principal: HTTP/www.example.com@EXAMPLE.COM
 
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 
@@ -352,7 +342,6 @@ By default certificates generated by the role will be set for
 auto-renewal. To disable that behavior set `auto_renew: no`.
 
 ```yaml
-
 ---
 - hosts: webserver
   vars:
@@ -363,7 +352,7 @@ auto-renewal. To disable that behavior set `auto_renew: no`.
         auto_renew: no
 
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 
@@ -373,7 +362,6 @@ If your host is enrolled in a FreeIPA server you will also have the option
 to use it's CA to issue your certificate. To do that just set `ca: ipa`.
 
 ```yaml
-
 ---
 - hosts: webserver
   vars:
@@ -384,7 +372,7 @@ to use it's CA to issue your certificate. To do that just set `ca: ipa`.
         ca: ipa
 
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 ### Running a command before or after a certificate is issued
@@ -395,7 +383,6 @@ renewed and another command just after. In order to do that use
 `run_before` and `run_after`.
 
 ```yaml
-
 ---
 - hosts: webserver
   vars:
@@ -407,7 +394,7 @@ renewed and another command just after. In order to do that use
         run_after: systemctl start webserver.service
 
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 ### Setting the certificate owner and group
@@ -419,7 +406,6 @@ owner and group are both set to httpd.
 
 
 ```yaml
-
 ---
 - hosts: webserver
   vars:
@@ -431,7 +417,7 @@ owner and group are both set to httpd.
         group: httpd
 
   roles:
-    - certificate
+    - linux-system-roles.certificate
 ```
 
 Please note that it's also possible to use UID and GID instead of
@@ -440,7 +426,7 @@ user and group names.
 
 ## Compatibility
 
-Currently supports CentOS / RHEL 7+.
+Currently supports CentOS 7+, RHEL 7+, Fedora.  Has been tested with Debian 10.
 
 
 ## Dependencies
@@ -451,7 +437,7 @@ In addition to those the `certmonger` provider (default) also depends on certmon
 
 ## License
 
-See LICENSE file.
+MIT
 
 
 ## Author Information
