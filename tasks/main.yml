@@ -16,12 +16,14 @@
 - name: Install and configure required providers
   vars:
     __certificate_providers: |
-      {{
-        certificate_requests |
-        map(attribute='provider', default=__certificate_provider_default) |
-        unique |
-        list
-      }}
+      {% set ns = namespace(unique_providers=[]) %}
+      {% for item in certificate_requests %}
+      {%   set _ = ns.unique_providers.append(
+             item.provider |
+             d(__certificate_provider_default)
+           ) %}
+      {% endfor %}
+      {{ ns.unique_providers | unique }}
   block:
     - name: Ensure provider packages are installed
       package:
