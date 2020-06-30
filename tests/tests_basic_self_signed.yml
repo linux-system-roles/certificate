@@ -28,3 +28,29 @@
       loop: "{{ certificates }}"
       loop_control:
         loop_var: cert
+
+- name: Issue self-signed certificate with nonexisting location.
+  hosts: all
+  become: true
+  vars:
+    certificate_requests:
+      - name: /tmpabc/other-cert
+        dns: www.example.org
+        ca: self-sign
+  tasks:
+    - vars:
+        expected_error_msg: >-
+          Path "/tmpabc": No such file or directory
+      block:
+        - import_role:
+            name: linux-system-roles.certificate
+        - fail:
+            msg: "Certificate issued with nonexistent path"
+      rescue:
+        - name: assert...
+          assert:
+            that:
+              - expected_error_msg in ansible_failed_result.results.0.stdout
+            fail_msg: >-
+              '{{ ansible_failed_result.results.0.stdout }}' !=
+              '{{ expected_error_msg }}'

@@ -30,3 +30,64 @@
       loop: "{{ certificates }}"
       loop_control:
         loop_var: cert
+
+- name: Test issuing certificate with invalid key_size
+  hosts: all
+  become: true
+
+  vars:
+    certificate_requests:
+      - name: /tmp/mycertsize
+        dns: www.example.com
+        ca: self-sign
+        key_size: 4096abc
+  tasks:
+    - vars:
+        expected_error_msg: >-
+          argument key_size is of type <class 'str'> and we were unable to convert to int: <class 'str'> cannot be converted to an int
+      block:
+        - import_role:
+            name: linux-system-roles.certificate
+        - fail:
+            msg: "Certificate issued with invalid key-size."
+      rescue:
+        - name: assert...
+          assert:
+            that:
+              - ansible_failed_result.results.0.msg  == expected_error_msg
+
+        - name: Test no certificate is generated.
+          stat:
+            path: /tmp/mycertsize.crt
+          register: sym
+        - name: assert not...
+          assert:
+            that:
+              - sym.stat.islnk is not defined
+
+- name: Test issuing certificate with negative key_size
+  hosts: all
+  become: true
+
+  vars:
+    certificate_requests:
+      - name: /tmp/negativesize
+        dns: www.example.com
+        ca: self-sign
+        key_size: -4096
+  tasks:
+    - name: Test no certs are generated.
+      block:
+        - import_role:
+            name: linux-system-roles.certificate
+        - fail:
+            msg: "Certificate issued with default key-size."
+      rescue:
+        - name: Test no certificate is generated.
+          stat:
+            path: /tmp/negativesize.crt
+          register: sym
+        - name: assert not...
+          assert:
+            that:
+              - sym.stat.islnk is not defined
