@@ -72,9 +72,11 @@
 - name: Verify certificate subject
   assert:
     that:
-     - cert.subject == cert_issued.subject
+      - cert.subject | sort(attribute="name") ==
+        cert_issued.subject | sort(attribute="name")
     fail_msg: >-
-      {{ cert.subject }} != {{ cert_issued.subject }}
+      {{ cert.subject | sort(attribute="name") }} !=
+      {{ cert_issued.subject | sort(attribute="name") }}
 
 - name: Verify certificate SAN
   assert:

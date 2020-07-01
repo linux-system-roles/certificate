@@ -6,13 +6,12 @@
     certificate_requests:
       - name: mycert
         dns: www.example.com
-        common_name: '# \\Every"thing+that,ne;eds<escap>ing\0 '
+        common_name: Some other common name
         country: US
         state: NC
         locality: Raleigh
         organization: Red Hat
         organizational_unit: Linux
-        contact_email: admin@example.com
         ca: self-sign
   roles:
     - linux-system-roles.certificate
@@ -39,12 +38,9 @@
           - name: organizationalUnitName
             oid: 2.5.4.11
             value: Linux
-          - name: emailAddress
-            oid: 1.2.840.113549.1.9.1
-            value: admin@example.com
           - name: commonName
             oid: 2.5.4.3
-            value: '# \\Every"thing+that,ne;eds<escap>ing\0 '
+            value: Some other common name
         subject_alt_name:
           - name: DNS
             value: www.example.com
