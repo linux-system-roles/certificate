@@ -24,15 +24,30 @@
       - path: /etc/pki/tls/certs/mycert.crt
         key_path: /etc/pki/tls/private/mycert.key
         subject:
-          - C=US
-          - ST=NC
-          - L=Raleigh
-          - O=Red Hat
-          - OU=Linux
-          - emailAddress=admin@example.com
-          - CN="# \\\\Every\"thing+that,ne;eds<escap>ing\\0 "
+          - name: countryName
+            oid: 2.5.4.6
+            value: US
+          - name: stateOrProvinceName
+            oid: 2.5.4.8
+            value: NC
+          - name: localityName
+            oid: 2.5.4.7
+            value: Raleigh
+          - name: organizationName
+            oid: 2.5.4.10
+            value: Red Hat
+          - name: organizationalUnitName
+            oid: 2.5.4.11
+            value: Linux
+          - name: emailAddress
+            oid: 1.2.840.113549.1.9.1
+            value: admin@example.com
+          - name: commonName
+            oid: 2.5.4.3
+            value: '# \\Every"thing+that,ne;eds<escap>ing\0 '
         subject_alt_name:
-          - DNS:www.example.com
+          - name: DNS
+            value: www.example.com
   tasks:
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml

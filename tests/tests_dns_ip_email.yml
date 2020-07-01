@@ -28,17 +28,28 @@
       - path: /etc/pki/tls/certs/mycert.crt
         key_path: /etc/pki/tls/private/mycert.key
         subject:
-          - CN=My Certificate with SAN
+          - name: commonName
+            oid: 2.5.4.3
+            value: My Certificate with SAN
         subject_alt_name:
-          - DNS:sub1.example.com
-          - DNS:www.example.com
-          - DNS:sub2.example.com
-          - DNS:sub3.example.com
-          - email:sysadmin@example.com
-          - email:support@example.com
-          - IP Address:192.0.2.12
-          - IP Address:198.51.100.65
-          - IP Address:2001:DB8:0:0:0:0:2:1
+          - name: DNS
+            value: sub1.example.com
+          - name: DNS
+            value: www.example.com
+          - name: DNS
+            value: sub2.example.com
+          - name: DNS
+            value: sub3.example.com
+          - name: email
+            value: sysadmin@example.com
+          - name: email
+            value: support@example.com
+          - name: IP Address
+            value: 192.0.2.12
+          - name: IP Address
+            value: 198.51.100.65
+          - name: IP Address
+            value: 2001:db8::2:1
   tasks:
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml

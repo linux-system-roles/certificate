@@ -21,16 +21,22 @@
       - path: /etc/pki/tls/certs/mycert.crt
         key_path: /etc/pki/tls/private/mycert.key
         subject:
-          - CN=www.example.com
+          - name: commonName
+            oid: 2.5.4.3
+            value: www.example.com
         subject_alt_name:
-          - DNS:www.example.com
+          - name: DNS
+            value: www.example.com
         auto_renew: no
       - path: /tmp/defaultcert.crt
         key_path: /tmp/defaultcert.key
         subject:
-          - CN=www.example.com
+          - name: commonName
+            oid: 2.5.4.3
+            value: www.example.com
         subject_alt_name:
-          - DNS:www.example.com
+          - name: DNS
+            value: www.example.com
         auto_renew: yes
   tasks:
     - name: Verify each certificate

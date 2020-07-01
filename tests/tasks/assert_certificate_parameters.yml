@@ -1,4 +1,19 @@
 ---
+- name: Set virtualenv_path
+  set_fact:
+    __virtualenv_path: /tmp/certificate-tests-venv
+
+- name: Ensure python3 is installed
+  package:
+    name:
+      - python3
+
+- name: Install certreader
+  pip:
+    name: certreader>=0.1.1
+    virtualenv: "{{ __virtualenv_path }}"
+    virtualenv_command: python3 -m venv
+
 - name: Retrieve certificate file stats
   stat:
     path: "{{ cert['path'] }}"
@@ -45,101 +60,66 @@
       {{ cert['owner'] | default('root') }}:
       {{ cert['group'] | default('root') }}
 
-- name: Retrieve certificate subject
-  shell: >-
-    openssl x509 -in {{ cert['path'] }} -noout -subject |
-    sed 's/ = /=/g' |
-    sed 's/^subject=\(.*\)$/\1/' |
-    sed 's/,\s/\n/g' |
-    sed 's/^\s\+//g'
-  register: result
+- name: Parse certificate
+  command: "{{ __virtualenv_path }}/bin/certreader2json {{ cert['path'] }}"
+  register: certreader_result
   changed_when: false
+
+- name: Load certificate YAML to cert_issued variable
+  set_fact:
+    cert_issued: "{{ certreader_result.stdout | from_json }}"
 
 - name: Verify certificate subject
   assert:
     that:
-      - cert['subject'] == result.stdout_lines
+     - cert.subject == cert_issued.subject
     fail_msg: >-
-      {{ cert['subject'] }} != {{ result.stdout_lines }}
-
-- name: Retrieve certificate Subject Alternative Name (SAN)
-  shell: >-
-    openssl x509 -in {{ cert['path'] }} -noout -text |
-    grep 'Subject Alternative Name' -A1 |
-    tail -1 |
-    tr , '\n' |
-    sed 's/^\s\+//g' |
-    grep -v "othername"
-  register: result
-  changed_when: false
+      {{ cert.subject }} != {{ cert_issued.subject }}
 
 - name: Verify certificate SAN
   assert:
     that:
-      - (cert['subject_alt_name'] | sort) == (result.stdout_lines | sort)
+      - cert.subject_alt_name ==
+        cert_issued.extensions.subjectAltName.value
     fail_msg: >-
-      {{ cert['subject_alt_name'] | sort }} != {{ result.stdout_lines | sort }}
+      {{ cert.subject_alt_name }} !=
+      {{ cert_issued.extensions.subjectAltName.value }}
 
-- name: Retrieve key size
-  shell: >-
-    openssl rsa -in {{ cert['key_path'] }} -text -noout |
-    grep -i "private-key" |
-    sed 's/^[^0-9]\+\([0-9]\+\).\+$/\1/'
-  register: result
-  changed_when: false
-
-- name: Verify key file attributes
+- name: Verify key size
   assert:
     that:
-      - (result.stdout | int) == (cert["key_size"] | default(2048) | int)
-    fail_msg: |
-      key_size {{ result.stdout }} != {{ cert['key_size'] | default(2048) }}
-
-- name: Retrieve certificate Key Usage
-  shell: >-
-    openssl x509 -in {{ cert['path'] }} -noout -ext keyUsage |
-    grep 'Key Usage' -A1 |
-    tail -1 |
-    tr , '\n' |
-    sed 's/^\s\+//g'
-  register: result
-  changed_when: false
+      - cert.key_size | default(2048) == cert_issued.key_size
+    fail_msg: >-
+      {{ cert.key_size | default(2048) }} != {{ cert_issued.key_size }}
 
 - name: Verify certificate Key Usage
   vars:
     default_ku:
-      - Digital Signature
-      - Key Encipherment
+      - digital_signature
+      - key_encipherment
   assert:
     that:
-      - (cert['key_usage'] | default(default_ku)) == result.stdout_lines
+      - (cert.key_usage | default(default_ku)) ==
+        cert_issued.extensions.keyUsage.value
     fail_msg: >-
-      {{ cert['key_usage'] | default(default_ku) }} !=
-      {{ result.stdout_lines }}
-
-- name: Retrieve certificate Extended Key Usage
-  shell: >-
-    openssl x509 -in {{ cert['path'] }} -noout -ext extendedKeyUsage |
-    grep 'Extended Key Usage' -A1 |
-    tail -1 |
-    tr , '\n' |
-    sed 's/^\s\+//g'
-  register: result
-  changed_when: false
+      {{ cert.key_usage | default(default_ku) }} !=
+      {{ cert_issued.extensions.keyUsage.value }}
 
 - name: Verify certificate Extended Key Usage
   vars:
     default_eku:
-      - TLS Web Server Authentication
-      - TLS Web Client Authentication
+      - name: id-kp-serverAuth
+        oid: 1.3.6.1.5.5.7.3.1
+      - name: id-kp-clientAuth
+        oid: 1.3.6.1.5.5.7.3.2
   assert:
     that:
       - (
-          cert['extended_key_usage'] | default(default_eku)
-        ) == result.stdout_lines
+          cert.extended_key_usage | default(default_eku)
+        ) == cert_issued.extensions.extendedKeyUsage.value
     fail_msg: >-
-      {{ cert['extended_key_usage'] | default(default_eku) }} !=
-      {{ result.stdout_lines }}
+      {{ cert.extended_key_usage | default(default_eku) }} !=
+      {{ cert_issued.extensions.extendedKeyUsage.value }}
 
 - name: Retrieve auto-renew flag
   shell: >-

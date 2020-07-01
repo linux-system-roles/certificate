@@ -22,21 +22,30 @@
       - path: /etc/pki/tls/certs/mycert.crt
         key_path: /etc/pki/tls/private/mycert.key
         subject:
-          - CN=www.example.com
+          - name: commonName
+            oid: 2.5.4.3
+            value: www.example.com
         subject_alt_name:
-          - DNS:www.example.com
+          - name: DNS
+            value: www.example.com
       - path: /tmp/other-cert.crt
         key_path: /tmp/other-cert.key
         subject:
-          - CN=www.example.org
+          - name: commonName
+            oid: 2.5.4.3
+            value: www.example.org
         subject_alt_name:
-          - DNS:www.example.org
+          - name: DNS
+            value: www.example.org
       - path: /tmp/another-cert.crt
         key_path: /tmp/another-cert.key
         subject:
-          - CN=www.example.net
+          - name: commonName
+            oid: 2.5.4.3
+            value: www.example.net
         subject_alt_name:
-          - DNS:www.example.net
+          - name: DNS
+            value: www.example.net
   tasks:
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml
