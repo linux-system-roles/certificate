@@ -143,7 +143,7 @@ stored in shell script files that later will be executed by the provider.
 
 | CA               | Providers   | CA description                                  | Requirements                                    |
 |------------------|-------------|-------------------------------------------------|-------------------------------------------------|
-| self-sign | certmonger* | Issue self-signed certificates from a local CA. |                                                 |
+| self-sign        | certmonger* | Issue self-signed certificates from a local CA. |                                                 |
 | ipa              | certmonger* | Issue certificates using the FreeIPA CA.        | Host needs to be enrolled in a FreeIPA server.  |
 
  *\* Default provider.*
@@ -156,6 +156,21 @@ If a user chooses `self-sign` CA, with `certmonger` as provider and, later on
 decide to change the provider to `openssl`, the CA certificates used in both
 cases needs to be the same. *Please note that `openssl` is **not yet a supported**
 provider and it's only mentioned here as an example.*
+
+### Certmonger and SELinux
+
+Please notice that if SELinux is enforced certmonger will only be able
+to write/edit files in directories where the `cert_t` context is present.
+
+In addition to that, if the scripts executed by `run_before` and `run_after`
+needs to write/edit files, those will also require `cert_t` context to be
+present prior to the role execution.
+
+You can use [linux-system-roles/selinux](https://github.com/linux-system-roles/selinux)
+to manage SELinux contexts.
+
+See [certmonger_selinux(8) man pages](https://linux.die.net/man/8/certmonger_selinux)
+for more information about certmonger requirements.
 
 
 ## Examples:

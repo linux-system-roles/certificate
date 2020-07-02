@@ -8,7 +8,7 @@
         dns: www.example.com
         ca: self-sign
         auto_renew: no
-      - name: /tmp/defaultcert
+      - name: defaultcert
         dns: www.example.com
         ca: self-sign
   roles:
@@ -28,8 +28,8 @@
           - name: DNS
             value: www.example.com
         auto_renew: no
-      - path: /tmp/defaultcert.crt
-        key_path: /tmp/defaultcert.key
+      - path: /etc/pki/tls/certs/defaultcert.crt
+        key_path: /etc/pki/tls/private/defaultcert.key
         subject:
           - name: commonName
             oid: 2.5.4.3

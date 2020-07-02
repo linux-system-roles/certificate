@@ -6,10 +6,10 @@
       - name: mycert
         dns: www.example.com
         ca: self-sign
-      - name: /tmp/other-cert
+      - name: other-cert
         dns: www.example.org
         ca: self-sign
-      - name: /tmp/another-cert
+      - name: another-cert
         dns: www.example.net
         ca: self-sign
   roles:
@@ -28,8 +28,8 @@
         subject_alt_name:
           - name: DNS
             value: www.example.com
-      - path: /tmp/other-cert.crt
-        key_path: /tmp/other-cert.key
+      - path: /etc/pki/tls/certs/other-cert.crt
+        key_path: /etc/pki/tls/private/other-cert.key
         subject:
           - name: commonName
             oid: 2.5.4.3
@@ -37,8 +37,8 @@
         subject_alt_name:
           - name: DNS
             value: www.example.org
-      - path: /tmp/another-cert.crt
-        key_path: /tmp/another-cert.key
+      - path: /etc/pki/tls/certs/another-cert.crt
+        key_path: /etc/pki/tls/private/another-cert.key
         subject:
           - name: commonName
             oid: 2.5.4.3
