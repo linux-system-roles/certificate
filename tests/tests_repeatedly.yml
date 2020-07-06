@@ -1,0 +1,90 @@
+---
+- name: Issue simple self-signed certificate
+  hosts: all
+  become: true
+
+  vars:
+    certificate_requests:
+      - name: mycert
+        dns: www.example.com
+        ca: self-sign
+  roles:
+    - linux-system-roles.certificate
+
+- name: Verify certificate
+  hosts: all
+  become: true
+  vars:
+    certificates:
+      - path: /etc/pki/tls/certs/mycert.crt
+        key_path: /etc/pki/tls/private/mycert.key
+        subject:
+          - CN=www.example.com
+        subject_alt_name:
+          - DNS:www.example.com
+  tasks:
+    - name: Verify each certificate
+      include_tasks: tasks/assert_certificate_parameters.yml
+      loop: "{{ certificates }}"
+      loop_control:
+        loop_var: cert
+
+- name: Test with repeatedly by adding same value for parameter
+  hosts: all
+  become: true
+
+  vars:
+    certificate_requests:
+      - name: mycert
+        dns: www.example.com
+        ca: self-sign
+  roles:
+    - linux-system-roles.certificate
+
+- name: Verify certificate
+  hosts: all
+  become: true
+  vars:
+    certificates:
+      - path: /etc/pki/tls/certs/mycert.crt
+        key_path: /etc/pki/tls/private/mycert.key
+        subject:
+          - CN=www.example.com
+        subject_alt_name:
+          - DNS:www.example.com
+  tasks:
+    - name: Verify each certificate
+      include_tasks: tasks/assert_certificate_parameters.yml
+      loop: "{{ certificates }}"
+      loop_control:
+        loop_var: cert
+
+- name: Test with updating parameters to modify certificate details.
+  hosts: all
+  become: true
+
+  vars:
+    certificate_requests:
+      - name: mycert
+        dns: www.examplemodify.com
+        ca: self-sign
+  roles:
+    - linux-system-roles.certificate
+
+- name: Verify certificate
+  hosts: all
+  become: true
+  vars:
+    certificates:
+      - path: /etc/pki/tls/certs/mycert.crt
+        key_path: /etc/pki/tls/private/mycert.key
+        subject:
+          - CN=www.examplemodify.com
+        subject_alt_name:
+          - DNS:www.examplemodify.com
+  tasks:
+    - name: Verify each certificate
+      include_tasks: tasks/assert_certificate_parameters.yml
+      loop: "{{ certificates }}"
+      loop_control:
+        loop_var: cert
