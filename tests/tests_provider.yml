@@ -1,7 +1,6 @@
 ---
 - name: Test issuing certificate with certmonger provider
   hosts: all
-  become: true
   vars:
     certificate_requests:
       - name: mycert
@@ -13,7 +12,6 @@
 
 - name: Verify certificate
   hosts: all
-  become: true
   vars:
     certificates:
       - path: /etc/pki/tls/certs/mycert.crt

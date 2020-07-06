@@ -1,6 +1,5 @@
 ---
 - hosts: all
-  become: true
 
   vars:
     certificate_wait: no

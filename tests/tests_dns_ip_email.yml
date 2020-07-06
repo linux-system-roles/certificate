@@ -1,7 +1,6 @@
 ---
 - name: Issue certificate with dns, ip and email in SAN
   hosts: all
-  become: true
   vars:
     certificate_requests:
       - name: mycert
@@ -24,7 +23,6 @@
 
 - name: Verify certificate
   hosts: all
-  become: true
   vars:
     certificates:
       - path: /etc/pki/tls/certs/mycert.crt
