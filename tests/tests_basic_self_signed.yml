@@ -10,6 +10,13 @@
   roles:
     - linux-system-roles.certificate
 
+  tasks:
+    - name: Verify if role is idempotent
+      idempotence_check:
+        role: linux-system-roles.certificate
+        with_vars:
+          certificate_requests: "{{ certificate_requests }}"
+
 - name: Verify certificate
   hosts: all
   vars:
