@@ -1,7 +1,6 @@
 ---
 - name: Issue simple self-signed certificate
   hosts: all
-  become: true
 
   vars:
     certificate_wait: false
@@ -14,7 +13,6 @@
 
 - name: Verify certificate
   hosts: all
-  become: true
   vars:
     certificates:
       - path: /etc/pki/tls/certs/mycert.crt
