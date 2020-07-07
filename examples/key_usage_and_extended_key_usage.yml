@@ -12,6 +12,9 @@
         extended_key_usage:
           - id-kp-clientAuth
           - id-kp-serverAuth
+          - anyExtendedKeyUsage
+          - id-kp-OCSPSigning
+          - id-kp-ipsecUser
         ca: self-sign
 
   roles:

@@ -26,18 +26,25 @@
       - path: /etc/pki/tls/certs/mycert.crt
         key_path: /etc/pki/tls/private/mycert.key
         subject:
-          - CN=www.example.com
+          - name: commonName
+            oid: 2.5.4.3
+            value: www.example.com
         subject_alt_name:
-          - DNS:www.example.com
+          - name: DNS
+            value: www.example.com
         key_usage:
-          - Digital Signature
-          - Non Repudiation
-          - Key Encipherment
+          - digital_signature
+          - content_commitment
+          - key_encipherment
         extended_key_usage:
-          - TLS Web Client Authentication
-          - TLS Web Server Authentication
-          - IPSec Tunnel
-          - Signing KDC Response
+          - name: id-kp-clientAuth
+            oid: 1.3.6.1.5.5.7.3.2
+          - name: id-kp-serverAuth
+            oid: 1.3.6.1.5.5.7.3.1
+          - name: id-kp-ipsecTunnel
+            oid: 1.3.6.1.5.5.7.3.6
+          - name:
+            oid: 1.3.6.1.5.2.3.5
   tasks:
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml

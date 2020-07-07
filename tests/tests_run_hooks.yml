@@ -8,9 +8,9 @@
         dns: www.example.com
         ca: self-sign
         run_before: >
-          touch /tmp/before_cert.tmp
+          touch /etc/pki/before_cert.tmp
         run_after: >
-          touch /tmp/after_cert.tmp
+          touch /etc/pki/after_cert.tmp
   roles:
     - linux-system-roles.certificate
 
@@ -21,9 +21,12 @@
       - path: /etc/pki/tls/certs/mycert.crt
         key_path: /etc/pki/tls/private/mycert.key
         subject:
-          - CN=www.example.com
+          - name: commonName
+            oid: 2.5.4.3
+            value: www.example.com
         subject_alt_name:
-          - DNS:www.example.com
+          - name: DNS
+            value: www.example.com
   tasks:
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml
@@ -39,11 +42,11 @@
           register: cert_result
         - name: Get pre-run file timestamp
           stat:
-            path: /tmp/before_cert.tmp
+            path: /etc/pki/before_cert.tmp
           register: before_result
         - name: Get post-run file timestamp
           stat:
-            path: /tmp/after_cert.tmp
+            path: /etc/pki/after_cert.tmp
           register: after_result
         - name: Assert file created before cert
           assert:

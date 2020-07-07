@@ -19,6 +19,7 @@ from ansible.module_utils._text import to_bytes
 if six.PY2:
     FileNotFoundError = IOError  # pylint: disable=redefined-builtin
 
+ANY_EXTENDED_KEY_USAGE = ObjectIdentifier("2.5.29.37.0")
 IPSEC_END_SYSTEM = ObjectIdentifier("1.3.6.1.5.5.7.3.5")
 IPSEC_TUNNEL = ObjectIdentifier("1.3.6.1.5.5.7.3.6")
 IPSEC_USER = ObjectIdentifier("1.3.6.1.5.5.7.3.7")
@@ -129,7 +130,7 @@ class CertificateProxy:
         "id-kp-emailProtection": x509.oid.ExtendedKeyUsageOID.EMAIL_PROTECTION,
         "id-kp-timeStamping": x509.oid.ExtendedKeyUsageOID.TIME_STAMPING,
         "id-kp-OCSPSigning": x509.oid.ExtendedKeyUsageOID.OCSP_SIGNING,
-        "anyExtendedKeyUsage": x509.oid.ExtendedKeyUsageOID.ANY_EXTENDED_KEY_USAGE,
+        "anyExtendedKeyUsage": ANY_EXTENDED_KEY_USAGE,
         "id-kp-ipsecEndSystem": IPSEC_END_SYSTEM,
         "id-kp-ipsecTunnel": IPSEC_TUNNEL,
         "id-kp-ipsecUser": IPSEC_USER,

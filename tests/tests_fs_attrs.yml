@@ -35,17 +35,23 @@
       - path: /etc/pki/tls/certs/mycert.crt
         key_path: /etc/pki/tls/private/mycert.key
         subject:
-          - CN=www.example.com
+          - name: commonName
+            oid: 2.5.4.3
+            value: www.example.com
         subject_alt_name:
-          - DNS:www.example.com
+          - name: DNS
+            value: www.example.com
         owner: ftp
         group: ftp
       - path: /etc/pki/tls/certs/certid.crt
         key_path: /etc/pki/tls/private/certid.key
         subject:
-          - CN=www.example.com
+          - name: commonName
+            oid: 2.5.4.3
+            value: www.example.com
         subject_alt_name:
-          - DNS:www.example.com
+          - name: DNS
+            value: www.example.com
         owner: 1040
         group: 1041
   tasks:
