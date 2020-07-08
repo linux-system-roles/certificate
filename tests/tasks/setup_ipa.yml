@@ -26,6 +26,7 @@
   package:
     name: nss
     state: latest
+  when: ansible_facts.distribution in ["CentOS", "RedHat", "Fedora"]
 
 - include_role:
     name: ipaserver
@@ -36,3 +37,4 @@
     ipadm_password: SomeDMpassword
     ipaserver_domain: test.local
     ipaserver_realm: TEST.LOCAL
+    ipaserver_no_dnssec_validation: yes
