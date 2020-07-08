@@ -2,7 +2,7 @@
 - name: Clone ansible-freeipa repo
   git:
     repo: https://github.com/freeipa/ansible-freeipa
-    version: v0.1.10
+    version: v0.1.12
     dest: /tmp/freeipa-repo
   delegate_to: 127.0.0.1
   become: false
@@ -20,14 +20,15 @@
 
 - name: Set hostname
   hostname:
-    name: ipaserver.test.local
+    name: ipaserver.ipa.test
 
 - include_role:
     name: ipaserver
   vars:
     ipaserver_setup_dns: yes
     ipaserver_auto_forwarders: yes
+    ipaserver_no_dnssec_validation: yes
     ipaadmin_password: SomeADMINpassword
     ipadm_password: SomeDMpassword
-    ipaserver_domain: test.local
-    ipaserver_realm: TEST.LOCAL
+    ipaserver_domain: ipa.test
+    ipaserver_realm: IPA.TEST

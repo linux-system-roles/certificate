@@ -1,0 +1,54 @@
+---
+- name: Install IPA server
+  hosts: all
+  tasks:
+    - import_tasks: tasks/setup_ipa.yml
+
+- name: Issue IPA signed certificate
+  hosts: all
+  become: true
+
+  vars:
+    certificate_requests:
+      - name: mycert
+        dns: ipaserver.ipa.test
+        principal: HTTP/ipaserver.ipa.test@IPA.TEST
+        ca: ipa
+  roles:
+    - linux-system-roles.certificate
+
+- name: Verify certificate
+  hosts: all
+  become: true
+  vars:
+    certificates:
+      - path: /etc/pki/tls/certs/mycert.crt
+        key_path: /etc/pki/tls/private/mycert.key
+        subject:
+          - name: commonName
+            oid: 2.5.4.3
+            value: ipaserver.ipa.test
+          - name: organizationName
+            oid: 2.5.4.10
+            value: IPA.TEST
+        subject_alt_name:
+          - name: DNS
+            value: ipaserver.ipa.test
+          - name: Universal Principal Name (UPN)
+            oid: 1.3.6.1.4.1.311.20.2.3
+            value: HTTP/ipaserver.ipa.test@IPA.TEST
+          - name: Kerberos principalname
+            oid: 1.3.6.1.5.2.2
+            value: HTTP/ipaserver.ipa.test@IPA.TEST
+        # IPA CA doesn't respect the requested key_usage (and that's ok)
+        key_usage:
+          - digital_signature
+          - content_commitment
+          - key_encipherment
+          - data_encipherment
+  tasks:
+    - name: Verify each certificate
+      include_tasks: tasks/assert_certificate_parameters.yml
+      loop: "{{ certificates }}"
+      loop_control:
+        loop_var: cert
