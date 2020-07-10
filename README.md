@@ -320,6 +320,9 @@ The certificate issuance can take several minutes depending on the CA.
 Because of that it's also possible to request the certificate but not
 actually wait for it.
 
+This configuration affects all certificates: if `certificate_wait` is
+set to `no` the role won't wait for any certificate to be issued.
+
 ```yaml
 ---
 - hosts: webserver
