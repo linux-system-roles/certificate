@@ -1,22 +1,21 @@
 ---
-- name: Clone ansible-freeipa repo
-  git:
-    repo: https://github.com/freeipa/ansible-freeipa
-    version: v0.1.10
-    dest: /tmp/freeipa-repo
+- name: install role from rpm
+  package:
+    name: ansible-freeipa
   delegate_to: 127.0.0.1
   become: false
 
-- name: Create role symlinks
-  file:
-    src: "/tmp/freeipa-repo/roles/{{ item }}/"
-    dest: "{{ playbook_dir }}/roles/{{ item }}"
-    state: link
-  delegate_to: 127.0.0.1
-  become: false
-  loop:
-    - ipaserver
-    - ipaclient
+- name: Ensure nss package is up-to-date
+  package:
+    name: nss
+    state: latest
+  when: ansible_facts.os_family == "RedHat"
+
+- name: Ensure nss package is up-to-date
+  package:
+    name: nss
+    state: latest
+  when: ansible_facts.os_family == "RedHat"
 
 - name: Set hostname
   hostname:
@@ -31,3 +30,4 @@
     ipadm_password: SomeDMpassword
     ipaserver_domain: test.local
     ipaserver_realm: TEST.LOCAL
+    ipaserver_no_dnssec_validation: yes
