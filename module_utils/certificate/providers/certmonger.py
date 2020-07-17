@@ -2,7 +2,9 @@ from distutils.version import StrictVersion
 
 import dbus
 
-from .base import CertificateRequestBaseProvider
+from ansible.module_utils.certificate.providers.base import (
+    CertificateRequestBaseProvider,
+)
 
 
 class CertmongerDBus:
