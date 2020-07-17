@@ -12,7 +12,7 @@
   pip:
     name: certreader>=0.1.1
     virtualenv: "{{ __virtualenv_path }}"
-    virtualenv_command: python3 -m venv
+    virtualenv_command: /usr/bin/python3 -m venv
 
 - name: Retrieve certificate file stats
   stat:
