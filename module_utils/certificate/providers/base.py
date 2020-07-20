@@ -13,10 +13,10 @@ from cryptography.x509.oid import NameOID, ObjectIdentifier
 from pyasn1.codec.der import decoder
 from pyasn1.type import char, namedtype, tag, univ
 
-from ansible.module_utils import six
-from ansible.module_utils._text import to_bytes
+from ansible.module_utils.six import PY2
+from ansible.module_utils._text import to_bytes, to_text
 
-if six.PY2:
+if PY2:
     FileNotFoundError = IOError  # pylint: disable=redefined-builtin
 
 ANY_EXTENDED_KEY_USAGE = ObjectIdentifier("2.5.29.37.0")
@@ -97,12 +97,12 @@ class KRB5PrincipalName(x509.OtherName):
     def _decode_krb5principalname(data):
         # pylint: disable=unsubscriptable-object
         principal = decoder.decode(data, asn1Spec=_KRB5PrincipalName())[0]
-        realm = six.ensure_text(
+        realm = to_text(
             str(principal["realm"]).replace("\\", "\\\\").replace("@", "\\@")
         )
         name = principal["principalName"]["name-string"]
         name = u"/".join(
-            six.ensure_text(str(n))
+            to_text(str(n))
             .replace("\\", "\\\\")
             .replace("/", "\\/")
             .replace("@", "\\@")
@@ -182,9 +182,7 @@ class CertificateProxy:
 
         info["subject"] = cls._get_subject_from_params(params)
         if info.get("ip"):
-            info["ip"] = [
-                ipaddress.ip_address(six.ensure_text(ip)) for ip in info["ip"] if ip
-            ]
+            info["ip"] = [ipaddress.ip_address(to_text(ip)) for ip in info["ip"] if ip]
 
         if info.get("extended_key_usage"):
             info["extended_key_usage"] = [
