@@ -53,4 +53,6 @@
 #
 #       - RUN_SHELLCHECK_DISABLED
 #       - RUN_SHELLCHECK_EXTRA_ARGS
+# https://github.com/koalaman/shellcheck/wiki/SC2034
+# shellcheck disable=SC2034
 LSR_EXTRA_PACKAGES="libdbus-1-dev"
