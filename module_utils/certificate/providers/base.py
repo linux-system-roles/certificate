@@ -184,6 +184,9 @@ class CertificateProxy:
         if info.get("ip"):
             info["ip"] = [ipaddress.ip_address(to_text(ip)) for ip in info["ip"] if ip]
 
+        if info.get("key_usage"):
+            info["key_usage"] = set(info["key_usage"])
+
         if info.get("extended_key_usage"):
             info["extended_key_usage"] = [
                 cls._get_extended_key_usage_object_identifier(eku).dotted_string
@@ -317,7 +320,7 @@ class CertificateProxy:
     @property
     def key_usage(self):
         """Return the Key Usage in the certificate."""
-        return self.cert_data.get("key_usage") or []
+        return self.cert_data.get("key_usage") or set()
 
     @property
     def extended_key_usage(self):
@@ -363,18 +366,16 @@ class CertificateProxy:
         return san_values
 
     def _get_key_usage(self):
-        if not self._key_usage_ext:
-            return []
-
-        key_usages = []
-        for attr, key_usage in self.KEY_USAGE_ATTR_MAP.items():
-            try:
-                key_usage_enabled = getattr(self._key_usage_ext.value, attr)
-            except ValueError:
-                pass
-            else:
-                if key_usage_enabled:
-                    key_usages.append(key_usage)
+        key_usages = set()
+        if self._key_usage_ext:
+            for attr, key_usage in self.KEY_USAGE_ATTR_MAP.items():
+                try:
+                    key_usage_enabled = getattr(self._key_usage_ext.value, attr)
+                except ValueError:
+                    pass
+                else:
+                    if key_usage_enabled:
+                        key_usages.add(key_usage)
         return key_usages
 
     @classmethod
