@@ -145,6 +145,16 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
         Since the provider base class doesn't know about CA this method
         needs to add the verification for CA change.
         """
+        # For earlier version of certmonger, keyusage order was not
+        # respected, so the keys need to be sorted to compare the
+        # certificates against the csr. If this is not done, a new
+        # certificate is issued, even if data has not changed leading
+        # to an idempotency issue.
+        require_keyusage_sort = self.certmonger_version < StrictVersion("0.79.0")
+        if require_keyusage_sort:
+            self.existing_certificate.cert_data.get("key_usage", []).sort()
+            self.csr.cert_data.get("key_usage", []).sort()
+
         needs_update = super(
             CertificateRequestCertmongerProvider, self
         ).cert_needs_update
