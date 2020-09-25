@@ -18,16 +18,14 @@
   become: false
   when: not __is_beaker_env
 
-- name: Create role symlinks
-  file:
-    src: "/tmp/freeipa-repo/roles/{{ item }}/"
-    dest: "{{ playbook_dir }}/roles/{{ item }}"
-    state: link
-  delegate_to: 127.0.0.1
-  become: false
-  loop:
-    - ipaserver
-    - ipaclient
+- name: Set ipaserver rolename to name
+  set_fact:
+    certificate_ipaserver_rolename: ipaserver
+  when: __is_beaker_env | bool
+
+- name: Set ipaserver rolename to path
+  set_fact:
+    certificate_ipaserver_rolename: /tmp/freeipa-repo/roles/ipaserver
   when: not __is_beaker_env
 
 - name: Set hostname
@@ -43,7 +41,7 @@
 - name: Run IPA server install
   block:
     - include_role:
-        name: ipaserver
+        name: "{{ certificate_ipaserver_rolename }}"
   rescue:
     - name: FAILURE - check entropy
       command: cat /proc/sys/kernel/random/entropy_avail
