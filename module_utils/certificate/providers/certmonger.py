@@ -197,7 +197,8 @@ class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
     def _set_user_and_group_if_different(self):
         if self.module.params.get("wait"):
             return super(
-                CertificateRequestCertmongerProvider, self,
+                CertificateRequestCertmongerProvider,
+                self,
             )._set_user_and_group_if_different()
 
         if self.module.params.get("owner") or self.module.params.get("group"):

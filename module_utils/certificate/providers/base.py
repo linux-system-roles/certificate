@@ -416,7 +416,9 @@ class CertificateProxy:
         #   comparison.
         if not isinstance(other, CertificateProxy):
             raise TypeError(
-                "Cannot compare 'CertificateProxy' with '{}'".format(type(other),)
+                "Cannot compare 'CertificateProxy' with '{}'".format(
+                    type(other),
+                )
             )
 
         self._module.debug(
@@ -489,7 +491,11 @@ class CertificateRequestBaseProvider:
             )
 
         base_path = self.module.params.get("directory")
-        return os.path.join(base_path, subdir, (name + ext),)
+        return os.path.join(
+            base_path,
+            subdir,
+            (name + ext),
+        )
 
     @property
     def existing_certificate(self):
@@ -506,7 +512,10 @@ class CertificateRequestBaseProvider:
                 auto_renew = self.get_existing_certificate_auto_renew_flag()
 
                 self._existing_certificate = self.certificate_proxy_class.load_from_pem(
-                    self.module, cert_pem, csr_pem, auto_renew,
+                    self.module,
+                    cert_pem,
+                    csr_pem,
+                    auto_renew,
                 )
         return self._existing_certificate
 
@@ -515,7 +524,8 @@ class CertificateRequestBaseProvider:
         """Instance CertificateProxy for the new certificate request."""
         if self._csr is None:
             self._csr = self.certificate_proxy_class.load_from_params(
-                self.module, self.module.params,
+                self.module,
+                self.module.params,
             )
         return self._csr
 
@@ -562,7 +572,8 @@ class CertificateRequestBaseProvider:
 
     def _exit_success(self):
         self.module.exit_json(
-            changed=self.changed, msg=self.message,
+            changed=self.changed,
+            msg=self.message,
         )
 
     def _set_user_and_group_if_different(self):
@@ -582,14 +593,18 @@ class CertificateRequestBaseProvider:
         }
         cert_diff = {}
         self.changed = self.module.set_fs_attributes_if_different(
-            file_attrs, self.changed, cert_diff,
+            file_attrs,
+            self.changed,
+            cert_diff,
         )
         self.module.debug("Certificate fs attribute diff: {}".format(cert_diff))
 
         file_attrs["path"] = self.certificate_key_path
         key_diff = {}
         self.changed = self.module.set_fs_attributes_if_different(
-            file_attrs, self.changed, key_diff,
+            file_attrs,
+            self.changed,
+            key_diff,
         )
         self.module.debug("Certificate Key fs attribute diff: {}".format(key_diff))
 
