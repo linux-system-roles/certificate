@@ -12,7 +12,7 @@
 - name: Clone ansible-freeipa repo
   git:
     repo: https://github.com/freeipa/ansible-freeipa
-    version: v0.1.12
+    version: v0.2.0
     dest: /tmp/freeipa-repo
   delegate_to: 127.0.0.1
   become: false
