@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.certificate.providers import PROVIDERS
+
+
 ANSIBLE_METADATA = {
     "metadata_version": "1.1",
     "status": ["preview"],
@@ -274,10 +278,6 @@ EXAMPLES = """
 """
 
 RETURN = ""
-
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.certificate.providers import PROVIDERS
-
 
 KEY_USAGE_CHOICES = [
     "digitalSignature",
