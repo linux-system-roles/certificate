@@ -1,4 +1,4 @@
-from ansible.module_utils.certificate.providers.certmonger import (
+from ansible.module_utils.certificate_lsr.providers.certmonger import (
     CertificateRequestCertmongerProvider,
 )
 

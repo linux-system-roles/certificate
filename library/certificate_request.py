@@ -276,7 +276,7 @@ EXAMPLES = """
 RETURN = ""
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.certificate.providers import PROVIDERS
+from ansible.module_utils.certificate_lsr.providers import PROVIDERS
 
 
 KEY_USAGE_CHOICES = [
