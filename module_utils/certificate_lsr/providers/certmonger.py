@@ -2,7 +2,7 @@ from distutils.version import StrictVersion
 
 import dbus
 
-from ansible.module_utils.certificate.providers.base import (
+from ansible.module_utils.certificate_lsr.providers.base import (
     CertificateRequestBaseProvider,
 )
 
