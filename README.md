@@ -1,4 +1,5 @@
 # Certificate System Role
+![CI Testing](https://github.com/linux-system-roles/certificate/workflows/tox/badge.svg)
 
 Role for managing TLS/SSL certificate issuance and renewal
 
