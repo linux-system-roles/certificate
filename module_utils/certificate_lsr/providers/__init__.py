@@ -1,8 +1,7 @@
-from ansible.module_utils.certificate_lsr.providers.certmonger import (
-    CertificateRequestCertmongerProvider,
-)
+from ansible.module_utils.certificate_lsr.providers import certmonger
+
 
 # fmt: off
 PROVIDERS = (
-    ("certmonger", CertificateRequestCertmongerProvider),
+    ("certmonger", certmonger.CertificateRequestCertmongerProvider),
 )
