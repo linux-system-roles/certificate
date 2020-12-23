@@ -5,9 +5,7 @@ dependency:
 driver:
   name: docker
 lint:
-  name: yamllint
-  options:
-    config-file: .yamllint.yml
+  enabled: false
 platforms:
   - name: centos-7
     image: docker.io/linuxsystemroles/centos-7
@@ -17,10 +15,10 @@ platforms:
 provisioner:
   name: ansible
   log: true
-  lint:
-    name: ansible-lint
   playbooks:
     converge: ../../tests/tests_default.yml
+  lint:
+    enabled: false
 scenario:
   name: default
   test_sequence:
@@ -30,7 +28,3 @@ scenario:
     - idempotence
     - check
     - destroy
-verifier:
-  name: testinfra
-  lint:
-    name: flake8
