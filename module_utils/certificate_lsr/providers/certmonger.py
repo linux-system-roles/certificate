@@ -2,9 +2,7 @@ from distutils.version import StrictVersion
 
 import dbus
 
-from ansible.module_utils.certificate_lsr.providers.base import (
-    CertificateRequestBaseProvider,
-)
+from ansible.module_utils.certificate_lsr.providers import base
 
 
 class CertmongerDBus:
@@ -49,7 +47,7 @@ class CertmongerDBus:
         ]
 
 
-class CertificateRequestCertmongerProvider(CertificateRequestBaseProvider):
+class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
     """Certmonger provider for certificate Linux System Role."""
 
     def __init__(self, *args, **kwargs):
