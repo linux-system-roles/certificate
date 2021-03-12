@@ -15,6 +15,7 @@ DOCUMENTATION = """
 module: certificate_request
 short_description: Manage SSL/TLS certificates.
 description:
+  - "WARNING: Do not use this module directly! It is only for role internal use."
   - The C(certificate_request) module takes a name, desired
     certificate request attributes and certificate properties.
   - The request is generated and sent to the CA to sign.
