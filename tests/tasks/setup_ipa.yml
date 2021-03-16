@@ -30,6 +30,11 @@
     - ipaclient
   when: not __is_beaker_env
 
+- name: ensure hostname package is installed
+  package:
+    name: hostname
+    state: present
+
 - name: Set hostname
   hostname:
     name: ipaserver.test.local
