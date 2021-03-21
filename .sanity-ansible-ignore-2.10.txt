@@ -1,5 +1,3 @@
-plugins/module_utils/certificate_lsr/providers/__init__.py empty-init!skip
-plugins/module_utils/certificate_lsr/providers/base.py compile-2.6!skip
 plugins/module_utils/certificate_lsr/providers/base.py import-2.6!skip
 plugins/module_utils/certificate_lsr/providers/base.py import-2.7!skip
 plugins/module_utils/certificate_lsr/providers/base.py import-3.5!skip
@@ -12,13 +10,17 @@ plugins/module_utils/certificate_lsr/providers/certmonger.py import-3.5!skip
 plugins/module_utils/certificate_lsr/providers/certmonger.py import-3.6!skip
 plugins/module_utils/certificate_lsr/providers/certmonger.py import-3.7!skip
 plugins/module_utils/certificate_lsr/providers/certmonger.py import-3.8!skip
+plugins/module_utils/certificate_lsr/providers/providers.py import-2.6!skip
+plugins/module_utils/certificate_lsr/providers/providers.py import-2.7!skip
+plugins/module_utils/certificate_lsr/providers/providers.py import-3.5!skip
+plugins/module_utils/certificate_lsr/providers/providers.py import-3.6!skip
+plugins/module_utils/certificate_lsr/providers/providers.py import-3.7!skip
+plugins/module_utils/certificate_lsr/providers/providers.py import-3.8!skip
 plugins/modules/certificate_request.py import-2.6!skip
 plugins/modules/certificate_request.py import-2.7!skip
 plugins/modules/certificate_request.py import-3.5!skip
 plugins/modules/certificate_request.py import-3.6!skip
 plugins/modules/certificate_request.py import-3.7!skip
 plugins/modules/certificate_request.py import-3.8!skip
-plugins/module_utils/certificate_lsr/providers/base.py pylint:ansible-format-automatic-specification
-plugins/module_utils/certificate_lsr/providers/certmonger.py pylint:ansible-format-automatic-specification
-plugins/modules/certificate_request.py pylint:ansible-format-automatic-specification
-plugins/modules/certificate_request.py validate-modules!skip
+plugins/modules/certificate_request.py validate-modules:missing-gplv3-license
+plugins/modules/certificate_request.py validate-modules:import-error

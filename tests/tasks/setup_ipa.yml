@@ -1,7 +1,7 @@
 ---
 - name: Set __is_beaker_env
   set_fact:
-    __is_beaker_env: "{{ lookup('env', 'BEAKERLIB') != '' }}"
+    __is_beaker_env: "{{ lookup('env', 'BEAKERLIB') | length > 0 }}"
 
 - name: Install ansible-freeipa
   package:
@@ -60,6 +60,7 @@
           - /var/log/ipaserver-install.log
           - /var/log/ipaclient-install.log
           - /var/log/pki
+        mode: '0644'
     - name: FAILURE - grab archive
       fetch:
         src: /tmp/ipalogs.tgz
@@ -73,7 +74,8 @@
         list_files: true
         remote_src: true
       delegate_to: 127.0.0.1
-    - fail:
+    - name: failed
+      fail:
         msg: failed
 
   vars:

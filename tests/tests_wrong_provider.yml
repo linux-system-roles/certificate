@@ -15,7 +15,8 @@
       block:
         - import_role:
             name: linux-system-roles.certificate
-        - fail:
+        - name: failed
+          fail:
             msg: "Certificate issued with nonexistent provider 'fake-provider'."
       rescue:
         - name: assert...

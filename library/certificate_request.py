@@ -1,4 +1,7 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+# SPDX-License-Identifier: MIT
 
 from __future__ import absolute_import, division, print_function
 
@@ -281,7 +284,7 @@ EXAMPLES = """
 RETURN = ""
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.certificate_lsr.providers import PROVIDERS
+from ansible.module_utils.certificate_lsr.providers import providers
 
 
 KEY_USAGE_CHOICES = [
@@ -363,10 +366,10 @@ class CertificateRequestModule(AnsibleModule):
         """Instantiate and return the proper provider for the run."""
         if self._provider is None:
             provider_name = self.params.get("provider")
-            provider_cls = dict(PROVIDERS).get(provider_name)
+            provider_cls = dict(providers.PROVIDERS).get(provider_name)
             if provider_cls is None:
                 self.fail_json(
-                    msg="Chosen provider '{}' is not available.".format(provider_name),
+                    msg="Chosen provider '{0}' is not available.".format(provider_name),
                 )
             self._provider = provider_cls(ansible_module=self)
 

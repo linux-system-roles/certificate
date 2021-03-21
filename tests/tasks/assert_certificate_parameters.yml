@@ -132,6 +132,7 @@
 
 - name: Retrieve auto-renew flag
   shell: >-
+    set -euo pipefail;
     getcert list -f {{ cert['path'] }} |
     grep 'auto-renew' |
     sed 's/^\s\+auto-renew: //g'
