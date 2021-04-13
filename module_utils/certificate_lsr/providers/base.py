@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+# SPDX-License-Identifier: MIT
+
 from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
@@ -284,7 +288,7 @@ class CertificateProxy:
         for param_name, short_name in cls.SUBJECT_SHORT_PARAM_MAP.items():
             value = kwargs.get(param_name)
             if value:
-                subject.append("{}={}".format(short_name, _escape_dn_value(value)))
+                subject.append("{0}={1}".format(short_name, _escape_dn_value(value)))
         return ",".join(subject)
 
     def _get_subject_from_x509(self):
@@ -420,7 +424,7 @@ class CertificateProxy:
         #   comparison.
         if not isinstance(other, CertificateProxy):
             raise TypeError(
-                "Cannot compare 'CertificateProxy' with '{}'".format(
+                "Cannot compare 'CertificateProxy' with '{0}'".format(
                     type(other),
                 )
             )
@@ -429,8 +433,8 @@ class CertificateProxy:
             "Preparing CertificateProxy objects for comparison: "
             "some keys might be added and/or removed."
         )
-        self._module.debug("Original A: {}".format(pformat(self.cert_data)))
-        self._module.debug("Original B: {}".format(pformat(other.cert_data)))
+        self._module.debug("Original A: {0}".format(pformat(self.cert_data)))
+        self._module.debug("Original B: {0}".format(pformat(other.cert_data)))
 
         # Remove empty sequences and strings, false and None values
         #   before comparison happens
@@ -438,11 +442,11 @@ class CertificateProxy:
         other_info = {k: v for k, v in other.cert_data.items() if v}
 
         self._module.debug("Comparing CertificateProxy objects:")
-        self._module.debug("A: {}".format(pformat(self_info)))
-        self._module.debug("B: {}".format(pformat(other_info)))
+        self._module.debug("A: {0}".format(pformat(self_info)))
+        self._module.debug("B: {0}".format(pformat(other_info)))
 
         equals = self_info == other_info
-        self._module.debug("A == B: {}".format(equals))
+        self._module.debug("A == B: {0}".format(equals))
         return equals
 
     def __ne__(self, other):
@@ -489,7 +493,7 @@ class CertificateRequestBaseProvider:
         if os.sep in name:
             self.module.fail_json(
                 msg=(
-                    "Relative path '{}' not allowed for 'name' parameter (use "
+                    "Relative path '{0}' not allowed for 'name' parameter (use "
                     "either a simple string or an absolute path)."
                 ).format(name)
             )
@@ -601,7 +605,7 @@ class CertificateRequestBaseProvider:
             self.changed,
             cert_diff,
         )
-        self.module.debug("Certificate fs attribute diff: {}".format(cert_diff))
+        self.module.debug("Certificate fs attribute diff: {0}".format(cert_diff))
 
         file_attrs["path"] = self.certificate_key_path
         key_diff = {}
@@ -610,7 +614,7 @@ class CertificateRequestBaseProvider:
             self.changed,
             key_diff,
         )
-        self.module.debug("Certificate Key fs attribute diff: {}".format(key_diff))
+        self.module.debug("Certificate Key fs attribute diff: {0}".format(key_diff))
 
         return cert_diff or key_diff
 

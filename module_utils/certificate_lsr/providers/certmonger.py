@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+# SPDX-License-Identifier: MIT
+
 from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
@@ -72,7 +76,7 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
                 self._version = StrictVersion(version_str)
             else:
                 self.module.fail_json(
-                    msg="Could not get certmonger version using '{}'".format(
+                    msg="Could not get certmonger version using '{0}'".format(
                         " ".join(certmonger_version_cmd),
                     )
                 )
@@ -103,7 +107,7 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
             if invalid_principal or not all([primary, instance, realm]):
                 self.module.fail_json(
                     msg=(
-                        "Invalid principal '{}'. It should be formatted as "
+                        "Invalid principal '{0}'. It should be formatted as "
                         "'primary/instance@REALM'".format(single_principal)
                     )
                 )
@@ -113,7 +117,7 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
         for request in self._certmonger_dbus.get_requests():
             if request["cert-file"] == self.certificate_file_path:
                 self.module.debug(
-                    "Certmonger Metadata for existing certificate: {}".format(request)
+                    "Certmonger Metadata for existing certificate: {0}".format(request)
                 )
                 return request
         return {}
@@ -153,7 +157,7 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
         ca_from_params = self._get_certmonger_ca_from_params()
         ca_from_existing_cert = self._get_certmonger_ca_for_existing_cert()
         self.module.debug(
-            "ca_from_params == ca_from_existing_cert: {}".format(
+            "ca_from_params == ca_from_existing_cert: {0}".format(
                 ca_from_params == ca_from_existing_cert
             )
         )
@@ -264,7 +268,7 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
         if not self.exists_in_certmonger or allow_key_size_update:
             command += ["-g", str(self.module.params.get("key_size"))]
 
-        self.module.debug("Certmonger command: {}".format(command))
+        self.module.debug("Certmonger command: {0}".format(command))
 
         # Set Kerberos principal
         for principal in self.csr.principal:

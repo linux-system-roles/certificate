@@ -52,7 +52,8 @@
       block:
         - import_role:
             name: linux-system-roles.certificate
-        - fail:
+        - name: failed
+          fail:
             msg: "certificate with invalid principal"
       rescue:
         - name: assert...
