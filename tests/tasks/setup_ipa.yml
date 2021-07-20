@@ -53,14 +53,15 @@
     - name: FAILURE - check entropy
       command: cat /proc/sys/kernel/random/entropy_avail
     - name: FAILURE - get logs for debugging
-      archive:
-        dest: /tmp/ipalogs.tgz
-        path:
-          - /var/log/messages
-          - /var/log/ipaserver-install.log
-          - /var/log/ipaclient-install.log
-          - /var/log/pki
-        mode: '0644'
+      shell: |-
+        set -euo pipefail
+        cd /var/log
+        tar -czf /tmp/ipalogs.tgz \
+          $( [[ -e messages ]] && echo messages ) \
+          $( [[ -e ipaserver-install.log ]] && echo ipaserver-install.log ) \
+          $( [[ -e ipaclient-install.log ]] && echo ipaclient-install.log ) \
+          $( [[ -e pki ]] && echo pki )
+        chmod '0644' /tmp/ipalogs.tgz
     - name: FAILURE - grab archive
       fetch:
         src: /tmp/ipalogs.tgz
