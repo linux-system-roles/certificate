@@ -62,18 +62,21 @@
           $( [[ -e ipaclient-install.log ]] && echo ipaclient-install.log ) \
           $( [[ -e pki ]] && echo pki )
         chmod '0644' /tmp/ipalogs.tgz
+      args:
+        warn: false  # suppress 'unarchive' warning
     - name: FAILURE - grab archive
       fetch:
         src: /tmp/ipalogs.tgz
         dest: "{{ local_log_dir }}/ipalogs.tgz"
         flat: true
     - name: FAILURE - unpack archive
-      unarchive:
-        src: "{{ local_log_dir }}/ipalogs.tgz"
-        dest: "{{ local_log_dir }}"
-        mode: 0644
-        list_files: true
-        remote_src: true
+      shell: |-
+        set -euo pipefail
+        cd "{{ local_log_dir }}"
+        tar -xvzf ipalogs.tgz
+        chmod 0644 *
+      args:
+        warn: false  # suppress 'unarchive' warning
       delegate_to: 127.0.0.1
     - name: failed
       fail:
