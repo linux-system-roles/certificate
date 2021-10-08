@@ -47,7 +47,8 @@
 
 - name: Run IPA server install
   block:
-    - include_role:
+    - name: Include ipaserver role
+      include_role:
         name: ipaserver
   rescue:
     - name: FAILURE - check entropy
