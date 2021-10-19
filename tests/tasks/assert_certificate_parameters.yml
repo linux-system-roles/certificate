@@ -17,7 +17,9 @@
 
 - name: Install certreader
   pip:
-    name: certreader>=0.1.1
+    name:
+      - cryptography<35
+      - certreader>=0.1.1
     virtualenv: "{{ __virtualenv_path }}"
     virtualenv_command: /usr/bin/python3 -m venv
 
