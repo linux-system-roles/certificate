@@ -1,0 +1,7 @@
+# These steps run for *all* tests
+
+- name: setup - get fix for https://pagure.io/certmonger/issue/223
+  dnf:
+    name: certmonger
+    state: latest
+    enablerepo: updates-testing

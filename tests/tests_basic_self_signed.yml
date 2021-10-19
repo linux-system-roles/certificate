@@ -1,4 +1,9 @@
 ---
+- name: Setup
+  hosts: all
+  tasks:
+    - include_tasks: tasks/setup.yml
+
 - name: Issue simple self-signed certificate
   hosts: all
 
