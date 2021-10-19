@@ -46,6 +46,12 @@
       {{ cert['owner'] | default('root') }}:
       {{ cert['group'] | default('root') }}
 
+- name: Verify certificate permissions
+  assert:
+    that:
+      - result.stat.mode == (cert['mode'] | default('0600'))
+    fail_msg: "{{ result.stat.mode }} != {{ cert['mode'] | default('0600') }}"
+
 - name: Retrieve key file stats
   stat:
     path: "{{ cert['key_path'] }}"
