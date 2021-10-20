@@ -43,6 +43,7 @@
             value: www.example.com
         owner: ftp
         group: ftp
+        mode: "0640"
       - path: /etc/pki/tls/certs/certid.crt
         key_path: /etc/pki/tls/private/certid.key
         subject:
@@ -54,6 +55,7 @@
             value: www.example.com
         owner: 1040
         group: 1041
+        mode: "0640"
   tasks:
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml

@@ -5,7 +5,7 @@
   tasks:
     - import_tasks: tasks/setup_ipa.yml
 
-- name: Issue IPA signed certificate
+- name: Issue IPA signed certificates
   hosts: all
   become: true
 
@@ -15,10 +15,16 @@
         dns: ipaserver.test.local
         principal: HTTP/ipaserver.test.local@TEST.LOCAL
         ca: ipa
+
+      - name: groupcert
+        dns: ipaserver.test.local
+        principal: HTTP/ipaserver.test.local@TEST.LOCAL
+        ca: ipa
+        group: ftp
   roles:
     - linux-system-roles.certificate
 
-- name: Verify certificate
+- name: Verify certificates
   hosts: all
   become: true
   vars:
@@ -42,6 +48,33 @@
             oid: 1.3.6.1.5.2.2
             value: HTTP/ipaserver.test.local@TEST.LOCAL
         # IPA CA doesn't respect the requested key_usage (and that's ok)
+        key_usage:
+          - digital_signature
+          - content_commitment
+          - key_encipherment
+          - data_encipherment
+
+      - path: /etc/pki/tls/certs/groupcert.crt
+        key_path: /etc/pki/tls/private/groupcert.key
+        owner: root
+        group: ftp
+        mode: "0640"
+        subject:
+          - name: commonName
+            oid: 2.5.4.3
+            value: ipaserver.test.local
+          - name: organizationName
+            oid: 2.5.4.10
+            value: TEST.LOCAL
+        subject_alt_name:
+          - name: DNS
+            value: ipaserver.test.local
+          - name: Universal Principal Name (UPN)
+            oid: 1.3.6.1.4.1.311.20.2.3
+            value: HTTP/ipaserver.test.local@TEST.LOCAL
+          - name: Kerberos principalname
+            oid: 1.3.6.1.5.2.2
+            value: HTTP/ipaserver.test.local@TEST.LOCAL
         key_usage:
           - digital_signature
           - content_commitment
