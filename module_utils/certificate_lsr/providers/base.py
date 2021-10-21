@@ -587,6 +587,7 @@ class CertificateRequestBaseProvider:
     def _set_user_and_group_if_different(self):
         owner = self.module.params.get("owner")
         group = self.module.params.get("group")
+        mode = "0640" if group else None
 
         if not any([owner, group]):
             return False
@@ -595,7 +596,7 @@ class CertificateRequestBaseProvider:
             "path": self.certificate_file_path,
             "owner": owner,
             "group": group,
-            "mode": None,
+            "mode": mode,
             "attributes": None,
             "secontext": [],
         }
