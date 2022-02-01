@@ -109,14 +109,14 @@ class KRB5PrincipalName(x509.OtherName):
             str(principal["realm"]).replace("\\", "\\\\").replace("@", "\\@")
         )
         name = principal["principalName"]["name-string"]
-        name = u"/".join(
+        name = "/".join(
             to_text(str(n))
             .replace("\\", "\\\\")
             .replace("/", "\\/")
             .replace("@", "\\@")
             for n in name
         )
-        name = u"%s@%s" % (name, realm)
+        name = "%s@%s" % (name, realm)
         return name
 
 
