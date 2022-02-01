@@ -141,6 +141,8 @@
     run_after: "{{ item.run_after | default(omit) }}"
     ca: "{{ item.ca | default(omit) }}"
     __header: "{{ __lsr_ansible_managed }}"
+    ansible_managed_new: "{{ __certificate_new_header }}"
+    profile: "{{ item.profile | default(omit) }}"
   loop: "{{ certificate_requests }}"
   vars:
     __lsr_ansible_managed: "{{

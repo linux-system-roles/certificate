@@ -154,3 +154,25 @@
     fail_msg: >-
       {{ cert['auto_renew'] | default('yes') | bool }} !=
       {{ result.stdout | bool }}
+
+# On RHEL/CentOS 7, the output of 'getcert list' doesn't include the profile
+- when:
+    - cert['profile'] is defined
+    - not (ansible_os_family == 'RedHat' and
+        ansible_distribution_major_version is version('7', '<='))
+  block:
+    - name: Retrieve profile
+      shell: >-
+        set -euo pipefail;
+        getcert list -f {{ cert['path'] }} |
+        grep 'profile:' |
+        sed 's/^\s\+profile: //g'
+      register: result
+      changed_when: false
+
+    - name: Verify certificate profile
+      assert:
+        that:
+          - cert['profile']  == result.stdout
+        fail_msg: >-
+          {{ cert['profile'] }} != {{ result.stdout }}

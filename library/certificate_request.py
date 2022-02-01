@@ -167,6 +167,10 @@ options:
       - as rendered by the template module
     type: str
     required: true
+  profile:
+    description:
+      - The certificate profile. Only used with certmonger.
+    required: false
 
 author:
   - Sergio Oliveira Campos (@seocam)
@@ -367,6 +371,8 @@ class CertificateRequestModule(AnsibleModule):
             run_before=dict(type="str"),
             run_after=dict(type="str"),
             __header=dict(type="str"),
+            ansible_managed_new=dict(type="str"),
+            profile=dict(type="str"),
         )
 
     @property
