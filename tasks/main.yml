@@ -140,4 +140,8 @@
     run_before: "{{ item.run_before | default(omit) }}"
     run_after: "{{ item.run_after | default(omit) }}"
     ca: "{{ item.ca | default(omit) }}"
+    ansible_managed_new: "{{ __certificate_new_header }}"
   loop: "{{ certificate_requests }}"
+  vars:
+    __certificate_new_header: "{{
+      lookup('template', 'get_ansible_managed.j2') }}"
