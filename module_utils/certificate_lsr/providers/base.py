@@ -547,6 +547,10 @@ class CertificateRequestBaseProvider:
         """Path where key should be placed."""
         return self._get_store_location(key=True)
 
+    def _get_ansible_managed_new(self):
+        """New ansible managed comment."""
+        return self.module.params.get("ansible_managed_new")
+
     def _get_hook_script_path(self, dirname):
         script_name = "{cert_name}-{request_id}.sh".format(
             cert_name=os.path.basename(self.module.params.get("name")),
@@ -570,7 +574,7 @@ class CertificateRequestBaseProvider:
         if not param:
             return None
 
-        script = ["#!/bin/bash", "", param]
+        script = ["#!/bin/bash", self._get_ansible_managed_new(), param]
         return "\n".join(script)
 
     @property
@@ -672,6 +676,15 @@ class CertificateRequestBaseProvider:
 
         # if file and param are the same just return
         if param_sha1 == file_sha1:
+            # Even if file and param are identical,
+            # if the script exists and the content of the script
+            # is different from the current one including the
+            # ansible managed comment, update the script.
+            cur_script = open(filepath, encoding="utf-8").read()
+            if param != cur_script:
+                with open(filepath, "w") as script_fp:
+                    script_fp.write(param)
+                return True
             return False
 
         # Changes needs to be performed.

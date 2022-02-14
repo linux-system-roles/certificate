@@ -160,6 +160,13 @@ options:
     description:
       - Command that should run after saving the certificate.
     required: false
+  ansible_managed_new:
+    description:
+      - Ansible ansible_managed string to put in header of file
+      - should be in the format of {{ ansible_managed | comment }}
+      - as rendered by the template module
+    type: str
+    required: true
 
 author:
   - Sergio Oliveira Campos (@seocam)
@@ -359,6 +366,7 @@ class CertificateRequestModule(AnsibleModule):
             wait=dict(type="bool", default=True),
             run_before=dict(type="str"),
             run_after=dict(type="str"),
+            ansible_managed_new=dict(type="str"),
         )
 
     @property

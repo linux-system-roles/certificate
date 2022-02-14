@@ -62,3 +62,13 @@
             fail_msg: >-
               {{ after_result.stat.mtime }} <=
               {{ cert_result.stat.mtime }}
+
+    - name: Get the ansible_managed comment in pre/post-scripts
+      command: >-
+        find /etc/certmonger/pre-scripts /etc/certmonger/post-scripts
+        -type f -exec grep "^# Ansible managed" {} \;
+      register: _result
+
+    - name: Verify the ansible_managed comment in pre/post-scripts
+      assert:
+        that: _result.stdout_lines | length == 2
