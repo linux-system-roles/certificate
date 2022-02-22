@@ -160,7 +160,7 @@ options:
     description:
       - Command that should run after saving the certificate.
     required: false
-  ansible_managed_new:
+  __header:
     description:
       - Ansible ansible_managed string to put in header of file
       - should be in the format of {{ ansible_managed | comment }}
@@ -366,7 +366,7 @@ class CertificateRequestModule(AnsibleModule):
             wait=dict(type="bool", default=True),
             run_before=dict(type="str"),
             run_after=dict(type="str"),
-            ansible_managed_new=dict(type="str"),
+            __header=dict(type="str"),
         )
 
     @property
