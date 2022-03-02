@@ -5,7 +5,7 @@
   vars:
     certificate_wait: false
     certificate_requests:
-      - name: mycert
+      - name: mycert_not_wait_for_cert
         dns: www.example.com
         ca: self-sign
   roles:
@@ -15,8 +15,8 @@
   hosts: all
   vars:
     certificates:
-      - path: /etc/pki/tls/certs/mycert.crt
-        key_path: /etc/pki/tls/private/mycert.key
+      - path: /etc/pki/tls/certs/mycert_not_wait_for_cert.crt
+        key_path: /etc/pki/tls/private/mycert_not_wait_for_cert.key
         subject:
           - name: commonName
             oid: 2.5.4.3

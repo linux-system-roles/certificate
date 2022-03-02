@@ -4,7 +4,7 @@
 
   vars:
     certificate_requests:
-      - name: mycert
+      - name: mycert_key_size
         dns: www.example.com
         ca: self-sign
         key_size: 4096
@@ -15,8 +15,8 @@
   hosts: all
   vars:
     certificates:
-      - path: /etc/pki/tls/certs/mycert.crt
-        key_path: /etc/pki/tls/private/mycert.key
+      - path: /etc/pki/tls/certs/mycert_key_size.crt
+        key_path: /etc/pki/tls/private/mycert_key_size.key
         subject:
           - name: commonName
             oid: 2.5.4.3

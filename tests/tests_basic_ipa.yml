@@ -11,7 +11,7 @@
 
   vars:
     certificate_requests:
-      - name: mycert
+      - name: mycert_basic_ipa
         dns: ipaserver.test.local
         principal: HTTP/ipaserver.test.local@TEST.LOCAL
         ca: ipa
@@ -29,8 +29,8 @@
   become: true
   vars:
     certificates:
-      - path: /etc/pki/tls/certs/mycert.crt
-        key_path: /etc/pki/tls/private/mycert.key
+      - path: /etc/pki/tls/certs/mycert_basic_ipa.crt
+        key_path: /etc/pki/tls/private/mycert_basic_ipa.key
         subject:
           - name: commonName
             oid: 2.5.4.3

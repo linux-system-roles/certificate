@@ -3,7 +3,7 @@
   hosts: all
   vars:
     certificate_requests:
-      - name: mycert
+      - name: mycert_wrong_provider
         dns: www.example.com
         ca: self-sign
         provider: fake-provider

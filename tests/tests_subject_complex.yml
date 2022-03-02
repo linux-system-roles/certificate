@@ -5,7 +5,7 @@
 
   vars:
     certificate_requests:
-      - name: mycert
+      - name: mycert_subject_complex
         dns: www.example.com
         common_name: '# \\Every"thing+that,ne;eds<escap>ing\0 '
         contact_email: admin@example.com
@@ -18,8 +18,8 @@
   become: true
   vars:
     certificates:
-      - path: /etc/pki/tls/certs/mycert.crt
-        key_path: /etc/pki/tls/private/mycert.key
+      - path: /etc/pki/tls/certs/mycert_subject_complex.crt
+        key_path: /etc/pki/tls/private/mycert_subject_complex.key
         subject:
           - name: emailAddress
             oid: 1.2.840.113549.1.9.1
