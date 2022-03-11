@@ -3,7 +3,7 @@
   hosts: all
   vars:
     certificate_requests:
-      - name: mycert
+      - name: mycert_principal
         dns: www.example.com
         principal: HTTP/www.example.com@EXAMPLE.COM
         ca: self-sign
@@ -14,8 +14,8 @@
   hosts: all
   vars:
     certificates:
-      - path: /etc/pki/tls/certs/mycert.crt
-        key_path: /etc/pki/tls/private/mycert.key
+      - path: /etc/pki/tls/certs/mycert_principal.crt
+        key_path: /etc/pki/tls/private/mycert_principal.key
         subject:
           - name: commonName
             oid: 2.5.4.3

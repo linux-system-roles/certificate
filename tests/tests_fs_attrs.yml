@@ -14,7 +14,7 @@
   hosts: all
   vars:
     certificate_requests:
-      - name: mycert
+      - name: mycert_fs_attrs
         dns: www.example.com
         owner: ftp
         group: ftp
@@ -32,8 +32,8 @@
   hosts: all
   vars:
     certificates:
-      - path: /etc/pki/tls/certs/mycert.crt
-        key_path: /etc/pki/tls/private/mycert.key
+      - path: /etc/pki/tls/certs/mycert_fs_attrs.crt
+        key_path: /etc/pki/tls/private/mycert_fs_attrs.key
         subject:
           - name: commonName
             oid: 2.5.4.3

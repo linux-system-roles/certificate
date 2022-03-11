@@ -4,7 +4,7 @@
 
   vars:
     certificate_requests:
-      - name: mycert
+      - name: mycert_subject
         dns: www.example.com
         common_name: Some other common name
         country: US
@@ -20,8 +20,8 @@
   hosts: all
   vars:
     certificates:
-      - path: /etc/pki/tls/certs/mycert.crt
-        key_path: /etc/pki/tls/private/mycert.key
+      - path: /etc/pki/tls/certs/mycert_subject.crt
+        key_path: /etc/pki/tls/private/mycert_subject.key
         subject:
           - name: countryName
             oid: 2.5.4.6
