@@ -2,13 +2,16 @@
 - name: Install IPA server
   hosts: all
   become: true
+  tags:
+    - tests::slow
   tasks:
     - import_tasks: tasks/setup_ipa.yml
 
 - name: Issue IPA signed certificates
   hosts: all
   become: true
-
+  tags:
+    - tests::slow
   vars:
     certificate_requests:
       - name: mycert_basic_ipa
@@ -27,6 +30,8 @@
 - name: Verify certificates
   hosts: all
   become: true
+  tags:
+    - tests::slow
   vars:
     certificates:
       - path: /etc/pki/tls/certs/mycert_basic_ipa.crt
