@@ -16,6 +16,7 @@
 - name: Verify certificate
   hosts: all
   become: true
+  gather_facts: true
   vars:
     certificates:
       - path: /etc/pki/tls/certs/mycert_subject_complex.crt
