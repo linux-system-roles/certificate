@@ -6,15 +6,17 @@ Changelog
 
 ### New Features
 
-- make all tests work with gather_facts: false (#121)
-
-Ensure tests work when using ANSIBLE_GATHERING=explicit
+- none
 
 ### Bug Fixes
 
 - none
 
 ### Other Changes
+
+- make all tests work with gather_facts: false (#121)
+
+Ensure tests work when using ANSIBLE_GATHERING=explicit
 
 - make min_ansible_version a string in meta/main.yml (#122)
 
