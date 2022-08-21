@@ -56,7 +56,7 @@ Alternative Names (SAN).
 | ip                   | IP, or list of IPs, to be included in the certificate. IPs can be IPv4, IPv6 or both. Also can provide the default value for [common\_name](#common_name). | str or list | no | - |
 | auto_renew           | Indicates if the certificate should be renewed automatically before it expires.                   | bool        | no       | yes                     |
 | owner                | User name (or user id) for the certificate and key files.                                         | str         | no       | *User running Ansible*  |
-| group                | Group name (or group id) for the certificate and key files.                                       | str         | no       | *Group running Ansible* |
+| group                | Group name (or group id) for the certificate and key files. If a group is specified the resulting key/cert files are readable by the group. | str         | no       | *Group running Ansible* |
 | key\_size            | Generate keys with a specific keysize in bits.                                                    | int         | no       | 2048 - See [key\_size](#key_size) |
 | common\_name         | Common Name requested for the certificate subject.                                                | str         | no       | See [common\_name](#common_name)  |
 | country              | Country code requested for the certificate subject.                                               | str         | no       | -                       |
