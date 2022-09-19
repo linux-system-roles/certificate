@@ -1,6 +1,25 @@
 Changelog
 =========
 
+[1.1.7] - 2022-09-19
+--------------------
+
+### New Features
+
+- none
+
+### Bug Fixes
+
+- Move Debian to Python 3 packages
+
+The python 2 packages don't exist any more in current stable Debian 11
+and Ubuntu 22.04 LTS. Use the python3-* packages (vars/main.yml has the
+correct ones).
+
+### Other Changes
+
+- changelog_to_tag action - support other than "master" for the main branch name (#129)
+
 [1.1.6] - 2022-07-19
 --------------------
 
