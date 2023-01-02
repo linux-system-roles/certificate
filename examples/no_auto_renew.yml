@@ -5,7 +5,7 @@
     certificate_requests:
       - name: mycert
         dns: www.example.com
-        auto_renew: no
+        auto_renew: false
         ca: self-sign
 
   roles:

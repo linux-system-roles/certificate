@@ -11,7 +11,7 @@
 - name: Install the package, force upgrade
   pip:
     name: pip
-    state: latest
+    state: latest  # noqa package-latest
     virtualenv: "{{ __virtualenv_path }}"
     virtualenv_command: /usr/bin/python3 -m venv
 

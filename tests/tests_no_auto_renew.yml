@@ -7,7 +7,7 @@
       - name: mycert_no_auto_renew
         dns: www.example.com
         ca: self-sign
-        auto_renew: no
+        auto_renew: false
       - name: defaultcert
         dns: www.example.com
         ca: self-sign
@@ -27,7 +27,7 @@
         subject_alt_name:
           - name: DNS
             value: www.example.com
-        auto_renew: no
+        auto_renew: false
       - path: /etc/pki/tls/certs/defaultcert.crt
         key_path: /etc/pki/tls/private/defaultcert.key
         subject:
@@ -37,7 +37,7 @@
         subject_alt_name:
           - name: DNS
             value: www.example.com
-        auto_renew: yes
+        auto_renew: true
   tasks:
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml
