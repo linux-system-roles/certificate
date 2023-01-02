@@ -30,7 +30,7 @@
     - ipaclient
   when: not __is_beaker_env
 
-- name: ensure hostname package is installed
+- name: Ensure hostname package is installed
   package:
     name: hostname
     state: present
@@ -42,10 +42,19 @@
 - name: Ensure nss package is up-to-date
   package:
     name: nss
-    state: latest
+    state: latest  # noqa package-latest
   when: ansible_facts.os_family == "RedHat"
 
 - name: Run IPA server install
+  vars:
+    ipaserver_setup_dns: true
+    ipaserver_auto_forwarders: true
+    ipaadmin_password: SomeADMINpassword
+    ipadm_password: SomeDMpassword
+    ipaserver_domain: test.local
+    ipaserver_realm: TEST.LOCAL
+    ipaserver_no_dnssec_validation: true
+    local_log_dir: "{{ lookup('env', 'TEST_ARTIFACTS') | d('/tmp', true) }}"
   block:
     - name: Include ipaserver role
       include_role:
@@ -53,6 +62,7 @@
   rescue:
     - name: FAILURE - check entropy
       command: cat /proc/sys/kernel/random/entropy_avail
+      changed_when: false
     - name: FAILURE - get logs for debugging
       shell: |-
         set -euo pipefail
@@ -63,8 +73,7 @@
           $( [[ -e ipaclient-install.log ]] && echo ipaclient-install.log ) \
           $( [[ -e pki ]] && echo pki )
         chmod '0644' /tmp/ipalogs.tgz
-      args:
-        warn: false  # suppress 'unarchive' warning
+      changed_when: false
     - name: FAILURE - grab archive
       fetch:
         src: /tmp/ipalogs.tgz
@@ -76,19 +85,8 @@
         cd "{{ local_log_dir }}"
         tar -xvzf ipalogs.tgz
         chmod 0644 *
-      args:
-        warn: false  # suppress 'unarchive' warning
       delegate_to: 127.0.0.1
-    - name: failed
+      changed_when: false
+    - name: Failed
       fail:
         msg: failed
-
-  vars:
-    ipaserver_setup_dns: yes
-    ipaserver_auto_forwarders: yes
-    ipaadmin_password: SomeADMINpassword
-    ipadm_password: SomeDMpassword
-    ipaserver_domain: test.local
-    ipaserver_realm: TEST.LOCAL
-    ipaserver_no_dnssec_validation: yes
-    local_log_dir: "{{ lookup('env', 'TEST_ARTIFACTS') | d('/tmp', true) }}"

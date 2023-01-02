@@ -90,7 +90,7 @@
         name: >-
           {{ __certificate_provider_vars[__certificate_provider].service }}
         state: started
-        enabled: yes
+        enabled: true
       loop: "{{ __certificate_providers }}"
       loop_control:
         loop_var: __certificate_provider

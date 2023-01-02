@@ -2,7 +2,7 @@
 - hosts: all
 
   vars:
-    certificate_wait: no
+    certificate_wait: false
     certificate_requests:
       - name: mycert
         dns: www.example.com
