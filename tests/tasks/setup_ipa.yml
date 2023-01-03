@@ -10,9 +10,9 @@
   when: __is_beaker_env
 
 - name: Clone ansible-freeipa repo
+  # noqa git-latest
   git:
     repo: https://github.com/freeipa/ansible-freeipa
-    version: master
     dest: /tmp/freeipa-repo
   delegate_to: 127.0.0.1
   become: false

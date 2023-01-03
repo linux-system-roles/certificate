@@ -18,7 +18,7 @@ correct ones).
 
 ### Other Changes
 
-- changelog_to_tag action - support other than "master" for the main branch name (#129)
+- changelog_to_tag action - github action ansible test improvements
 
 [1.1.6] - 2022-07-19
 --------------------
@@ -183,14 +183,14 @@ must be a `string` value like `"2.9"`, not a `float` value like `2.9`.
 
 ### Bug fixes
 
-- Fix some ansible-test sanity errors; suppressing the rest
+- Fix some ansible-test errors; suppressing the rest
 - Fix ansible-test errors
 - Add a note to each module Doc to indicate it is private
 
 ### Other Changes
 
 - Remove python-26 environment from tox testing
-- update to tox-lsr 2.4.0 - add support for ansible-test sanity with docker
+- update to tox-lsr 2.4.0 - add support for ansible-test with docker
 - CI: Add support for RHEL-9
 
 [1.0.2] - 2021-02-12
