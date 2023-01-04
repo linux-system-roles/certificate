@@ -1,6 +1,6 @@
 ---
-- hosts: all
-
+- name: Example with key_usage and extended_key_usage
+  hosts: all
   vars:
     certificate_requests:
       - name: mycert
@@ -16,6 +16,5 @@
           - id-kp-OCSPSigning
           - id-kp-ipsecUser
         ca: self-sign
-
   roles:
     - linux-system-roles.certificate

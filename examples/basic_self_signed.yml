@@ -1,11 +1,10 @@
 ---
-- hosts: all
-
+- name: Example role usage
+  hosts: all
   vars:
     certificate_requests:
       - name: mycert
         dns: www.example.com
         ca: self-sign
-
   roles:
     - linux-system-roles.certificate

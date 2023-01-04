@@ -1,12 +1,11 @@
 ---
-- hosts: all
-
+- name: Example with provider
+  hosts: all
   vars:
     certificate_requests:
       - name: mycert
         dns: www.example.com
         ca: self-sign
         provider: fake-provider
-
   roles:
     - linux-system-roles.certificate

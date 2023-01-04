@@ -6,7 +6,8 @@
   tags:
     - tests::slow
   tasks:
-    - import_tasks: tasks/setup_ipa.yml
+    - name: Setup IPA
+      import_tasks: tasks/setup_ipa.yml
 
 - name: Issue IPA signed certificates
   hosts: all

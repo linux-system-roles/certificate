@@ -1,12 +1,11 @@
 ---
-- hosts: all
-
+- name: Example with no waiting for cert issuance
+  hosts: all
   vars:
     certificate_wait: false
     certificate_requests:
       - name: mycert
         dns: www.example.com
         ca: self-sign
-
   roles:
     - linux-system-roles.certificate

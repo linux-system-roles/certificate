@@ -9,17 +9,19 @@
         provider: fake-provider
 
   tasks:
-    - vars:
+    - name: Run test
+      vars:
         expected_error_msg: >-
           Chosen provider 'fake-provider' is not available.
       block:
-        - import_role:
+        - name: Import certificate role
+          import_role:
             name: linux-system-roles.certificate
-        - name: failed
+        - name: Failed
           fail:
             msg: "Certificate issued with nonexistent provider 'fake-provider'."
       rescue:
-        - name: assert...
+        - name: Assert...
           assert:
             that:
               - ansible_failed_result.results.0.msg  == expected_error_msg

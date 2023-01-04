@@ -10,7 +10,7 @@
   when: __is_beaker_env
 
 - name: Clone ansible-freeipa repo
-  # noqa git-latest
+  # noqa latest[git] git-latest
   git:
     repo: https://github.com/freeipa/ansible-freeipa
     dest: /tmp/freeipa-repo

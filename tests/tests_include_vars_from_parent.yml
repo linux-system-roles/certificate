@@ -1,8 +1,9 @@
 ---
-- hosts: all
+- name: Test role include variable override
+  hosts: all
   gather_facts: true
   tasks:
-    - name: create var file in caller that can override the one in called role
+    - name: Create var file in caller that can override the one in called role
       delegate_to: localhost
       copy:
         # usually the fake file will cause the called role to crash of

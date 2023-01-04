@@ -68,6 +68,7 @@
         find /etc/certmonger/pre-scripts /etc/certmonger/post-scripts
         -type f -exec grep "^# Ansible managed" {} \;
       register: _result
+      changed_when: false
 
     - name: Verify the ansible_managed comment in pre/post-scripts
       assert:

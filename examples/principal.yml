@@ -1,12 +1,11 @@
 ---
-- hosts: all
-
+- name: Example with principal
+  hosts: all
   vars:
     certificate_requests:
       - name: mycert
         dns: www.example.com
         principal: HTTP/www.example.com@EXAMPLE.com
         ca: self-sign
-
   roles:
     - linux-system-roles.certificate

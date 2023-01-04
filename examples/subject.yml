@@ -1,6 +1,6 @@
 ---
-- hosts: all
-
+- name: Example with subject fields
+  hosts: all
   vars:
     certificate_requests:
       - name: mycert
@@ -11,6 +11,5 @@
         organization: Red Hat
         organizational_unit: Linux
         ca: self-sign
-
   roles:
     - linux-system-roles.certificate

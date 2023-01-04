@@ -1,6 +1,6 @@
 ---
-- hosts: all
-
+- name: Example with multiple self-signed certs
+  hosts: all
   vars:
     certificate_requests:
       - name: mycert
@@ -12,6 +12,5 @@
       - name: /tmp/another-cert
         dns: www.example.net
         ca: self-sign
-
   roles:
     - linux-system-roles.certificate
