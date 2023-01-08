@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Example with dns, ip, and email
+  hosts: all
   vars:
     certificate_requests:
       - name: mycert
@@ -17,6 +18,5 @@
           - sysadmin@example.com
           - support@example.com
         ca: self-sign
-
   roles:
     - linux-system-roles.certificate

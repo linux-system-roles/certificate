@@ -1,12 +1,11 @@
 ---
-- hosts: all
-
+- name: Example with no auto_renew
+  hosts: all
   vars:
     certificate_requests:
       - name: mycert
         dns: www.example.com
         auto_renew: false
         ca: self-sign
-
   roles:
     - linux-system-roles.certificate

@@ -1,6 +1,6 @@
 ---
-- hosts: all
-
+- name: Example with owner and group
+  hosts: all
   vars:
     certificate_requests:
       - name: mycert
@@ -8,6 +8,5 @@
         ca: self-sign
         owner: ftp
         group: ftp
-
   roles:
     - linux-system-roles.certificate

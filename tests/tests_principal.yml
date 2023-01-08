@@ -46,17 +46,19 @@
         principal: HTTP/abc
         ca: self-sign
   tasks:
-    - vars:
+    - name: Run test
+      vars:
         expected_error_msg: >-
           It should be formatted as 'primary/instance@REALM'
       block:
-        - import_role:
+        - name: Import certificate role
+          import_role:
             name: linux-system-roles.certificate
-        - name: failed
+        - name: Failed
           fail:
             msg: "certificate with invalid principal"
       rescue:
-        - name: assert...
+        - name: Assert...
           assert:
             that:
               - expected_error_msg in ansible_failed_result.results.0.msg
