@@ -1,6 +1,21 @@
 Changelog
 =========
 
+[1.1.9] - 2023-02-02
+--------------------
+
+### New Features
+
+- none
+
+### Bug Fixes
+
+- none
+
+### Other Changes
+
+- Fix assert in tests_run_hooks.yml (#157)
+
 [1.1.8] - 2023-01-20
 --------------------
 
