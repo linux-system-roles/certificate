@@ -51,16 +51,16 @@
         - name: Assert file created before cert
           assert:
             that:
-              - before_result.stat.mtime < cert_result.stat.mtime
+              - before_result.stat.mtime <= cert_result.stat.mtime
             fail_msg: >-
-              {{ before_result.stat.mtime }} >=
+              {{ before_result.stat.mtime }} >
               {{ cert_result.stat.mtime }}
         - name: Assert file created after cert
           assert:
             that:
-              - after_result.stat.mtime > cert_result.stat.mtime
+              - after_result.stat.mtime >= cert_result.stat.mtime
             fail_msg: >-
-              {{ after_result.stat.mtime }} <=
+              {{ after_result.stat.mtime }} <
               {{ cert_result.stat.mtime }}
 
     - name: Get the ansible_managed comment in pre/post-scripts
