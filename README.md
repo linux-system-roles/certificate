@@ -24,6 +24,10 @@ Basic usage:
 On a RPM-based system this will place the certificate in `/etc/pki/tls/certs/mycert.crt`
 and the key in `/etc/pki/tls/private/mycert.key`.
 
+## Requirements
+
+None
+
 ## Variables
 
 | Parameter               | Description                                                                                                    | Type | Required | Default           |
@@ -167,8 +171,7 @@ Additionally to that, if the scripts executed by `run_before` and `run_after`
 parameters need to write or edit files, those scripts also require the `cert_t`
 context to be present prior to the role execution.
 
-You can use [linux-system-roles/selinux](https://github.com/linux-system-roles/selinux)
-to manage SELinux contexts.
+You can use the `selinux` System Role to manage SELinux contexts.
 
 For more information about `certmonger` and SELinux requirements, see
 [certmonger_selinux(8) man pages](https://linux.die.net/man/8/certmonger_selinux).
@@ -445,11 +448,6 @@ Note that you can also use UID and GID instead of user and group names.
 ## Compatibility
 
 Currently supports CentOS 7+, RHEL 7+, Fedora. It has been tested with Debian 10.
-
-
-## Dependencies
-
-None.
 
 
 ## License
