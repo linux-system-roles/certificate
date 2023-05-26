@@ -1,6 +1,14 @@
 Changelog
 =========
 
+[1.1.12] - 2023-05-26
+--------------------
+
+### Other Changes
+
+- docs: Consistent contributing.md for all roles - allow role specific contributing.md section
+- docs: remove unused Dependencies section in README
+
 [1.1.11] - 2023-04-27
 --------------------
 
