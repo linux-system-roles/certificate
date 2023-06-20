@@ -56,6 +56,11 @@ options:
     description:
       - Group name (or group id) for the certificate and key files.
     required: false
+  mode:
+    description:
+      - The file system permissions for the certificate and key files.
+    type: raw
+    required: false
   common_name:
     description:
       - Common Name requested for the certificate subject.
@@ -357,6 +362,7 @@ class CertificateRequestModule(AnsibleModule):
             key_size=dict(type="int", default=2048),
             owner=dict(type="str"),
             group=dict(type="str"),
+            mode=dict(type="raw"),
             principal=dict(type="list"),
             key_usage=dict(
                 type="list", choices=KEY_USAGE_CHOICES, default=KEY_USAGE_DEFAULTS
