@@ -10,6 +10,7 @@
       group:
         name: somegroup
         gid: 1041
+
 - name: Issue certificate setting user/group
   hosts: all
   vars:
@@ -56,6 +57,57 @@
         owner: 1040
         group: 1041
         mode: "0640"
+  tasks:
+    - name: Verify each certificate
+      include_tasks: tasks/assert_certificate_parameters.yml
+      loop: "{{ certificates }}"
+      loop_control:
+        loop_var: cert
+
+- name: Issue certificate setting user/group/mode
+  hosts: all
+  vars:
+    certificate_requests:
+      - name: mycert_fs_attrs_mode
+        dns: www.example.com
+        owner: ftp
+        group: ftp
+        mode: "0620"
+        ca: self-sign
+      - name: certid_mode
+        dns: www.example.com
+        mode: "0600"
+        ca: self-sign
+
+  roles:
+    - linux-system-roles.certificate
+
+- name: Verify certificate
+  hosts: all
+  vars:
+    certificates:
+      - path: /etc/pki/tls/certs/mycert_fs_attrs_mode.crt
+        key_path: /etc/pki/tls/private/mycert_fs_attrs_mode.key
+        subject:
+          - name: commonName
+            oid: 2.5.4.3
+            value: www.example.com
+        subject_alt_name:
+          - name: DNS
+            value: www.example.com
+        owner: ftp
+        group: ftp
+        mode: "0620"
+      - path: /etc/pki/tls/certs/certid_mode.crt
+        key_path: /etc/pki/tls/private/certid_mode.key
+        subject:
+          - name: commonName
+            oid: 2.5.4.3
+            value: www.example.com
+        subject_alt_name:
+          - name: DNS
+            value: www.example.com
+        mode: "0600"
   tasks:
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml

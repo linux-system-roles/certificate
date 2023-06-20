@@ -106,6 +106,7 @@
     common_name: "{{ item.common_name | default(omit) }}"
     owner: "{{ item.owner | default(omit) }}"
     group: "{{ item.group | default(omit) }}"
+    mode: "{{ item.mode | default(omit) }}"
     provider: "{{ item.provider | default(omit) }}"
     principal: "{{ item.principal | default(omit) }}"
     directory: "{{ __certificate_default_directory }}"
