@@ -133,3 +133,64 @@
   vars:
     __lsr_ansible_managed: "{{
       lookup('template', 'get_ansible_managed.j2') }}"
+
+# For using this role to issue certs for tests for other
+# system roles.  Assumes that the calling role wants
+# self signed certs e.g. as a replacement for various
+# openssl calls to generate certs, keys.  Also assumes
+# that each item in certificate_requests has a unique
+# name that can be used as the keys to the
+# certificate_test_certs dict
+- name: Handle test mode
+  when: certificate_test_mode | d(false)
+  vars:
+    __cert_dir: "{{ __certificate_default_directory ~ '/certs' }}"
+    __key_dir: "{{ __certificate_default_directory ~ '/private' }}"
+    __ca_dir: "{{ __certificate_default_directory ~ '/certs' }}"
+  block:
+    - name: Slurp the contents of the files
+      slurp:
+        path: "{{ __file }}"
+      register: __certificate_test_data
+      loop: "{{ ['cert', 'key', 'ca'] | product(certificate_requests) | list }}"
+      vars:
+        __file: "{{ __cert_dir ~ '/' ~ item[1].name ~ '.crt'
+          if item[0] == 'cert' else
+          __key_dir ~ '/' ~ item[1].name ~ '.key'
+          if item[0] == 'key' else
+          __ca_dir ~ '/' ~ item[1].name ~ '.crt' }}"
+
+    - name: Create return data
+      set_fact:
+        certificate_test_certs: |
+          {% set rv = {} %}
+          {% for ii in __certificate_test_data.results %}
+          {%   set name = ii.item[1].name %}
+          {%   set dct = rv.setdefault(name, {}) %}
+          {%   set key1 = ii.item[0] %}
+          {%   set val1 = ii.source %}
+          {%   set key2 = ii.item[0] ~ '_content' %}
+          {%   set val2 = ii.content | b64decode %}
+          {%   set _ = dct.__setitem__(key1, val1) %}
+          {%   set _ = dct.__setitem__(key2, val2) %}
+          {% endfor %}
+          {{ rv }}
+
+    - name: Stop tracking certificates
+      command: getcert stop-tracking -f {{ item.cert }}
+      changed_when: false
+      loop: "{{ certificate_test_certs.values() | list }}"
+
+    - name: Remove files
+      file:
+        path: "{{ item }}"
+        state: absent
+      when: certificate_test_remove_files | d(false)
+      loop: "{{ __certs + __keys + __ca }}"
+      vars:
+        __certs: "{{ certificate_test_certs.values() | map(attribute='cert') |
+          list }}"
+        __keys: "{{ certificate_test_certs.values() | map(attribute='key') |
+          list }}"
+        __ca: "{{ certificate_test_certs.values() | map(attribute='ca') |
+          list }}"
