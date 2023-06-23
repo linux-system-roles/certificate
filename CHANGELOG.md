@@ -1,6 +1,15 @@
 Changelog
 =========
 
+[1.1.13] - 2023-06-23
+--------------------
+
+### Other Changes
+
+- ci: Add pull request template and run commitlint on PR title only (#174)
+- ci: Rename commitlint to PR title Lint, echo PR titles from env var (#176)
+- test: easily generate certs for tests for other roles (#177)
+
 [1.1.12] - 2023-05-26
 --------------------
 
