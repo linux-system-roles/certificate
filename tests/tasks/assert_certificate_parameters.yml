@@ -5,21 +5,23 @@
 
 - name: Ensure python3 is installed
   package:
-    name:
-      - python3
+    name: python3
 
-- name: Install the package, force upgrade
+- name: Ensure packages are updated
   pip:
-    name: pip
+    name:
+      - pip
     state: latest  # noqa package-latest
     virtualenv: "{{ __virtualenv_path }}"
     virtualenv_command: /usr/bin/python3 -m venv
 
-- name: Install certreader
+- name: Ensure packages are updated
   pip:
     name:
-      - cryptography<35
-      - certreader>=0.1.1
+      - pip
+      - cryptography
+      - pyasn1
+    state: latest  # noqa package-latest
     virtualenv: "{{ __virtualenv_path }}"
     virtualenv_command: /usr/bin/python3 -m venv
 
@@ -76,13 +78,16 @@
       {{ cert['group'] | default('root') }}
 
 - name: Parse certificate
-  command: "{{ __virtualenv_path }}/bin/certreader2json {{ cert['path'] }}"
-  register: certreader_result
+  certtojson:
+    filename: "{{ cert['path'] }}"
+  register: certificate_data
   changed_when: false
+  vars:
+    ansible_python_interpreter: "{{ __virtualenv_path }}/bin/python"
 
 - name: Load certificate YAML to cert_issued variable
   set_fact:
-    cert_issued: "{{ certreader_result.stdout | from_json }}"
+    cert_issued: "{{ certificate_data.certificate }}"
 
 - name: Verify certificate subject
   assert:
