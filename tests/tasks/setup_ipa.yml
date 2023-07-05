@@ -9,11 +9,19 @@
   delegate_to: 127.0.0.1
   when: __is_beaker_env
 
+- name: Ensure freeipa-repo is absent
+  file:
+    path: /tmp/freeipa-repo/
+    state: absent
+  delegate_to: 127.0.0.1
+  become: false
+  when: not __is_beaker_env
+
 - name: Clone ansible-freeipa repo
-  # noqa latest[git] git-latest
-  git:
+  git:  # noqa latest[git]
     repo: https://github.com/freeipa/ansible-freeipa
     dest: /tmp/freeipa-repo
+    depth: 1
   delegate_to: 127.0.0.1
   become: false
   when: not __is_beaker_env
@@ -47,13 +55,12 @@
 
 - name: Run IPA server install
   vars:
-    ipaserver_setup_dns: true
-    ipaserver_auto_forwarders: true
+    ipaserver_setup_dns: false
+    ipaserver_auto_forwarders: false
     ipaadmin_password: SomeADMINpassword
     ipadm_password: SomeDMpassword
     ipaserver_domain: test.local
     ipaserver_realm: TEST.LOCAL
-    ipaserver_no_dnssec_validation: true
     local_log_dir: "{{ lookup('env', 'TEST_ARTIFACTS') | d('/tmp', true) }}"
   block:
     - name: Include ipaserver role
