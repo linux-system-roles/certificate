@@ -6,6 +6,7 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from pyasn1.codec.der import decoder
 from pyasn1.type import char, namedtype, tag, univ
+import struct
 
 
 def load_unknown_certificate_from_data(cert_data):
@@ -29,7 +30,10 @@ def parse_cert_timestamp(cert_datetime):
 
 def to_hex_str(value):
     """Convert byte list to "XX:XX:XX..." string."""
-    return ":".join(f"{byte:02X}" for byte in value)
+    # pylint: disable=C0209
+    fmtstr = str(len(value)) + "B"
+    intlist = struct.unpack(fmtstr, value)
+    return ":".join("{0:02X}".format(byte) for byte in intlist)
 
 
 def decode_kerberos_principalname(data):
