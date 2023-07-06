@@ -46,6 +46,8 @@
 - name: Set hostname
   hostname:
     name: ipaserver.test.local
+    use: systemd
+  when: ansible_facts.os_family == "RedHat"
 
 - name: Ensure nss package is up-to-date
   package:
