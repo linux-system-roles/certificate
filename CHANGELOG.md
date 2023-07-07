@@ -1,6 +1,21 @@
 Changelog
 =========
 
+[1.2.0] - 2023-07-07
+--------------------
+
+### New Features
+
+- feat: Allow setting certificate and key files mode (#175)
+
+### Other Changes
+
+- ci: Use Ubuntu repository for Python 2.7 (#179)
+- ci: Remove certreader dependency (#180)
+- test: Update pre-commit hooks (#181)
+- ci: Remove package installation through pip (#182)
+- tests: Ensure ipaserver hostname is a FQDN (#183)
+
 [1.1.13] - 2023-06-23
 --------------------
 
