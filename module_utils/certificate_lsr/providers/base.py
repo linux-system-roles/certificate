@@ -185,6 +185,7 @@ class CertificateProxy:
             "extended_key_usage",
             "principal",
             "auto_renew",
+            "key_size",
         ]
         info = {k: v for k, v in params.items() if k in map_attrs}
 
@@ -254,6 +255,7 @@ class CertificateProxy:
         cert_like = cls(module)
         info = cert_like._get_info_from_x509(x509_obj)
         info["auto_renew"] = auto_renew
+        info["key_size"] = x509_obj.public_key().key_size
         cert_like.cert_data = info
         return cert_like
 
