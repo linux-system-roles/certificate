@@ -1,0 +1,85 @@
+---
+- name: Test re-issue certificate if key size changes
+  hosts: all
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Include role, ignore fail if certmonger version is not supported
+      block:
+        - name: Request certificate with key size
+          ansible.builtin.include_role:
+            name: linux-system-roles.certificate
+          vars:
+            certificate_requests:
+              - name: mycert_key_size
+                dns: www.example.com
+                ca: self-sign
+                key_size: 4096
+        - name: Verify each certificate
+          include_tasks: tasks/assert_certificate_parameters.yml
+          loop: "{{ certificates }}"
+          loop_control:
+            loop_var: cert
+          vars:
+            certificates:
+              - path: /etc/pki/tls/certs/mycert_key_size.crt
+                key_path: /etc/pki/tls/private/mycert_key_size.key
+                subject:
+                  - name: commonName
+                    oid: 2.5.4.3
+                    value: www.example.com
+                subject_alt_name:
+                  - name: DNS
+                    value: www.example.com
+                key_size: 4096
+      rescue:
+        - name: Abort test if certmonger is not supported
+          vars:
+            version_error: >-
+              certmonger version does not support attribute 'key_size'
+          when:
+            - ansible_failed_result is defined
+            - version_error in ansible_failed_result.results[0].msg
+          block:
+            - name: Clear host errors
+              meta: clear_host_errors
+            - name: End play
+              meta: end_play
+
+    - name: Request certificate with key size 3072
+      ansible.builtin.include_role:
+        name: linux-system-roles.certificate
+      vars:
+        certificate_requests:
+          - name: mycert_key_size
+            dns: www.example.com
+            ca: self-sign
+            key_size: 3072
+
+    - name: Fail if certificate was not updated.
+      fail:
+        msg: Certificate was not updated.
+      when:
+        - ansible_failed_result is defined
+        - expected_msg not in ansible_failed_result.results[-1].msg
+      vars:
+        expected_msg: "Certificate requested (updated)"
+
+    - name: Verify each certificate
+      include_tasks: tasks/assert_certificate_parameters.yml
+      loop: "{{ certificates }}"
+      loop_control:
+        loop_var: cert
+      vars:
+        certificates:
+          - path: /etc/pki/tls/certs/mycert_key_size.crt
+            key_path: /etc/pki/tls/private/mycert_key_size.key
+            subject:
+              - name: commonName
+                oid: 2.5.4.3
+                value: www.example.com
+            subject_alt_name:
+              - name: DNS
+                value: www.example.com
+            key_size: 3072

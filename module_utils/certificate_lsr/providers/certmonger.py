@@ -264,9 +264,14 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
         command += self.set_auto_renew(self.csr.auto_renew)
 
         # Set certificate key size
+        key_size = self.module.params.get("key_size")
         allow_key_size_update = self.certmonger_version >= StrictVersion("0.79.0")
+        if key_size is not None and not allow_key_size_update:
+            self.module.fail_json(
+                msg="Your certmonger version does not support attribute 'key_size'"
+            )
         if not self.exists_in_certmonger or allow_key_size_update:
-            command += ["-g", str(self.module.params.get("key_size"))]
+            command += ["-g", str(key_size)]
 
         self.module.debug("Certmonger command: {0}".format(command))
 

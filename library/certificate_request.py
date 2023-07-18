@@ -67,9 +67,8 @@ options:
     required: false
   key_size:
     description:
-      - Generate keys with a specific keysize in bits.
+      - Generate keys with a specific keysize in bits, by default 2048.
     required: false
-    default: 2048
   ca:
     description:
       - CA that will issue the certificate. The available options
@@ -359,7 +358,7 @@ class CertificateRequestModule(AnsibleModule):
             directory=dict(type="str", default="/etc/pki/tls"),
             provider_config_directory=dict(type="str", default="/etc/certmonger"),
             provider=dict(type="str", default="certmonger"),
-            key_size=dict(type="int", default=2048),
+            key_size=dict(type="int", default=None),
             owner=dict(type="str"),
             group=dict(type="str"),
             mode=dict(type="raw"),
