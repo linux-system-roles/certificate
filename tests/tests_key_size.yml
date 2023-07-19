@@ -1,33 +1,40 @@
 ---
-- name: Issue simple self-signed certificate
+- name: Test certificate generation with key_size
   hosts: all
 
-  vars:
-    certificate_requests:
-      - name: mycert_key_size
-        dns: www.example.com
-        ca: self-sign
-        key_size: 4096
-  roles:
-    - linux-system-roles.certificate
-
-- name: Verify certificate
-  hosts: all
-  vars:
-    certificates:
-      - path: /etc/pki/tls/certs/mycert_key_size.crt
-        key_path: /etc/pki/tls/private/mycert_key_size.key
-        subject:
-          - name: commonName
-            oid: 2.5.4.3
-            value: www.example.com
-        subject_alt_name:
-          - name: DNS
-            value: www.example.com
-        key_size: 4096
   tasks:
-    - name: Verify each certificate
-      include_tasks: tasks/assert_certificate_parameters.yml
-      loop: "{{ certificates }}"
-      loop_control:
-        loop_var: cert
+    - name: Include role, ignore fail if certmonger version is not supported
+      block:
+        - name: Request certificate with key size
+          ansible.builtin.include_role:
+            name: linux-system-roles.certificate
+          vars:
+            certificate_requests:
+              - name: mycert_key_size
+                dns: www.example.com
+                ca: self-sign
+                key_size: 1024
+        - name: Verify each certificate
+          include_tasks: tasks/assert_certificate_parameters.yml
+          loop: "{{ certificates }}"
+          loop_control:
+            loop_var: cert
+          vars:
+            certificates:
+              - path: /etc/pki/tls/certs/mycert_key_size.crt
+                key_path: /etc/pki/tls/private/mycert_key_size.key
+                subject:
+                  - name: commonName
+                    oid: 2.5.4.3
+                    value: www.example.com
+                subject_alt_name:
+                  - name: DNS
+                    value: www.example.com
+                key_size: 1024
+      rescue:
+        - name: Clear host errors if certmonger version is not supported
+          meta: clear_host_errors
+          when: version_error in ansible_failed_result.results[0].msg
+          vars:
+            version_error: >-
+              certmonger version does not support attribute 'key_size'
