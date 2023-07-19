@@ -1,6 +1,19 @@
 Changelog
 =========
 
+[1.2.1] - 2023-07-19
+--------------------
+
+### Bug Fixes
+
+- fix: Re-issue certificate if key size changes (#188)
+- fix: facts being gathered unnecessarily (#187)
+
+### Other Changes
+
+- ci: ansible-lint - ignore var-naming[no-role-prefix] (#185)
+- ci: ansible-test ignores file for ansible-core 2.15 (#186)
+
 [1.2.0] - 2023-07-07
 --------------------
 
