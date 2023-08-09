@@ -1,4 +1,5 @@
 # Certificate System Role
+
 ![CI Testing](https://github.com/linux-system-roles/certificate/workflows/tox/badge.svg)
 
 Role for managing TLS/SSL certificate issuance and renewal
@@ -35,7 +36,6 @@ None
 | certificate_wait        | If the task should wait for the certificate to be issued.                                                      | bool | no       | yes               |
 | certificate\_requests   | A list of dicts representing each certificate to be issued. See [certificate_requests](#certificate_requests). | list | no       | -                 |
 
-
 ### certificate_requests
 
 **Note:** Fields such as `common_name`, `country`, `state`, `locality`,
@@ -49,7 +49,6 @@ the certificate without `country` in it's subject.
 
 **Note:** The fields `dns`, `email` and `ip` are used to define the Subject
 Alternative Names (SAN).
-
 
 | Parameter            | Description                                                                                       | Type        | Required | Default                 |
 |----------------------|---------------------------------------------------------------------------------------------------|:-----------:|:--------:|-------------------------|
@@ -78,13 +77,11 @@ Alternative Names (SAN).
 | principal            | Kerberos principal.                                                                               | str         | no       | -                       |
 | provider             | The underlying method used to request and manage the certificate.                                 | str         | no       | *Varies by CA*          |
 
-
 ### common_name
 
 If `common_name` is not set the role will attempt to use the first
 value of `dns` or `ip`, respectively, as the default. If `dns` and
 `ip` are also not set, `common_name` will not be included in the certificate.
-
 
 ### key_size
 
@@ -94,7 +91,6 @@ the default minimal-value for `key_size` will be increased over time.
 
 If you want your certificates to always keep the same `key_size` when
 renewed, set this variable to the desired value.
-
 
 ### key_usage
 
@@ -145,7 +141,6 @@ renewed and another command just after. In order to do that use
 The value provided to `run_before` and `run_after` will be wrapped and
 stored in shell script files that later will be executed by the provider.
 
-
 ## CAs and Providers
 
 | CA               | Providers   | CA description                                  | Requirements                                    |
@@ -178,15 +173,12 @@ You can use the `selinux` System Role to manage SELinux contexts.
 For more information about `certmonger` and SELinux requirements, see
 [certmonger_selinux(8) man pages](https://linux.die.net/man/8/certmonger_selinux).
 
+## Examples
 
-## Examples:
-
-
-### Issuing a self-signed certificate:
+### Issuing a self-signed certificate
 
 Issue a certificate for `*.example.com` and place it in the standard
 directory for the distribution.
-
 
 ```yaml
 ---
@@ -211,7 +203,6 @@ You can find the directories for each distribution in the following locations:
 * RHEL/CentOS/Fedora:
   * Certificates: `/etc/pki/tls/certs/`
   * Keys: `/etc/pki/tls/private/`
-
 
 ### Choosing where to place the certificates
 
@@ -258,7 +249,6 @@ The example below creates a certificate file in
     - linux-system-roles.certificate
 ```
 
-
 ### Setting common subject options
 
 ```yaml
@@ -280,7 +270,6 @@ The example below creates a certificate file in
     - linux-system-roles.certificate
 ```
 
-
 ### Setting the certificate key size
 
 ```yaml
@@ -296,9 +285,7 @@ The example below creates a certificate file in
     - linux-system-roles.certificate
 ```
 
-
 ### Setting the "Key Usage" and "Extended Key Usage" (EKU)
-
 
 ```yaml
 ---
@@ -318,7 +305,6 @@ The example below creates a certificate file in
   roles:
     - linux-system-roles.certificate
 ```
-
 
 ### Don't wait for the certificate to be issued
 
@@ -342,7 +328,6 @@ set to `no` the role does not wait for any certificate to be issued.
     - linux-system-roles.certificate
 ```
 
-
 ### Setting a principal
 
 ```yaml
@@ -358,7 +343,6 @@ set to `no` the role does not wait for any certificate to be issued.
   roles:
     - linux-system-roles.certificate
 ```
-
 
 ### Choosing to not auto-renew a certificate
 
@@ -378,7 +362,6 @@ auto-renewal. To disable that behavior set `auto_renew: no`.
   roles:
     - linux-system-roles.certificate
 ```
-
 
 ### Using FreeIPA to issue a certificate
 
@@ -400,7 +383,6 @@ to use it's CA to issue your certificate. To do that, set `ca: ipa`.
 ```
 
 ### Running a command before or after a certificate is issued
-
 
 Sometimes you need to execute a command just before a certificate is
 renewed and another command just after. To do so, use `run_before`
@@ -428,7 +410,6 @@ you need to set the certificate owner and group that will own the
 certificate. In the following example the owner and group are both
 set to httpd.
 
-
 ```yaml
 ---
 - hosts: webserver
@@ -446,20 +427,14 @@ set to httpd.
 
 Note that you can also use UID and GID instead of user and group names.
 
-
 ## Compatibility
 
 Currently supports CentOS 7+, RHEL 7+, Fedora. It has been tested with Debian 10.
-
 
 ## License
 
 MIT
 
-
 ## Author Information
 
 Sergio Oliveira Campos (@seocam)
-
-
-[modeline]: # ( vim: set ts=2 sts=2 et: )
