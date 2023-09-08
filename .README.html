@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<!--
+==============================================================================
+           "GitHub HTML5 Pandoc Template" v2.2 — by Tristano Ajmone
+==============================================================================
+Copyright © Tristano Ajmone, 2017-2020, MIT License (MIT). Project's home:
+
+- https://github.com/tajmone/pandoc-goodies
+
+The CSS in this template reuses source code taken from the following projects:
+
+- GitHub Markdown CSS: Copyright © Sindre Sorhus, MIT License (MIT):
+  https://github.com/sindresorhus/github-markdown-css
+
+- Primer CSS: Copyright © 2016-2017 GitHub Inc., MIT License (MIT):
+  http://primercss.io/
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The MIT License
+
+Copyright (c) Tristano Ajmone, 2017-2020 (github.com/tajmone/pandoc-goodies)
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+Copyright (c) 2017 GitHub Inc.
+
+"GitHub Pandoc HTML5 Template" is Copyright (c) Tristano Ajmone, 2017-2020,
+released under the MIT License (MIT); it contains readaptations of substantial
+portions of the following third party softwares:
+
+(1) "GitHub Markdown CSS", Copyright (c) Sindre Sorhus, MIT License (MIT).
+(2) "Primer CSS", Copyright (c) 2016 GitHub Inc., MIT License (MIT).
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+==============================================================================-->
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Certificate System Role</title>
+  <style type="text/css">
+@charset "UTF-8";.markdown-body{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;color:#24292e;font-family:-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";font-size:16px;line-height:1.5;word-wrap:break-word;box-sizing:border-box;min-width:200px;margin:0 auto;padding:45px}.markdown-body a{color:#0366d6;background-color:transparent;text-decoration:none;-webkit-text-decoration-skip:objects}.markdown-body a:active,.markdown-body a:hover{outline-width:0}.markdown-body a:hover{text-decoration:underline}.markdown-body a:not([href]){color:inherit;text-decoration:none}.markdown-body strong{font-weight:600}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{margin-top:24px;margin-bottom:16px;font-weight:600;line-height:1.25}.markdown-body h1{font-size:2em;margin:.67em 0;padding-bottom:.3em;border-bottom:1px solid #eaecef}.markdown-body h2{padding-bottom:.3em;font-size:1.5em;border-bottom:1px solid #eaecef}.markdown-body h3{font-size:1.25em}.markdown-body h4{font-size:1em}.markdown-body h5{font-size:.875em}.markdown-body h6{font-size:.85em;color:#6a737d}.markdown-body img{border-style:none}.markdown-body svg:not(:root){overflow:hidden}.markdown-body hr{box-sizing:content-box;height:.25em;margin:24px 0;padding:0;overflow:hidden;background-color:#e1e4e8;border:0}.markdown-body hr::before{display:table;content:""}.markdown-body hr::after{display:table;clear:both;content:""}.markdown-body input{margin:0;overflow:visible;font:inherit;font-family:inherit;font-size:inherit;line-height:inherit}.markdown-body [type=checkbox]{box-sizing:border-box;padding:0}.markdown-body *{box-sizing:border-box}.markdown-body blockquote{margin:0}.markdown-body ol,.markdown-body ul{padding-left:2em}.markdown-body ol ol,.markdown-body ul ol{list-style-type:lower-roman}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-top:0;margin-bottom:0}.markdown-body ol ol ol,.markdown-body ol ul ol,.markdown-body ul ol ol,.markdown-body ul ul ol{list-style-type:lower-alpha}.markdown-body li>p{margin-top:16px}.markdown-body li+li{margin-top:.25em}.markdown-body dd{margin-left:0}.markdown-body dl{padding:0}.markdown-body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:600}.markdown-body dl dd{padding:0 16px;margin-bottom:16px}.markdown-body code{font-family:SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace}.markdown-body pre{font:12px SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace;word-wrap:normal}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin-top:0;margin-bottom:16px}.markdown-body blockquote{padding:0 1em;color:#6a737d;border-left:.25em solid #dfe2e5}.markdown-body blockquote>:first-child{margin-top:0}.markdown-body blockquote>:last-child{margin-bottom:0}.markdown-body table{display:block;width:100%;overflow:auto;border-spacing:0;border-collapse:collapse}.markdown-body table th{font-weight:600}.markdown-body table td,.markdown-body table th{padding:6px 13px;border:1px solid #dfe2e5}.markdown-body table tr{background-color:#fff;border-top:1px solid #c6cbd1}.markdown-body table tr:nth-child(2n){background-color:#f6f8fa}.markdown-body img{max-width:100%;box-sizing:content-box;background-color:#fff}.markdown-body code{padding:.2em 0;margin:0;font-size:85%;background-color:rgba(27,31,35,.05);border-radius:3px}.markdown-body code::after,.markdown-body code::before{letter-spacing:-.2em;content:" "}.markdown-body pre>code{padding:0;margin:0;font-size:100%;word-break:normal;white-space:pre;background:0 0;border:0}.markdown-body .highlight{margin-bottom:16px}.markdown-body .highlight pre{margin-bottom:0;word-break:normal}.markdown-body .highlight pre,.markdown-body pre{padding:16px;overflow:auto;font-size:85%;line-height:1.45;background-color:#f6f8fa;border-radius:3px}.markdown-body pre code{display:inline;max-width:auto;padding:0;margin:0;overflow:visible;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}.markdown-body pre code::after,.markdown-body pre code::before{content:normal}.markdown-body .full-commit .btn-outline:not(:disabled):hover{color:#005cc5;border-color:#005cc5}.markdown-body kbd{box-shadow:inset 0 -1px 0 #959da5;display:inline-block;padding:3px 5px;font:11px/10px SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace;color:#444d56;vertical-align:middle;background-color:#fcfcfc;border:1px solid #c6cbd1;border-bottom-color:#959da5;border-radius:3px;box-shadow:inset 0 -1px 0 #959da5}.markdown-body :checked+.radio-label{position:relative;z-index:1;border-color:#0366d6}.markdown-body .task-list-item{list-style-type:none}.markdown-body .task-list-item+.task-list-item{margin-top:3px}.markdown-body .task-list-item input{margin:0 .2em .25em -1.6em;vertical-align:middle}.markdown-body::before{display:table;content:""}.markdown-body::after{display:table;clear:both;content:""}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.Alert,.Error,.Note,.Success,.Warning{padding:11px;margin-bottom:24px;border-style:solid;border-width:1px;border-radius:4px}.Alert p,.Error p,.Note p,.Success p,.Warning p{margin-top:0}.Alert p:last-child,.Error p:last-child,.Note p:last-child,.Success p:last-child,.Warning p:last-child{margin-bottom:0}.Alert{color:#246;background-color:#e2eef9;border-color:#bac6d3}.Warning{color:#4c4a42;background-color:#fff9ea;border-color:#dfd8c2}.Error{color:#911;background-color:#fcdede;border-color:#d2b2b2}.Success{color:#22662c;background-color:#e2f9e5;border-color:#bad3be}.Note{color:#2f363d;background-color:#f6f8fa;border-color:#d5d8da}.Alert h1,.Alert h2,.Alert h3,.Alert h4,.Alert h5,.Alert h6{color:#246;margin-bottom:0}.Warning h1,.Warning h2,.Warning h3,.Warning h4,.Warning h5,.Warning h6{color:#4c4a42;margin-bottom:0}.Error h1,.Error h2,.Error h3,.Error h4,.Error h5,.Error h6{color:#911;margin-bottom:0}.Success h1,.Success h2,.Success h3,.Success h4,.Success h5,.Success h6{color:#22662c;margin-bottom:0}.Note h1,.Note h2,.Note h3,.Note h4,.Note h5,.Note h6{color:#2f363d;margin-bottom:0}.Alert h1:first-child,.Alert h2:first-child,.Alert h3:first-child,.Alert h4:first-child,.Alert h5:first-child,.Alert h6:first-child,.Error h1:first-child,.Error h2:first-child,.Error h3:first-child,.Error h4:first-child,.Error h5:first-child,.Error h6:first-child,.Note h1:first-child,.Note h2:first-child,.Note h3:first-child,.Note h4:first-child,.Note h5:first-child,.Note h6:first-child,.Success h1:first-child,.Success h2:first-child,.Success h3:first-child,.Success h4:first-child,.Success h5:first-child,.Success h6:first-child,.Warning h1:first-child,.Warning h2:first-child,.Warning h3:first-child,.Warning h4:first-child,.Warning h5:first-child,.Warning h6:first-child{margin-top:0}h1.title,p.subtitle{text-align:center}h1.title.followed-by-subtitle{margin-bottom:0}p.subtitle{font-size:1.5em;font-weight:600;line-height:1.25;margin-top:0;margin-bottom:16px;padding-bottom:.3em}div.line-block{white-space:pre-line}
+  </style>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<article class="markdown-body">
+<header>
+<h1 class="title">Certificate System Role</h1>
+</header>
+<hr>
+<nav id="TOC">
+<h1 class="toc-title">Contents</h1>
+<ul>
+<li><a href="#requirements" id="toc-requirements">Requirements</a></li>
+<li><a href="#variables" id="toc-variables">Variables</a>
+<ul>
+<li><a href="#certificate_requests"
+id="toc-certificate_requests">certificate_requests</a></li>
+<li><a href="#common_name" id="toc-common_name">common_name</a></li>
+<li><a href="#key_size" id="toc-key_size">key_size</a></li>
+<li><a href="#key_usage" id="toc-key_usage">key_usage</a></li>
+<li><a href="#extended_key_usage"
+id="toc-extended_key_usage">extended_key_usage</a></li>
+<li><a href="#run-hooks" id="toc-run-hooks">run hooks</a></li>
+</ul></li>
+<li><a href="#cas-and-providers" id="toc-cas-and-providers">CAs and
+Providers</a>
+<ul>
+<li><a href="#certmonger-and-selinux"
+id="toc-certmonger-and-selinux">Certmonger and SELinux</a></li>
+</ul></li>
+<li><a href="#examples" id="toc-examples">Examples</a>
+<ul>
+<li><a href="#issuing-a-self-signed-certificate"
+id="toc-issuing-a-self-signed-certificate">Issuing a self-signed
+certificate</a></li>
+<li><a href="#choosing-where-to-place-the-certificates"
+id="toc-choosing-where-to-place-the-certificates">Choosing where to
+place the certificates</a></li>
+<li><a href="#issuing-certificates-with-multiple-dns-ip-and-email"
+id="toc-issuing-certificates-with-multiple-dns-ip-and-email">Issuing
+certificates with multiple DNS, IP and Email</a></li>
+<li><a href="#setting-common-subject-options"
+id="toc-setting-common-subject-options">Setting common subject
+options</a></li>
+<li><a href="#setting-the-certificate-key-size"
+id="toc-setting-the-certificate-key-size">Setting the certificate key
+size</a></li>
+<li><a href="#setting-the-key-usage-and-extended-key-usage-eku"
+id="toc-setting-the-key-usage-and-extended-key-usage-eku">Setting the
+"Key Usage" and "Extended Key Usage" (EKU)</a></li>
+<li><a href="#dont-wait-for-the-certificate-to-be-issued"
+id="toc-dont-wait-for-the-certificate-to-be-issued">Don't wait for the
+certificate to be issued</a></li>
+<li><a href="#setting-a-principal" id="toc-setting-a-principal">Setting
+a principal</a></li>
+<li><a href="#choosing-to-not-auto-renew-a-certificate"
+id="toc-choosing-to-not-auto-renew-a-certificate">Choosing to not
+auto-renew a certificate</a></li>
+<li><a href="#using-freeipa-to-issue-a-certificate"
+id="toc-using-freeipa-to-issue-a-certificate">Using FreeIPA to issue a
+certificate</a></li>
+<li><a href="#running-a-command-before-or-after-a-certificate-is-issued"
+id="toc-running-a-command-before-or-after-a-certificate-is-issued">Running
+a command before or after a certificate is issued</a></li>
+<li><a href="#setting-the-certificate-owner-and-group"
+id="toc-setting-the-certificate-owner-and-group">Setting the certificate
+owner and group</a></li>
+</ul></li>
+<li><a href="#compatibility"
+id="toc-compatibility">Compatibility</a></li>
+<li><a href="#license" id="toc-license">License</a></li>
+<li><a href="#author-information" id="toc-author-information">Author
+Information</a></li>
+</ul>
+</nav>
+<hr>
+<p>Role for managing TLS/SSL certificate issuance and renewal</p>
+<p>Linux system role to issue and renew SSL certificates.</p>
+<p>Basic usage:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> mycert</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span><span class="at"> www.example.com</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> self-sign</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<p>On a RPM-based system this will place the certificate in
+<code>/etc/pki/tls/certs/mycert.crt</code> and the key in
+<code>/etc/pki/tls/private/mycert.key</code>.</p>
+<h1 id="requirements">Requirements</h1>
+<p>None</p>
+<h1 id="variables">Variables</h1>
+<table>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Description</th>
+<th style="text-align: center;">Type</th>
+<th style="text-align: center;">Required</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>certificate_wait</td>
+<td>If the task should wait for the certificate to be issued.</td>
+<td style="text-align: center;">bool</td>
+<td style="text-align: center;">no</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td>certificate_requests</td>
+<td>A list of dicts representing each certificate to be issued. See <a
+href="#certificate_requests">certificate_requests</a>.</td>
+<td style="text-align: center;">list</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h2 id="certificate_requests">certificate_requests</h2>
+<p><strong>Note:</strong> Fields such as <code>common_name</code>,
+<code>country</code>, <code>state</code>, <code>locality</code>,
+<code>organization</code>, <code>organizational_unit</code>,
+<code>email</code>, <code>key_usage</code>, and
+<code>extended_key_usage</code> that can be included in the certificate
+request are defined by the RFC 5280.</p>
+<p><strong>Note:</strong> Be aware that the CA might not honor all the
+requested fields. For example, even if a request include
+<code>country: US</code>, the CA might issue the certificate without
+<code>country</code> in it's subject.</p>
+<p><strong>Note:</strong> The fields <code>dns</code>,
+<code>email</code> and <code>ip</code> are used to define the Subject
+Alternative Names (SAN).</p>
+<table>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Description</th>
+<th style="text-align: center;">Type</th>
+<th style="text-align: center;">Required</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>name</td>
+<td>Name of the certificate. A full path can be used to choose the
+directory where files will be stored.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">yes</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>ca</td>
+<td>CA that will issue the certificate. See <a
+href="#cas-and-providers">CAs and Providers</a>.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">yes</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>dns</td>
+<td>Domain (or list of domains) to be included in the certificate. Also
+can provide the default value for <a
+href="#common_name">common_name</a>.</td>
+<td style="text-align: center;">str or list</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>email</td>
+<td>Email (or list of emails) to be included in the certificate.</td>
+<td style="text-align: center;">str or list</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>ip</td>
+<td>IP, or list of IPs, to be included in the certificate. IPs can be
+IPv4, IPv6 or both. Also can provide the default value for <a
+href="#common_name">common_name</a>.</td>
+<td style="text-align: center;">str or list</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>auto_renew</td>
+<td>Indicates if the certificate should be renewed automatically before
+it expires.</td>
+<td style="text-align: center;">bool</td>
+<td style="text-align: center;">no</td>
+<td>yes</td>
+</tr>
+<tr class="odd">
+<td>owner</td>
+<td>User name (or user id) for the certificate and key files.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td><em>User running Ansible</em></td>
+</tr>
+<tr class="even">
+<td>group</td>
+<td>Group name (or group id) for the certificate and key files.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td><em>Group running Ansible</em></td>
+</tr>
+<tr class="odd">
+<td>mode</td>
+<td>The file system permissions for the certificate and key files.</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>raw</td>
+<td>no</td>
+<td style="text-align: center;">-</td>
+<td style="text-align: center;"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>key_size</td>
+<td>Generate keys with a specific keysize in bits.</td>
+<td style="text-align: center;">int</td>
+<td style="text-align: center;">no</td>
+<td>2048 - See <a href="#key_size">key_size</a></td>
+</tr>
+<tr class="even">
+<td>common_name</td>
+<td>Common Name requested for the certificate subject.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td>See <a href="#common_name">common_name</a></td>
+</tr>
+<tr class="odd">
+<td>country</td>
+<td>Country code requested for the certificate subject.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>state</td>
+<td>State requested for the certificate subject.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>locality</td>
+<td>Locality requested for the certificate subject (usually city).</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>organization</td>
+<td>Organization requested for the certificate subject.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>organizational_unit</td>
+<td>Organizational unit requested for the certificate subject.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>contact_email</td>
+<td>Contact email requested for the certificate subject.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>key_usage</td>
+<td>Allowed Key Usage for the certificate. For valid values see: <a
+href="#key_usage">key_usage</a>.</td>
+<td style="text-align: center;">list</td>
+<td style="text-align: center;">no</td>
+<td>See <a href="#key_usage">key_usage</a></td>
+</tr>
+<tr class="even">
+<td>extended_key_usage</td>
+<td>Extended Key Usage attributes to be present in the certificate
+request.</td>
+<td style="text-align: center;">list</td>
+<td style="text-align: center;">no</td>
+<td>See <a href="#extended_key_usage">extended_key_usage</a></td>
+</tr>
+<tr class="odd">
+<td>run_before</td>
+<td>Command that should run before saving the certificate. See <a
+href="#run-hooks">run hooks</a>.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>run_after</td>
+<td>Command that should run after saving the certificate. See <a
+href="#run-hooks">run hooks</a>.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>principal</td>
+<td>Kerberos principal.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>provider</td>
+<td>The underlying method used to request and manage the
+certificate.</td>
+<td style="text-align: center;">str</td>
+<td style="text-align: center;">no</td>
+<td><em>Varies by CA</em></td>
+</tr>
+</tbody>
+</table>
+<h2 id="common_name">common_name</h2>
+<p>If <code>common_name</code> is not set the role will attempt to use
+the first value of <code>dns</code> or <code>ip</code>, respectively, as
+the default. If <code>dns</code> and <code>ip</code> are also not set,
+<code>common_name</code> will not be included in the certificate.</p>
+<h2 id="key_size">key_size</h2>
+<p>Recommended minimal-values for a certificate key size, from different
+organizations, vary across time. In the attempt to provide safe
+settings, the default minimal-value for <code>key_size</code> will be
+increased over time.</p>
+<p>If you want your certificates to always keep the same
+<code>key_size</code> when renewed, set this variable to the desired
+value.</p>
+<h2 id="key_usage">key_usage</h2>
+<p>Valid values for <code>key_usage</code> are:</p>
+<ul>
+<li>digitalSignature</li>
+<li>nonRepudiation</li>
+<li>keyEncipherment</li>
+<li>dataEncipherment</li>
+<li>keyAgreement</li>
+<li>keyCertSign</li>
+<li>cRLSign</li>
+<li>encipherOnly</li>
+<li>decipherOnly</li>
+</ul>
+<p>The defaults for <code>key_usage</code> are:</p>
+<ul>
+<li>digitalSignature</li>
+<li>keyEncipherment</li>
+</ul>
+<h2 id="extended_key_usage">extended_key_usage</h2>
+<p>Any valid oid can be used to set one or more
+<code>extended_key_usage</code>. In addition to that there is also a
+list of known aliases that will be recognized by the role:</p>
+<ul>
+<li>id-kp-serverAuth</li>
+<li>id-kp-clientAuth</li>
+<li>id-kp-codeSigning</li>
+<li>id-kp-emailProtection</li>
+<li>id-kp-timeStamping</li>
+<li>id-kp-OCSPSigning</li>
+<li>id-kp-ipsecEndSystem</li>
+<li>id-kp-ipsecTunnel</li>
+<li>id-kp-ipsecUser</li>
+</ul>
+<p>If <code>extended_key_usage</code> is not set the role will default
+to:</p>
+<ul>
+<li>id-kp-serverAuth</li>
+<li>id-kp-clientAuth</li>
+</ul>
+<h2 id="run-hooks">run hooks</h2>
+<p>Sometimes you need to execute a command just before a certificate is
+renewed and another command just after. In order to do that use
+<code>run_before</code> and <code>run_after</code>.</p>
+<p>The value provided to <code>run_before</code> and
+<code>run_after</code> will be wrapped and stored in shell script files
+that later will be executed by the provider.</p>
+<h1 id="cas-and-providers">CAs and Providers</h1>
+<table>
+<thead>
+<tr class="header">
+<th>CA</th>
+<th>Providers</th>
+<th>CA description</th>
+<th>Requirements</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>self-sign</td>
+<td>certmonger*</td>
+<td>Issue self-signed certificates from a local CA.</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>ipa</td>
+<td>certmonger*</td>
+<td>Issue certificates using the FreeIPA CA.</td>
+<td>Host needs to be enrolled in a FreeIPA server.</td>
+</tr>
+</tbody>
+</table>
+<p><em>* Default provider.</em></p>
+<p>CA represents the CA certificates that will be used to issue and sign
+the requested certificate. Provider represents the method used to send
+the certificate request to the CA and then retrieve the signed
+certificate.</p>
+<p>If a user chooses <code>self-sign</code> CA, with
+<code>certmonger</code> as provider and, later on decide to change the
+provider to <code>openssl</code>, the CA certificates used in both cases
+needs to be the same. <em>Please note that <code>openssl</code> is
+<strong>not yet a supported</strong> provider and it's only mentioned
+here as an example.</em></p>
+<h2 id="certmonger-and-selinux">Certmonger and SELinux</h2>
+<p>If SELinux is enforced, the <code>certmonger</code> service is only
+able to write or edit files in directories where the <code>cert_t</code>
+context is present.</p>
+<p>Additionally to that, if the scripts executed by
+<code>run_before</code> and <code>run_after</code> parameters need to
+write or edit files, those scripts also require the <code>cert_t</code>
+context to be present prior to the role execution.</p>
+<p>You can use the <code>selinux</code> System Role to manage SELinux
+contexts.</p>
+<p>For more information about <code>certmonger</code> and SELinux
+requirements, see <a
+href="https://linux.die.net/man/8/certmonger_selinux">certmonger_selinux(8)
+man pages</a>.</p>
+<h1 id="examples">Examples</h1>
+<h2 id="issuing-a-self-signed-certificate">Issuing a self-signed
+certificate</h2>
+<p>Issue a certificate for <code>*.example.com</code> and place it in
+the standard directory for the distribution.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> mycert</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span><span class="at"> </span><span class="ot">*.example.com</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> self-sign</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<p>You can find the directories for each distribution in the following
+locations:</p>
+<ul>
+<li><p>Debian/Ubuntu:</p>
+<ul>
+<li>Certificates: <code>/etc/ssl/localcerts/certs/</code></li>
+<li>Keys: <code>/etc/ssl/localcerts/private/</code></li>
+</ul></li>
+<li><p>RHEL/CentOS/Fedora:</p>
+<ul>
+<li>Certificates: <code>/etc/pki/tls/certs/</code></li>
+<li>Keys: <code>/etc/pki/tls/private/</code></li>
+</ul></li>
+</ul>
+<h2 id="choosing-where-to-place-the-certificates">Choosing where to
+place the certificates</h2>
+<p>Issue a certificate and key and place them in the specified location.
+The example below creates a certificate file in
+<code>/another/path/mycert.crt</code> and a key file in
+<code>/another/path/mycert.key</code>.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> /another/path/mycert</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span><span class="at"> </span><span class="ot">*.example.com</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> self-sign</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<h2 id="issuing-certificates-with-multiple-dns-ip-and-email">Issuing
+certificates with multiple DNS, IP and Email</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> mycert</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> www.example.com</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> sub1.example.com</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> sub2.example.com</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> sub3.example.com</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ip</span><span class="kw">:</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="fl">192.0.2.12</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="fl">198.51.100.65</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> 2001:db8::2:1</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">email</span><span class="kw">:</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> sysadmin@example.com</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> support@example.com</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> self-sign</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<h2 id="setting-common-subject-options">Setting common subject
+options</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> mycert</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span><span class="at"> www.example.com</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">common_name</span><span class="kw">:</span><span class="at"> www.example.com</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> self-sign</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">country</span><span class="kw">:</span><span class="at"> US</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">state</span><span class="kw">:</span><span class="at"> NY</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">locality</span><span class="kw">:</span><span class="at"> New York</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">organization</span><span class="kw">:</span><span class="at"> Red Hat</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">organizational_unit</span><span class="kw">:</span><span class="at"> platform</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">email</span><span class="kw">:</span><span class="at"> admin@example.com</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<h2 id="setting-the-certificate-key-size">Setting the certificate key
+size</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> mycert</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span><span class="at"> www.example.com</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> self-sign</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">key_size</span><span class="kw">:</span><span class="at"> </span><span class="dv">4096</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<h2 id="setting-the-key-usage-and-extended-key-usage-eku">Setting the
+"Key Usage" and "Extended Key Usage" (EKU)</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> mycert</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span><span class="at"> www.example.com</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> self-sign</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">key_usage</span><span class="kw">:</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> digitalSignature</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> nonRepudiation</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> keyEncipherment</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">extended_key_usage</span><span class="kw">:</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> id-kp-clientAuth</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> id-kp-serverAuth</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<h2 id="dont-wait-for-the-certificate-to-be-issued">Don't wait for the
+certificate to be issued</h2>
+<p>The certificate issuance can take several minutes depending on the
+CA. Because of that it's also possible to request the certificate but
+not actually wait for it.</p>
+<p>This configuration affects all certificates: if
+<code>certificate_wait</code> is set to <code>no</code> the role does
+not wait for any certificate to be issued.</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_wait</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> mycert</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span><span class="at"> www.example.com</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> self-sign</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<h2 id="setting-a-principal">Setting a principal</h2>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> mycert</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span><span class="at"> www.example.com</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> self-sign</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">principal</span><span class="kw">:</span><span class="at"> HTTP/www.example.com@EXAMPLE.COM</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<h2 id="choosing-to-not-auto-renew-a-certificate">Choosing to not
+auto-renew a certificate</h2>
+<p>By default certificates generated by the role are set for
+auto-renewal. To disable that behavior set
+<code>auto_renew: no</code>.</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> mycert</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span><span class="at"> www.example.com</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> self-sign</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">auto_renew</span><span class="kw">:</span><span class="at"> </span><span class="ch">no</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<h2 id="using-freeipa-to-issue-a-certificate">Using FreeIPA to issue a
+certificate</h2>
+<p>If your host is enrolled in a FreeIPA server, you also have the
+option to use it's CA to issue your certificate. To do that, set
+<code>ca: ipa</code>.</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> mycert</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span><span class="at"> www.example.com</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">principal</span><span class="kw">:</span><span class="at"> HTTP/www.example.com@EXAMPLE.COM</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> ipa</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<h2
+id="running-a-command-before-or-after-a-certificate-is-issued">Running a
+command before or after a certificate is issued</h2>
+<p>Sometimes you need to execute a command just before a certificate is
+renewed and another command just after. To do so, use
+<code>run_before</code> and <code>run_after</code>.</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> mycert</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span><span class="at"> www.example.com</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> self-sign</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run_before</span><span class="kw">:</span><span class="at"> systemctl stop webserver.service</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run_after</span><span class="kw">:</span><span class="at"> systemctl start webserver.service</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<h2 id="setting-the-certificate-owner-and-group">Setting the certificate
+owner and group</h2>
+<p>If you are using a certificate for a service, for example httpd, you
+need to set the certificate owner and group that will own the
+certificate. In the following example the owner and group are both set
+to httpd.</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vars</span><span class="kw">:</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">certificate_requests</span><span class="kw">:</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> mycert</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">dns</span><span class="kw">:</span><span class="at"> www.example.com</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ca</span><span class="kw">:</span><span class="at"> self-sign</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">owner</span><span class="kw">:</span><span class="at"> httpd</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">group</span><span class="kw">:</span><span class="at"> httpd</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">roles</span><span class="kw">:</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> linux-system-roles.certificate</span></span></code></pre></div>
+<p>Note that you can also use UID and GID instead of user and group
+names.</p>
+<h1 id="compatibility">Compatibility</h1>
+<p>Currently supports CentOS 7+, RHEL 7+, Fedora. It has been tested
+with Debian 10.</p>
+<h1 id="license">License</h1>
+<p>MIT</p>
+<h1 id="author-information">Author Information</h1>
+<p>Sergio Oliveira Campos (@seocam)</p>
+</article>
+</body>
+</html>
