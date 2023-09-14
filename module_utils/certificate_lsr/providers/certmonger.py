@@ -239,6 +239,11 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
         if self.module.params["wait"]:
             command += ["-w"]
 
+        # Set profile
+        profile = self.module.params["profile"]
+        if profile:
+            command += ["-T", profile]
+
         # Set certificate locations
         if not self.exists_in_certmonger:
             command += ["-k", self.certificate_key_path]
