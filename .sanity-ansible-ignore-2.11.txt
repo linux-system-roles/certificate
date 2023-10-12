@@ -29,3 +29,4 @@ plugins/modules/certificate_request.py import-3.8!skip
 plugins/modules/certificate_request.py import-3.9!skip
 plugins/modules/certificate_request.py validate-modules:missing-gplv3-license
 plugins/modules/certificate_request.py validate-modules:import-error
+roles/certificate/.ostree/get_ostree_data.sh shebang!skip
