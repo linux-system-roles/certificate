@@ -27,7 +27,17 @@ and the key in `/etc/pki/tls/private/mycert.key`.
 
 ## Requirements
 
-None
+See below
+
+### Collection requirements
+
+The role requires external collections only for management of `rpm-ostree`
+nodes. Please run the following command to install them if you need to manage
+`rpm-ostree` nodes:
+
+```bash
+ansible-galaxy collection install -vv -r meta/collection-requirements.yml
+```
 
 ## Variables
 
@@ -430,6 +440,10 @@ Note that you can also use UID and GID instead of user and group names.
 ## Compatibility
 
 Currently supports CentOS 7+, RHEL 7+, Fedora. It has been tested with Debian 10.
+
+## rpm-ostree
+
+See README-ostree.md
 
 ## License
 
