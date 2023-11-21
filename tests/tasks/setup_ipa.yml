@@ -3,23 +3,17 @@
   set_fact:
     __is_beaker_env: "{{ lookup('env', 'BEAKERLIB') | length > 0 }}"
 
-- name: Ensure correct package manager for ostree systems
-  vars:
-    ostree_pkg_mgr: ansible.posix.rhel_rpm_ostree
-    ostree_booted_file: /run/ostree-booted
-  when: ansible_facts.pkg_mgr | d("") != ostree_pkg_mgr
+- name: Determine if system is ostree and set flag
+  when: not __certificate_is_ostree is defined
   block:
     - name: Check if system is ostree
       stat:
-        path: "{{ ostree_booted_file }}"
+        path: /run/ostree-booted
       register: __ostree_booted_stat
 
-    - name: Set package manager to use for ostree
-      ansible.utils.update_fact:
-        updates:
-          - path: ansible_facts.pkg_mgr
-            value: "{{ ostree_pkg_mgr }}"
-      when: __ostree_booted_stat.stat.exists
+    - name: Set flag to indicate system is ostree
+      set_fact:
+        __certificate_is_ostree: "{{ __ostree_booted_stat.stat.exists }}"
 
 - name: Install ansible-freeipa
   package:
@@ -60,6 +54,8 @@
   package:
     name: hostname
     state: present
+    use: "{{ (__certificate_is_ostree | d(false)) |
+      ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
 
 - name: Set hostname
   hostname:
@@ -71,6 +67,8 @@
   package:
     name: nss
     state: latest  # noqa package-latest
+    use: "{{ (__certificate_is_ostree | d(false)) |
+      ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
   when: ansible_facts.os_family == "RedHat"
 
 - name: Run IPA server install
