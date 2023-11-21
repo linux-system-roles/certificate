@@ -6,6 +6,8 @@
   package:
     name: "{{ __certificate_packages }}"
     state: present
+    use: "{{ (__certificate_is_ostree | d(false)) |
+      ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
 
 - name: Install and configure required providers
   vars:
@@ -24,6 +26,8 @@
         name: |
           {{ __certificate_provider_vars[__certificate_provider].packages }}
         state: present
+        use: "{{ (__certificate_is_ostree | d(false)) |
+          ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
       loop: "{{ __certificate_providers }}"
       loop_control:
         loop_var: __certificate_provider

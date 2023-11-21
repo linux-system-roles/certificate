@@ -3,29 +3,25 @@
   set_fact:
     __virtualenv_path: /tmp/certificate-tests-venv
 
-- name: Ensure correct package manager for ostree systems
-  vars:
-    ostree_pkg_mgr: ansible.posix.rhel_rpm_ostree
-    ostree_booted_file: /run/ostree-booted
-  when: ansible_facts.pkg_mgr | d("") != ostree_pkg_mgr
+- name: Determine if system is ostree and set flag
+  when: not __certificate_is_ostree is defined
   block:
     - name: Check if system is ostree
       stat:
-        path: "{{ ostree_booted_file }}"
+        path: /run/ostree-booted
       register: __ostree_booted_stat
 
-    - name: Set package manager to use for ostree
-      ansible.utils.update_fact:
-        updates:
-          - path: ansible_facts.pkg_mgr
-            value: "{{ ostree_pkg_mgr }}"
-      when: __ostree_booted_stat.stat.exists
+    - name: Set flag to indicate system is ostree
+      set_fact:
+        __certificate_is_ostree: "{{ __ostree_booted_stat.stat.exists }}"
 
 - name: Ensure python3 is installed
   package:
     name:
       - python2-cryptography
       - python2-cryptography
+    use: "{{ (__certificate_is_ostree | d(false)) |
+      ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
   when:
     - ansible_distribution_major_version == "7"
     - ansible_os_family == "RedHat"
@@ -35,6 +31,8 @@
     name:
       - python3-cryptography
       - python3-pyasn1
+    use: "{{ (__certificate_is_ostree | d(false)) |
+      ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
   when:
     - ansible_distribution_major_version != "7"
     - ansible_os_family == "RedHat"
