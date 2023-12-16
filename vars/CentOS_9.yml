@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: MIT
+---
+__certificate_certmonger_packages:
+  - certmonger
+  - python3-packaging

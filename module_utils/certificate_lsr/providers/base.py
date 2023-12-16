@@ -8,29 +8,90 @@ __metaclass__ = type
 
 import hashlib
 import os
-import ipaddress
+import traceback
+
+try:
+    import ipaddress
+except ImportError:
+    HAS_IPADDRESS = False
+    IPADDRESS_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_IPADDRESS = True
+    IPADDRESS_IMPORT_ERROR = None
 
 from abc import ABCMeta, abstractmethod
 
 from pprint import pformat
 
-from cryptography import x509
-from cryptography.hazmat.backends import default_backend
-from cryptography.x509.oid import NameOID, ObjectIdentifier
 
-from pyasn1.codec.der import decoder
-from pyasn1.type import char, namedtype, tag, univ
+# for ansible-test import/compile functionality
+def fake_func(*args, **kwargs):
+    return None
+
+
+class FakeSubClass(object):
+    def __init__(self, *args):
+        pass
+
+    def __getattr__(self, value):
+        if value == "subtype":
+            return fake_func
+        else:
+            return object
+
+
+class FakeBaseClass(object):
+    def __getattr__(self, value):
+        if value == "oid":
+            return FakeBaseClass()
+        elif value.endswith("OID"):
+            return FakeSubClass()
+        else:
+            return FakeSubClass
+
+
+# for ansible-test import/compile functionality
+
+
+try:
+    from cryptography import x509
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.x509.oid import NameOID, ObjectIdentifier
+except ImportError:
+    HAS_CRYPTOGRAPHY = False
+    CRYPTOGRAPHY_IMPORT_ERROR = traceback.format_exc()
+    x509 = FakeBaseClass()
+    ANY_EXTENDED_KEY_USAGE = None
+    IPSEC_END_SYSTEM = None
+    IPSEC_TUNNEL = None
+    IPSEC_USER = None
+else:
+    HAS_CRYPTOGRAPHY = True
+    CRYPTOGRAPHY_IMPORT_ERROR = None
+    ANY_EXTENDED_KEY_USAGE = ObjectIdentifier("2.5.29.37.0")
+    IPSEC_END_SYSTEM = ObjectIdentifier("1.3.6.1.5.5.7.3.5")
+    IPSEC_TUNNEL = ObjectIdentifier("1.3.6.1.5.5.7.3.6")
+    IPSEC_USER = ObjectIdentifier("1.3.6.1.5.5.7.3.7")
+
+try:
+    from pyasn1.codec.der import decoder
+    from pyasn1.type import char, namedtype, tag, univ
+except ImportError:
+    HAS_PYASN1 = False
+    PYASN1_IMPORT_ERROR = traceback.format_exc()
+    univ = FakeBaseClass()
+    namedtype = FakeBaseClass()
+    tag = FakeBaseClass()
+    char = FakeBaseClass()
+else:
+    HAS_PYASN1 = True
+    PYASN1_IMPORT_ERROR = None
 
 from ansible.module_utils.six import PY2
 from ansible.module_utils._text import to_bytes, to_text
 
 if PY2:
     FileNotFoundError = IOError  # pylint: disable=redefined-builtin
-
-ANY_EXTENDED_KEY_USAGE = ObjectIdentifier("2.5.29.37.0")
-IPSEC_END_SYSTEM = ObjectIdentifier("1.3.6.1.5.5.7.3.5")
-IPSEC_TUNNEL = ObjectIdentifier("1.3.6.1.5.5.7.3.6")
-IPSEC_USER = ObjectIdentifier("1.3.6.1.5.5.7.3.7")
 
 
 def _escape_dn_value(val):
