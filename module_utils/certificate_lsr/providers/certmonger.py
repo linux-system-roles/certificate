@@ -6,9 +6,39 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-from distutils.version import StrictVersion
+import traceback
 
-import dbus
+# Yes, yes, yes - distutils is deprecated - but we still have to support
+# older platforms which do not have packaging.version - so tell ansible-test
+# with newer python to shut up
+try:
+    from packaging.version import Version as CertificateVersion
+except ImportError:
+    import warnings
+
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    try:
+        from distutils.version import StrictVersion as CertificateVersion
+    except ImportError:
+        HAS_PACKAGING = False
+        PACKAGING_IMPORT_ERROR = traceback.format_exc()
+    else:
+        HAS_PACKAGING = True
+        PACKAGING_IMPORT_ERROR = None
+    # re-enable deprecation warnings for other code
+    warnings.filterwarnings("default", category=DeprecationWarning)
+else:
+    HAS_PACKAGING = True
+    PACKAGING_IMPORT_ERROR = None
+
+try:
+    import dbus
+except ImportError:
+    HAS_DBUS = False
+    DBUS_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_DBUS = True
+    DBUS_IMPORT_ERROR = None
 
 from ansible.module_utils.certificate_lsr.providers import base
 
@@ -73,7 +103,7 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
             ret, out, err = self._run_command(certmonger_version_cmd, check_rc=False)
             if ret == 0 and not err:
                 version_str = out.split(" ")[1]
-                self._version = StrictVersion(version_str)
+                self._version = CertificateVersion(version_str)
             else:
                 self.module.fail_json(
                     msg="Could not get certmonger version using '{0}'".format(
@@ -265,7 +295,7 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
 
         # Set certificate key size
         key_size = self.module.params.get("key_size")
-        allow_key_size_update = self.certmonger_version >= StrictVersion("0.79.0")
+        allow_key_size_update = self.certmonger_version >= CertificateVersion("0.79.0")
         if key_size is not None and not allow_key_size_update:
             self.module.fail_json(
                 msg="Your certmonger version does not support attribute 'key_size'"

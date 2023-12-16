@@ -30,71 +30,76 @@ options:
         where files will be stored or a just a simple file name
         to be stored in I(directory).
     required: true
+    type: str
   dns:
     description:
       - Domain (or list of domains) to be included in the
         certificate. Also can provide the default value for
         I(common_name).
-    required: false
+    type: list
+    elements: str
   ip:
     description:
       - IP (or list of IPs) to be included in the certificate.
         IPs can be IPv4, IPv6 or both. Also can provide the
         default value for I(common_name).
-    required: false
+    type: list
+    elements: str
   email:
     description:
       - Email (or list of emails) to be included in the
         certificate. Also can provide the default value for
         I(common_name).
-    required: false
+    type: list
+    elements: str
   owner:
     description:
       - User name (or user id) for the certificate and key files.
-    required: false
+    type: str
   group:
     description:
       - Group name (or group id) for the certificate and key files.
-    required: false
+    type: str
   mode:
     description:
       - The file system permissions for the certificate and key files.
     type: raw
-    required: false
   common_name:
     description:
       - Common Name requested for the certificate subject.
-    required: false
+    type: str
   key_size:
     description:
       - Generate keys with a specific keysize in bits, by default 2048.
-    required: false
+    type: int
   ca:
     description:
       - CA that will issue the certificate. The available options
         will vary depending on each provider.
+    type: str
     required: true
   provider:
     description:
       - The underlying method used to request and manage the
         certificate.
-    required: false
+    type: str
     default: certmonger
   directory:
     description:
       - Directory where certificate and key will be stored. Only used
         if I(name) is not an absolute path.
-    required: false
+    type: str
     default: /etc/pki/tls
   provider_config_directory:
     description:
       - Directory where pre/post run scripts will be stored.
-    required: false
+    type: str
     default: /etc/certmonger
   principal:
     description:
       - Kerberos principal.
-    required: false
+    type: list
+    elements: str
   key_usage:
     description:
       - Allowed Key Usage for the certificate.
@@ -108,7 +113,8 @@ options:
       - cRLSign
       - encipherOnly
       - decipherOnly
-    required: false
+    type: list
+    elements: str
     default:
       - digitalSignature
       - keyEncipherment
@@ -116,54 +122,55 @@ options:
     description:
       - Extended Key Usage attributes to be present in the
         certificate request.
-    required: false
     default:
       - id-kp-serverAuth
       - id-kp-clientAuth
+    type: list
+    elements: str
   auto_renew:
     description:
       - Indicates if the certificate should be renewed
         automatically before it expires.
-    required: false
+    type: bool
     default: true
   wait:
     description:
       - If the role should block while waiting for the certificate
         to be issued.
-    required: false
+    type: bool
     default: true
   country:
     description:
       - Country requested for the certificate subject.
-    required: false
+    type: str
   state:
     description:
       - State requested for the certificate subject.
-    required: false
+    type: str
   locality:
     description:
       - Locality requested for the certificate subject (usually city).
-    required: false
+    type: str
   organization:
     description:
       - Organization requested for the certificate subject.
-    required: false
+    type: str
   organizational_unit:
     description:
       - Organizational unit requested for the certificate subject.
-    required: false
+    type: str
   contact_email:
     description:
       - Contact email requested for the certificate subject.
-    required: false
+    type: str
   run_before:
     description:
       - Command that should run before saving the certificate.
-    required: false
+    type: str
   run_after:
     description:
       - Command that should run after saving the certificate.
-    required: false
+    type: str
   __header:
     description:
       - Ansible ansible_managed string to put in header of file
@@ -256,7 +263,7 @@ EXAMPLES = """
   certificate_request:
     name: mycert
     dns: www.example.com
-    auto_renew: no
+    auto_renew: false
     ca: self-sign
 
 # Not wait for certificate to be issued
@@ -264,7 +271,7 @@ EXAMPLES = """
   certificate_request:
     name: single-example
     dns: www.example.com
-    wait: no
+    wait: false
     ca: self-sign
 
 # Certificate with more subject data
@@ -344,9 +351,9 @@ class CertificateRequestModule(AnsibleModule):
         """Return a dict with the module arguments."""
         return dict(
             name=dict(type="str", required=True),
-            dns=dict(type="list"),
-            ip=dict(type="list"),
-            email=dict(type="list"),
+            dns=dict(type="list", elements="str"),
+            ip=dict(type="list", elements="str"),
+            email=dict(type="list", elements="str"),
             common_name=dict(type="str"),
             country=dict(type="str"),
             state=dict(type="str"),
@@ -362,16 +369,21 @@ class CertificateRequestModule(AnsibleModule):
             owner=dict(type="str"),
             group=dict(type="str"),
             mode=dict(type="raw"),
-            principal=dict(type="list"),
+            principal=dict(type="list", elements="str"),
             key_usage=dict(
-                type="list", choices=KEY_USAGE_CHOICES, default=KEY_USAGE_DEFAULTS
+                type="list",
+                choices=KEY_USAGE_CHOICES,
+                default=KEY_USAGE_DEFAULTS,
+                elements="str",
             ),
-            extended_key_usage=dict(type="list", default=EXTENDED_KEY_USAGE_DEFAULTS),
+            extended_key_usage=dict(
+                type="list", default=EXTENDED_KEY_USAGE_DEFAULTS, elements="str"
+            ),
             auto_renew=dict(type="bool", default=True),
             wait=dict(type="bool", default=True),
             run_before=dict(type="str"),
             run_after=dict(type="str"),
-            __header=dict(type="str"),
+            __header=dict(type="str", required=True),
         )
 
     @property

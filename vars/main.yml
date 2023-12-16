@@ -4,10 +4,12 @@
 
 __certificate_provider_default: certmonger
 
+__certificate_certmonger_packages:
+  - certmonger
+
 __certificate_provider_vars:
   certmonger:
-    packages:
-      - certmonger
+    packages: "{{ __certificate_certmonger_packages }}"
     service: certmonger
     config_dir: /etc/certmonger/
     hooks_dirs_owner: root
