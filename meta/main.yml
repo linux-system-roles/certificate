@@ -15,16 +15,18 @@ galaxy_info:
         - "7"
         - "8"
         - "9"
-
   galaxy_tags:
     - centos
-    - fedora
     - certificate
-    - tls
-    - ssl
+    - certmonger
+    - el7
+    - el8
+    - el9
+    - el10
+    - fedora
     - redhat
     - rhel
-    - certmonger
+    - ssl
     - system
-
+    - tls
 dependencies: []

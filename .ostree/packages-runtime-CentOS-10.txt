@@ -1,0 +1,4 @@
+python3-cryptography
+python3-dbus
+python3-packaging
+python3-pyasn1
