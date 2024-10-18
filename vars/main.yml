@@ -35,3 +35,21 @@ __certificate_required_facts:
 # the 'gather_subset' parameter of the 'setup' module
 __certificate_required_facts_subsets: "{{ ['!all', '!min'] +
   __certificate_required_facts }}"
+
+# BEGIN - DO NOT EDIT THIS BLOCK - rh distros variables
+# Ansible distribution identifiers that the role treats like RHEL
+__certificate_rh_distros:
+  - AlmaLinux
+  - CentOS
+  - RedHat
+  - Rocky
+
+# Same as above but includes Fedora
+__certificate_rh_distros_fedora: "{{ __certificate_rh_distros + ['Fedora'] }}"
+
+# Use this in conditionals to check if distro is Red Hat or clone
+__certificate_is_rh_distro: "{{ ansible_distribution in __certificate_rh_distros }}"
+
+# Use this in conditionals to check if distro is Red Hat or clone, or Fedora
+__certificate_is_rh_distro_fedora: "{{ ansible_distribution in __certificate_rh_distros_fedora }}"
+# END - DO NOT EDIT THIS BLOCK - rh distros variables
