@@ -59,7 +59,7 @@ SOFTWARE.
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -70,7 +70,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -233,7 +233,7 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="
 <h1 id="variables">Variables</h1>
 <table>
 <thead>
-<tr class="header">
+<tr>
 <th>Parameter</th>
 <th>Description</th>
 <th style="text-align: center;">Type</th>
@@ -242,14 +242,14 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>certificate_wait</td>
 <td>If the task should wait for the certificate to be issued.</td>
 <td style="text-align: center;">bool</td>
 <td style="text-align: center;">no</td>
 <td>yes</td>
 </tr>
-<tr class="even">
+<tr>
 <td>certificate_requests</td>
 <td>A list of dicts representing each certificate to be issued. See <a
 href="#certificate_requests">certificate_requests</a>.</td>
@@ -275,7 +275,7 @@ requested fields. For example, even if a request include
 Alternative Names (SAN).</p>
 <table>
 <thead>
-<tr class="header">
+<tr>
 <th>Parameter</th>
 <th>Description</th>
 <th style="text-align: center;">Type</th>
@@ -284,7 +284,7 @@ Alternative Names (SAN).</p>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>name</td>
 <td>Name of the certificate. A full path can be used to choose the
 directory where files will be stored.</td>
@@ -292,7 +292,7 @@ directory where files will be stored.</td>
 <td style="text-align: center;">yes</td>
 <td>-</td>
 </tr>
-<tr class="even">
+<tr>
 <td>ca</td>
 <td>CA that will issue the certificate. See <a
 href="#cas-and-providers">CAs and Providers</a>.</td>
@@ -300,7 +300,7 @@ href="#cas-and-providers">CAs and Providers</a>.</td>
 <td style="text-align: center;">yes</td>
 <td>-</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>dns</td>
 <td>Domain (or list of domains) to be included in the certificate. Also
 can provide the default value for <a
@@ -309,14 +309,14 @@ href="#common_name">common_name</a>.</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
 </tr>
-<tr class="even">
+<tr>
 <td>email</td>
 <td>Email (or list of emails) to be included in the certificate.</td>
 <td style="text-align: center;">str or list</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>ip</td>
 <td>IP, or list of IPs, to be included in the certificate. IPs can be
 IPv4, IPv6 or both. Also can provide the default value for <a
@@ -325,7 +325,7 @@ href="#common_name">common_name</a>.</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
 </tr>
-<tr class="even">
+<tr>
 <td>auto_renew</td>
 <td>Indicates if the certificate should be renewed automatically before
 it expires.</td>
@@ -333,91 +333,91 @@ it expires.</td>
 <td style="text-align: center;">no</td>
 <td>yes</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>owner</td>
 <td>User name (or user id) for the certificate and key files.</td>
 <td style="text-align: center;">str</td>
 <td style="text-align: center;">no</td>
 <td><em>User running Ansible</em></td>
 </tr>
-<tr class="even">
+<tr>
 <td>group</td>
 <td>Group name (or group id) for the certificate and key files.</td>
 <td style="text-align: center;">str</td>
 <td style="text-align: center;">no</td>
 <td><em>Group running Ansible</em></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>mode</td>
 <td>The file system permissions for the certificate and key files.</td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr>
 <td>raw</td>
 <td>no</td>
 <td style="text-align: center;">-</td>
 <td style="text-align: center;"></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>key_size</td>
 <td>Generate keys with a specific keysize in bits.</td>
 <td style="text-align: center;">int</td>
 <td style="text-align: center;">no</td>
 <td>2048 - See <a href="#key_size">key_size</a></td>
 </tr>
-<tr class="even">
+<tr>
 <td>common_name</td>
 <td>Common Name requested for the certificate subject.</td>
 <td style="text-align: center;">str</td>
 <td style="text-align: center;">no</td>
 <td>See <a href="#common_name">common_name</a></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>country</td>
 <td>Country code requested for the certificate subject.</td>
 <td style="text-align: center;">str</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
 </tr>
-<tr class="even">
+<tr>
 <td>state</td>
 <td>State requested for the certificate subject.</td>
 <td style="text-align: center;">str</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>locality</td>
 <td>Locality requested for the certificate subject (usually city).</td>
 <td style="text-align: center;">str</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
 </tr>
-<tr class="even">
+<tr>
 <td>organization</td>
 <td>Organization requested for the certificate subject.</td>
 <td style="text-align: center;">str</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>organizational_unit</td>
 <td>Organizational unit requested for the certificate subject.</td>
 <td style="text-align: center;">str</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
 </tr>
-<tr class="even">
+<tr>
 <td>contact_email</td>
 <td>Contact email requested for the certificate subject.</td>
 <td style="text-align: center;">str</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>key_usage</td>
 <td>Allowed Key Usage for the certificate. For valid values see: <a
 href="#key_usage">key_usage</a>.</td>
@@ -425,7 +425,7 @@ href="#key_usage">key_usage</a>.</td>
 <td style="text-align: center;">no</td>
 <td>See <a href="#key_usage">key_usage</a></td>
 </tr>
-<tr class="even">
+<tr>
 <td>extended_key_usage</td>
 <td>Extended Key Usage attributes to be present in the certificate
 request.</td>
@@ -433,7 +433,7 @@ request.</td>
 <td style="text-align: center;">no</td>
 <td>See <a href="#extended_key_usage">extended_key_usage</a></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>run_before</td>
 <td>Command that should run before saving the certificate. See <a
 href="#run-hooks">run hooks</a>.</td>
@@ -441,7 +441,7 @@ href="#run-hooks">run hooks</a>.</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
 </tr>
-<tr class="even">
+<tr>
 <td>run_after</td>
 <td>Command that should run after saving the certificate. See <a
 href="#run-hooks">run hooks</a>.</td>
@@ -449,14 +449,14 @@ href="#run-hooks">run hooks</a>.</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>principal</td>
 <td>Kerberos principal.</td>
 <td style="text-align: center;">str</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
 </tr>
-<tr class="even">
+<tr>
 <td>provider</td>
 <td>The underlying method used to request and manage the
 certificate.</td>
@@ -528,7 +528,7 @@ that later will be executed by the provider.</p>
 <h1 id="cas-and-providers">CAs and Providers</h1>
 <table>
 <thead>
-<tr class="header">
+<tr>
 <th>CA</th>
 <th>Providers</th>
 <th>CA description</th>
@@ -536,13 +536,13 @@ that later will be executed by the provider.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>self-sign</td>
 <td>certmonger*</td>
 <td>Issue self-signed certificates from a local CA.</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr>
 <td>ipa</td>
 <td>certmonger*</td>
 <td>Issue certificates using the FreeIPA CA.</td>
