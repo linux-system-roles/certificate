@@ -40,6 +40,8 @@ else:
     HAS_DBUS = True
     DBUS_IMPORT_ERROR = None
 
+import os
+
 from ansible.module_utils.certificate_lsr.providers import base
 
 
@@ -254,6 +256,18 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
         command = [getcert_bin]
 
         if self.exists_in_certmonger:
+            # if certificate exists in certmonger and key-file is missing,
+            # reissuing the certificate will hang certmonger.
+            # See: https://issues.redhat.com/browse/RHEL-69043
+            keyfile = self._certmonger_metadata.get("key-file")
+            if keyfile and not os.path.isfile(keyfile):
+                self.module.fail_json(
+                    "Resubmiting a request without the private key "
+                    "file may hang certmonger. Please, stop monitoring "
+                    "certificate '{0}' before reissuing.".format(
+                        self._certmonger_metadata.get("nickname")
+                    )
+                )
             command += ["resubmit"]
         else:
             command += ["request"]
