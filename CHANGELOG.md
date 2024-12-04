@@ -1,6 +1,19 @@
 Changelog
 =========
 
+[1.3.8] - 2024-12-04
+--------------------
+
+### Bug Fixes
+
+- fix: Workaround getcert issue when cert key-file is missing (#243)
+
+### Other Changes
+
+- ci: bump codecov/codecov-action from 4 to 5 (#244)
+- ci: Use Fedora 41, drop Fedora 39 (#245)
+- ci: Use Fedora 41, drop Fedora 39 - part two (#246)
+
 [1.3.7] - 2024-10-30
 --------------------
 
