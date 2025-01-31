@@ -1,1 +1,2 @@
 libdbus-1-dev
+glib-2.0
