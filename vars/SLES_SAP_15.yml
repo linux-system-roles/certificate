@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT
+---
+# Put internal variables here with SLES_SAP_15 specific values.
+
+__certificate_default_directory: /etc/ssl
+
+__certificate_packages:
+  - python3-cryptography
+  - python3-dbus-python
+  - python3-pyasn1

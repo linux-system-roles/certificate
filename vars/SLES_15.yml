@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 ---
-# Put internal variables here with SLES specific values.
+# Put internal variables here with SLES_15 specific values.
 
 __certificate_default_directory: /etc/ssl
 
