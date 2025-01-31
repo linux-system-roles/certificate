@@ -1,6 +1,17 @@
 Changelog
 =========
 
+[1.3.9] - 2025-01-31
+--------------------
+
+### Other Changes
+
+- ci: Add SLES vars (#248)
+- ci: ansible-plugin-scan is disabled for now (#249)
+- ci: bump ansible-lint to v25; provide collection requirements for ansible-lint (#252)
+- ci: fix python tests (#253)
+- ci: Add vars for SLES_SAP (#254)
+
 [1.3.8] - 2024-12-04
 --------------------
 
