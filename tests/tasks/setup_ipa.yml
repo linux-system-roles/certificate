@@ -80,10 +80,24 @@
     ipaserver_domain: test.local
     ipaserver_realm: TEST.LOCAL
     local_log_dir: "{{ lookup('env', 'TEST_ARTIFACTS') | d('/tmp', true) }}"
+    role_collection_path: >-
+      /usr/share/ansible/collections/ansible_collections/freeipa/ansible_freeipa/roles/ipaserver
+    role_collection_name: freeipa.ansible_freeipa.ipaserver
   block:
+    - name: See if collection exists
+      stat:
+        path: "{{ role_collection_path }}"
+      register: __ipa_collection
+      delegate_to: localhost
+
+    - name: Set name of ipa server role
+      set_fact:
+        __ipa_server_role: "{{ role_collection_name
+          if __ipa_collection.stat.exists else 'ipaserver' }}"
+
     - name: Include ipaserver role
       include_role:
-        name: ipaserver
+        name: "{{ __ipa_server_role }}"
   rescue:
     - name: FAILURE - check entropy
       command: cat /proc/sys/kernel/random/entropy_avail
