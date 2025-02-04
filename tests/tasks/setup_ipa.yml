@@ -1,7 +1,8 @@
 ---
 - name: Set __is_beaker_env
   set_fact:
-    __is_beaker_env: "{{ lookup('env', 'BEAKERLIB') | length > 0 }}"
+    __is_beaker_env: "{{ lookup('env', 'BEAKERLIB') | length > 0
+      and lookup('env', 'TESTING_FARM_GIT_URL') | length == 0 }}"
 
 - name: Determine if system is ostree and set flag
   when: not __certificate_is_ostree is defined
@@ -71,6 +72,30 @@
       ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
   when: ansible_facts.os_family == "RedHat"
 
+- name: Sanitize /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: "{{ ansible_default_ipv4.address }}"
+    state: absent
+    owner: root
+    group: root
+    mode: "0644"
+  when: not __is_beaker_env
+  become: true
+
+- name: Add host to /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ ansible_default_ipv4.address }}  ipaserver.test.local"
+    state: present
+    insertafter: EOF
+    create: True
+    owner: root
+    group: root
+    mode: "0644"
+  when: not __is_beaker_env
+  become: true
+
 - name: Run IPA server install
   vars:
     ipaserver_setup_dns: false
@@ -79,6 +104,8 @@
     ipadm_password: SomeDMpassword
     ipaserver_domain: test.local
     ipaserver_realm: TEST.LOCAL
+    ipaserver_hostname: ipaserver.test.local
+    ipaserver_no_host_dns: true
     local_log_dir: "{{ lookup('env', 'TEST_ARTIFACTS') | d('/tmp', true) }}"
     role_collection_path: >-
       /usr/share/ansible/collections/ansible_collections/freeipa/ansible_freeipa/roles/ipaserver
@@ -112,6 +139,14 @@
           $( [[ -e ipaclient-install.log ]] && echo ipaclient-install.log ) \
           $( [[ -e pki ]] && echo pki )
         chmod '0644' /tmp/ipalogs.tgz
+        echo "==========================="
+        echo "    ipaserver-install.log"
+        echo "==========================="
+        cat ipaserver-install.log
+        echo "==========================="
+        echo "    /var/log/messages"
+        echo "==========================="
+        cat /var/log/messages
       changed_when: false
     - name: FAILURE - grab archive
       fetch:
