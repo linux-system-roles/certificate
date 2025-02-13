@@ -1,6 +1,16 @@
 Changelog
 =========
 
+[1.3.10] - 2025-02-13
+--------------------
+
+### Other Changes
+
+- test: use ipaserver role from collection if it exists (#256)
+- ci: Check spelling with codespell (#257)
+- ci: enable ansible verbosity (#258)
+- ci: turn off ansible verbosity (#259)
+
 [1.3.9] - 2025-01-31
 --------------------
 
