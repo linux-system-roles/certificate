@@ -157,7 +157,6 @@ jobs:
         uses: sclorg/testing-farm-as-github-action@v3
         if: contains(needs.prepare_vars.outputs.supported_platforms, matrix.platform)
         with:
-          git_url: https://github.com/linux-system-roles/tft-tests
           git_ref: main
           pipeline_settings: '{ "type": "tmt-multihost" }'
           environment_settings: '{ "provisioning": { "tags": { "BusinessUnit": "system_roles" } } }'
@@ -170,7 +169,6 @@ jobs:
             TEST_LOCAL_CHANGES=false;\
             LINUXSYSTEMROLES_USER=${{ vars.LINUXSYSTEMROLES_USER }};\
             ARTIFACTS_URL=${{ steps.set_vars.outputs.ARTIFACTS_URL }}"
-          # to increase ansible verbosity, add LSR_ANSIBLE_VERBOSITY='-vvv'
           # Note that LINUXSYSTEMROLES_SSH_KEY must be single-line, TF doesn't read multi-line variables fine.
           secrets: "LINUXSYSTEMROLES_DOMAIN=${{ secrets.LINUXSYSTEMROLES_DOMAIN }};\
             LINUXSYSTEMROLES_SSH_KEY=${{ secrets.LINUXSYSTEMROLES_SSH_KEY }}"
@@ -181,8 +179,7 @@ jobs:
           tf_scope: private
           api_key: ${{ secrets.TF_API_KEY_RH }}
           update_pull_request_status: false
-          tmt_hardware: '{ "memory": ">= ${{ needs.prepare_vars.outputs.memory }} MB" }'
-          tmt_plan_filter: "tag:general,certificate"
+          tmt_plan_filter: "tag:playbooks_parallel,certificate"
 
       - name: Set final commit status
         uses: myrotvorets/set-commit-status-action@master
