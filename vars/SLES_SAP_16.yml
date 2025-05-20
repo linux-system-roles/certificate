@@ -5,6 +5,6 @@
 __certificate_default_directory: /etc/ssl
 
 __certificate_packages:
-  - python311-cryptography
-  - python311-dbus-python
-  - python311-pyasn1
+  - python313-cryptography
+  - python313-dbus-python
+  - python313-pyasn1
