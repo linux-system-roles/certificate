@@ -1,0 +1,28 @@
+---
+- name: Test test mode
+  hosts: all
+  vars:
+    __test_cert_name1: lsr_cert_test_mode_1
+    __test_cert_name2: lsr_cert_test_mode_2
+    certificate_requests:
+      - name: "{{ __test_cert_name1 }}"
+        dns: ["localhost"]
+        ca: self-sign
+      - name: "{{ __test_cert_name2 }}"
+        dns: ["localhost"]
+        ca: self-sign
+    certificate_test_mode: true
+    certificate_test_remove_files: true
+  tasks:
+    - name: Run the role in test mode
+      include_role:
+        name: linux-system-roles.certificate
+
+    - name: Verify test data
+      assert:
+        that:
+          - certificate_test_certs[item.0][item.1] | length > 10
+          - certificate_test_certs[item.0][item.1 ~ "_content"] | length > 100
+      loop: "{{ [__test_cert_name1, __test_cert_name2] | product(key_names) | list }}"
+      vars:
+        key_names: [ca, cert, key]
