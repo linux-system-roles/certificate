@@ -8,8 +8,8 @@
 - name: Check for presence of ansible managed header, fingerprint
   assert:
     that:
-      - ansible_managed in content
+      - __lsr_ansible_managed in content
       - __fingerprint in content
   vars:
     content: "{{ __content.content | b64decode }}"
-    ansible_managed: "{{ lookup('template', 'get_ansible_managed.j2') }}"
+    __lsr_ansible_managed: "{{ lookup('template', 'get_ansible_managed.j2') }}"

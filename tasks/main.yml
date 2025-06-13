@@ -11,28 +11,19 @@
 
 - name: Install and configure required providers
   vars:
-    __certificate_providers: |
-      {% set unique_providers = [] %}
-      {% for item in certificate_requests %}
-      {%   set _ = unique_providers.append(
-             item.provider |
-             d(__certificate_provider_default)
-           ) %}
-      {% endfor %}
-      {{ unique_providers | unique }}
+    __certificate_providers: "{{ (certificate_requests | selectattr('provider', 'defined') | map(attribute='provider') | list) +
+      [__certificate_provider_default] | unique | list }}"
   block:
     - name: Ensure provider packages are installed
       package:
-        name: |
-          {{ __certificate_provider_vars[__certificate_provider].packages }}
+        name: "{{ __certificate_provider_vars[__certificate_provider].packages }}"
         state: present
         use: "{{ (__certificate_is_ostree | d(false)) |
           ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
       loop: "{{ __certificate_providers }}"
       loop_control:
         loop_var: __certificate_provider
-      when: |
-        __certificate_provider_vars[__certificate_provider].packages is defined
+      when: __certificate_provider_vars[__certificate_provider].packages is defined
 
     - name: Ensure pre-scripts hooks directory exists
       file:
@@ -56,9 +47,7 @@
       loop: "{{ __certificate_providers }}"
       loop_control:
         loop_var: __certificate_provider
-      when: |
-        __certificate_provider_vars[__certificate_provider].config_dir
-        is defined
+      when: __certificate_provider_vars[__certificate_provider].config_dir is defined
 
     - name: Ensure post-scripts hooks directory exists
       file:
@@ -82,24 +71,20 @@
       loop: "{{ __certificate_providers }}"
       loop_control:
         loop_var: __certificate_provider
-      when: |
-        __certificate_provider_vars[__certificate_provider].config_dir
-        is defined
+      when: __certificate_provider_vars[__certificate_provider].config_dir is defined
 
     # While most Linux system roles have a list of services
     #   this role doesn't need it. In fact some providers
     #   won't have any service at all.
     - name: Ensure provider service is running
       service:
-        name: >-
-          {{ __certificate_provider_vars[__certificate_provider].service }}
+        name: "{{ __certificate_provider_vars[__certificate_provider].service }}"
         state: started
         enabled: true
       loop: "{{ __certificate_providers }}"
       loop_control:
         loop_var: __certificate_provider
-      when:
-        __certificate_provider_vars[__certificate_provider].service is defined
+      when: __certificate_provider_vars[__certificate_provider].service is defined
 
 - name: Ensure certificate requests
   certificate_request:
@@ -165,21 +150,26 @@
           if item[0] == 'key' else
           __ca_dir ~ '/' ~ item[1].name ~ '.crt' }}"
 
+    - name: Reset certificate_test_certs
+      set_fact:
+        certificate_test_certs: {}
+
     - name: Create return data
       set_fact:
-        certificate_test_certs: |
-          {% set rv = {} %}
-          {% for ii in __certificate_test_data.results %}
-          {%   set name = ii.item[1].name %}
-          {%   set dct = rv.setdefault(name, {}) %}
-          {%   set key1 = ii.item[0] %}
-          {%   set val1 = ii.source %}
-          {%   set key2 = ii.item[0] ~ '_content' %}
-          {%   set val2 = ii.content | b64decode %}
-          {%   set _ = dct.__setitem__(key1, val1) %}
-          {%   set _ = dct.__setitem__(key2, val2) %}
-          {% endfor %}
-          {{ rv }}
+        certificate_test_certs: "{{ certificate_test_certs | combine({cert_name: cert_data}) }}"
+      loop: "{{ __certificate_test_data.results | map(attribute='item.1.name') | unique | list }}"
+      loop_control:
+        loop_var: cert_name
+      vars:
+        name_match: "{{ '^' ~ cert_name ~ '$' }}"
+        cert_data: "{{ dict((file_keys + content_keys) | zip(file_vals + content_vals)) }}"
+        file_keys: "{{ __certificate_test_data.results | selectattr('item.1.name', 'match', name_match) |
+          map(attribute='item.0') | list }}"
+        content_keys: "{{ file_keys | map('regex_replace', '$', '_content') | list }}"
+        file_vals: "{{ __certificate_test_data.results | selectattr('item.1.name', 'match', name_match) |
+          map(attribute='source') | list }}"
+        content_vals: "{{ __certificate_test_data.results | selectattr('item.1.name', 'match', name_match) |
+          map(attribute='content') | map('b64decode') | list }}"
 
     - name: Stop tracking certificates
       command: getcert stop-tracking -f {{ item.cert }}
