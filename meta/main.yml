@@ -19,6 +19,7 @@ galaxy_info:
     - centos
     - certificate
     - certmonger
+    - containerbuild
     - el7
     - el8
     - el9

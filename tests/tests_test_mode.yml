@@ -1,6 +1,9 @@
 ---
 - name: Test test mode
   hosts: all
+  tags:
+    # test mode is not supported in container build environments
+    - tests::booted
   vars:
     __test_cert_name1: lsr_cert_test_mode_1
     __test_cert_name2: lsr_cert_test_mode_2

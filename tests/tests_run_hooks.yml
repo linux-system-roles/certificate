@@ -35,6 +35,8 @@
         loop_var: cert
 
     - name: Verify test files timestamp
+      # certmonger does not actually run in buildah
+      when: ansible_connection != "buildah"
       block:
         - name: Get certificate timestamp
           stat:

@@ -5,6 +5,9 @@
   become: true
   tags:
     - tests::slow
+    # can't run IPA in a buildah system
+    # this is a test restriction, not a role restriction
+    - tests::booted
   tasks:
     - name: Check if test is supported
       vars:

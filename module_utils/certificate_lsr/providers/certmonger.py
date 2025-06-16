@@ -6,6 +6,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
+import shlex
 import traceback
 
 # Yes, yes, yes - distutils is deprecated - but we still have to support
@@ -92,9 +93,15 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
 
     def __init__(self, *args, **kwargs):
         super(CertificateRequestCertmongerProvider, self).__init__(*args, **kwargs)
-        self._certmonger_dbus = CertmongerDBus()
-        self._certmonger_metadata = self._get_certmonger_request()
         self._version = None
+
+        if self.module.params.get("booted"):
+            self._certmonger_dbus = CertmongerDBus()
+            self._certmonger_metadata = self._get_certmonger_request()
+        else:
+            self._certmonger_dbus = None
+            # in a container build we assume a pristine state, i.e. no existing requests
+            self._certmonger_metadata = {}
 
     @property
     def certmonger_version(self):
@@ -215,6 +222,10 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
                 command = ["-R"]
             return command
 
+        # we should never get here in non-booted mode
+        if not self.module.params.get("booted"):
+            raise AssertionError("Should be unreachable in non-booted mode")
+
         # If certificate exists in certmonger it will require a different
         #   command to update the auto_renew flag
         getcert_bin = self.module.get_bin_path("getcert", required=True)
@@ -233,6 +244,44 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
         return []
 
     def _set_user_and_group_if_different(self):
+        if not self.module.params.get("booted"):
+            (owner, group, mode) = self._get_permissions()
+            if not any([owner, group, mode]):
+                return False
+            if owner:
+                self.command_systemd(
+                    [
+                        "chown",
+                        owner,
+                        self.certificate_file_path,
+                        self.certificate_key_path,
+                    ]
+                )
+            if group:
+                self.command_systemd(
+                    [
+                        "chgrp",
+                        group,
+                        self.certificate_file_path,
+                        self.certificate_key_path,
+                    ]
+                )
+            if mode:
+                if isinstance(mode, int):
+                    mode_str = "%o" % mode
+                else:
+                    mode_str = mode
+
+                self.command_systemd(
+                    [
+                        "chmod",
+                        mode_str,
+                        self.certificate_file_path,
+                        self.certificate_key_path,
+                    ]
+                )
+            return True
+
         if self.module.params.get("wait"):
             return super(
                 CertificateRequestCertmongerProvider,
@@ -345,5 +394,54 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
         else:
             command += ["-C", ""]
 
-        self._run_command(command, check_rc=True)
+        if self.module.params.get("booted"):
+            self._run_command(command, check_rc=True)
+        else:
+            self.command_systemd(command)
         self.changed = True
+
+    def command_systemd(self, command):
+        """Run command on next boot through a systemd unit."""
+
+        # accumulate the commands; there might be multiple certificates
+        # or multiple role invocations
+        commands_file = "/var/lib/certmonger/system-roles-create.commands"
+        with open(commands_file, "a") as f:
+            f.write(" ".join(shlex.quote(arg) for arg in command) + "\n")
+
+        # Create systemd unit content
+        unit_name = "system-roles-certmonger-create.service"
+        unit_path = "/etc/systemd/system/" + unit_name
+
+        if os.path.exists(unit_path):
+            self.module.debug(
+                "Unit file {0} already exists, skipping creation.".format(unit_path)
+            )
+            return
+
+        with open(unit_path, "w") as f:
+            f.write(
+                """[Unit]
+Description=Request certificates via certmonger from System Role
+Documentation=https://github.com/linux-system-roles/certificate/
+ConditionFileExists={commands_file}
+Wants=certmonger.service
+After=certmonger.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -e {commands_file}
+ExecStartPost=/bin/rm {commands_file}
+
+[Install]
+WantedBy=multi-user.target
+""".format(
+                    commands_file=commands_file
+                )
+            )
+
+        # Enable the service
+        systemctl_cmd = ["systemctl", "enable", unit_name]
+        self._run_command(systemctl_cmd, check_rc=True)
+
+        self.module.debug("Created certificate creation service: " + unit_path)

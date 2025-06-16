@@ -178,6 +178,13 @@ options:
       - as rendered by the template module
     type: str
     required: true
+  booted:
+    description:
+      - The role is run in a booted system and can directly talk to
+        services. If false, the certificate generation will be
+        deferred to the first boot.
+    type: bool
+    default: true
 
 author:
   - Sergio Oliveira Campos (@seocam)
@@ -384,6 +391,7 @@ class CertificateRequestModule(AnsibleModule):
             run_before=dict(type="str"),
             run_after=dict(type="str"),
             __header=dict(type="str", required=True),
+            booted=dict(type="bool", required=False, default=True),
         )
 
     @property

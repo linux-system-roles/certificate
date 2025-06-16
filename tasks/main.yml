@@ -79,7 +79,7 @@
     - name: Ensure provider service is running
       service:
         name: "{{ __certificate_provider_vars[__certificate_provider].service }}"
-        state: started
+        state: "{{ 'started' if __certificate_is_booted else omit }}"
         enabled: true
       loop: "{{ __certificate_providers }}"
       loop_control:
@@ -119,6 +119,7 @@
     run_after: "{{ item.run_after | default(omit) }}"
     ca: "{{ item.ca | default(omit) }}"
     __header: "{{ __lsr_ansible_managed }}"
+    booted: "{{ __certificate_is_booted }}"
   loop: "{{ certificate_requests }}"
   vars:
     __lsr_ansible_managed: "{{
@@ -138,6 +139,11 @@
     __key_dir: "{{ __certificate_default_directory ~ '/private' }}"
     __ca_dir: "{{ __certificate_default_directory ~ '/certs' }}"
   block:
+    - name: Check if test mode is supported
+      fail:
+        msg: "Test mode is not supported in non-booted mode."
+      when: not __certificate_is_booted
+
     - name: Slurp the contents of the files
       slurp:
         path: "{{ __file }}"
