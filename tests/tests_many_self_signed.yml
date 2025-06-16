@@ -17,6 +17,14 @@
           - name: another-cert
             dns: www.example.net
             ca: self-sign
+      when: not __bootc_validation | d(false)
+
+    - name: Create QEMU deployment during bootc end-to-end test
+      delegate_to: localhost
+      become: false
+      command: "{{ lsr_scriptdir }}/bootc-buildah-qcow.sh {{ ansible_host }}"
+      changed_when: true
+      when: ansible_connection == "buildah"
 
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml

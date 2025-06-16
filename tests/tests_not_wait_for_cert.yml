@@ -30,6 +30,8 @@
         path: "{{ item.path }}"
         timeout: 5
       loop: "{{ certificates }}"
+      # cert isn't actually generated during buildah build
+      when: ansible_connection != "buildah"
 
     - name: Verify each certificate
       include_tasks: tasks/assert_certificate_parameters.yml

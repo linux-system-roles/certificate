@@ -1,166 +1,209 @@
 ---
-- name: Set virtualenv_path
-  set_fact:
-    __virtualenv_path: /tmp/certificate-tests-venv
-
-- name: Determine if system is ostree and set flag
-  when: not __certificate_is_ostree is defined
+- name: Verify certificate in running systems
+  when: ansible_connection != "buildah"
   block:
-    - name: Check if system is ostree
-      stat:
-        path: /run/ostree-booted
-      register: __ostree_booted_stat
-
-    - name: Set flag to indicate system is ostree
+    - name: Set virtualenv_path
       set_fact:
-        __certificate_is_ostree: "{{ __ostree_booted_stat.stat.exists }}"
+        __virtualenv_path: /tmp/certificate-tests-venv
 
-- name: Ensure python2 is installed
-  package:
-    name:
-      - python2-cryptography
-      - python2-cryptography
-    use: "{{ (__certificate_is_ostree | d(false)) |
-      ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
-  when:
-    - ansible_distribution_major_version == "7"
-    - ansible_os_family == "RedHat"
+    - name: Determine if system is ostree and set flag
+      when: not __certificate_is_ostree is defined
+      block:
+        - name: Check if system is ostree
+          stat:
+            path: /run/ostree-booted
+          register: __ostree_booted_stat
 
-- name: Ensure python3 is installed
-  package:
-    name:
-      - python3-cryptography
-      - python3-pyasn1
-    use: "{{ (__certificate_is_ostree | d(false)) |
-      ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
-  when:
-    - ansible_distribution_major_version != "7"
-    - ansible_os_family == "RedHat"
+        - name: Set flag to indicate system is ostree
+          set_fact:
+            __certificate_is_ostree: "{{ __ostree_booted_stat.stat.exists }}"
 
-- name: Retrieve certificate file stats
-  stat:
-    path: "{{ cert['path'] }}"
-  register: result
+    - name: Ensure python2 is installed
+      package:
+        name:
+          - python2-cryptography
+          - python2-cryptography
+        use: "{{ (__certificate_is_ostree | d(false)) |
+          ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
+      when:
+        - ansible_distribution_major_version == "7"
+        - ansible_os_family == "RedHat"
 
-- name: Verify if certificate file exists
-  assert:
-    that:
-      - result.stat.exists
-    fail_msg: "Certificate file '{{ cert['path'] }}' does not exist."
+    - name: Ensure python3 is installed
+      package:
+        name:
+          - python3-cryptography
+          - python3-pyasn1
+        use: "{{ (__certificate_is_ostree | d(false)) |
+          ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
+      when:
+        - ansible_distribution_major_version != "7"
+        - ansible_os_family == "RedHat"
 
-- name: Verify certificate file owner and group
-  assert:
-    that:
-      - (cert['owner'] | default('root')) in
-        [result.stat.pw_name, result.stat.uid]
-      - (cert['group'] | default('root')) in
-        [result.stat.gr_name, result.stat.gid]
-    fail_msg: >-
-      {{ result.stat.pw_name }}:{{ result.stat.gr_name }} !=
-      {{ cert['owner'] | default('root') }}:
-      {{ cert['group'] | default('root') }}
+    - name: Retrieve certificate file stats
+      stat:
+        path: "{{ cert['path'] }}"
+      register: result
 
-- name: Verify certificate permissions
-  assert:
-    that:
-      - result.stat.mode == (cert['mode'] | default('0600'))
-    fail_msg: "{{ result.stat.mode }} != {{ cert['mode'] | default('0600') }}"
+    - name: Verify if certificate file exists
+      assert:
+        that:
+          - result.stat.exists
+        fail_msg: "Certificate file '{{ cert['path'] }}' does not exist."
 
-- name: Retrieve key file stats
-  stat:
-    path: "{{ cert['key_path'] }}"
-  register: result
+    - name: Verify certificate file owner and group
+      assert:
+        that:
+          - (cert['owner'] | default('root')) in
+            [result.stat.pw_name, result.stat.uid]
+          - (cert['group'] | default('root')) in
+            [result.stat.gr_name, result.stat.gid]
+        fail_msg: >-
+          {{ result.stat.pw_name }}:{{ result.stat.gr_name }} !=
+          {{ cert['owner'] | default('root') }}:
+          {{ cert['group'] | default('root') }}
 
-- name: Verify if key file exists
-  assert:
-    that:
-      - result.stat.exists
-    fail_msg: "Key file '{{ cert['key_path'] }}' does not exist."
+    - name: Verify certificate permissions
+      assert:
+        that:
+          - result.stat.mode == (cert['mode'] | default('0600'))
+        fail_msg: "{{ result.stat.mode }} != {{ cert['mode'] | default('0600') }}"
 
-- name: Verify key file owner and group
-  assert:
-    that:
-      - (cert['owner'] | default('root')) in
-        [result.stat.pw_name, result.stat.uid]
-      - (cert['group'] | default('root')) in
-        [result.stat.gr_name, result.stat.gid]
-    fail_msg: >-
-      {{ result.stat.pw_name }}:{{ result.stat.gr_name }} !=
-      {{ cert['owner'] | default('root') }}:
-      {{ cert['group'] | default('root') }}
+    - name: Retrieve key file stats
+      stat:
+        path: "{{ cert['key_path'] }}"
+      register: result
 
-- name: Parse certificate
-  certtojson:
-    filename: "{{ cert['path'] }}"
-  register: certificate_data
-  changed_when: false
+    - name: Verify if key file exists
+      assert:
+        that:
+          - result.stat.exists
+        fail_msg: "Key file '{{ cert['key_path'] }}' does not exist."
 
-- name: Load certificate YAML to cert_issued variable
-  set_fact:
-    cert_issued: "{{ certificate_data.certificate }}"
+    - name: Verify key file owner and group
+      assert:
+        that:
+          - (cert['owner'] | default('root')) in
+            [result.stat.pw_name, result.stat.uid]
+          - (cert['group'] | default('root')) in
+            [result.stat.gr_name, result.stat.gid]
+        fail_msg: >-
+          {{ result.stat.pw_name }}:{{ result.stat.gr_name }} !=
+          {{ cert['owner'] | default('root') }}:
+          {{ cert['group'] | default('root') }}
 
-- name: Verify certificate subject
-  assert:
-    that:
-      - cert.subject | sort(attribute="name") ==
-        cert_issued.subject | sort(attribute="name")
-    fail_msg: >-
-      {{ cert.subject | sort(attribute="name") }} !=
-      {{ cert_issued.subject | sort(attribute="name") }}
+    - name: Parse certificate
+      certtojson:
+        filename: "{{ cert['path'] }}"
+      register: certificate_data
+      changed_when: false
 
-- name: Verify certificate SAN
-  assert:
-    that:
-      - cert.subject_alt_name ==
-        cert_issued.extensions.subjectAltName.value
-    fail_msg: >-
-      {{ cert.subject_alt_name }} !=
-      {{ cert_issued.extensions.subjectAltName.value }}
+    - name: Load certificate YAML to cert_issued variable
+      set_fact:
+        cert_issued: "{{ certificate_data.certificate }}"
 
-- name: Verify key size
-  assert:
-    that:
-      - cert.key_size | default(2048) == cert_issued.key_size
-    fail_msg: >-
-      {{ cert.key_size | default(2048) }} != {{ cert_issued.key_size }}
+    - name: Verify certificate subject
+      assert:
+        that:
+          - cert.subject | sort(attribute="name") ==
+            cert_issued.subject | sort(attribute="name")
+        fail_msg: >-
+          {{ cert.subject | sort(attribute="name") }} !=
+          {{ cert_issued.subject | sort(attribute="name") }}
 
-- name: Verify certificate Key Usage
-  vars:
-    default_ku:
-      - digital_signature
-      - key_encipherment
-    expected: "{{ cert.key_usage | d(default_ku) | sort }}"
-    actual: "{{ cert_issued.extensions.keyUsage.value | sort }}"
-  assert:
-    that: expected == actual
-    fail_msg: expected value {{ expected }} != {{ actual }}
+    - name: Verify certificate SAN
+      assert:
+        that:
+          - cert.subject_alt_name ==
+            cert_issued.extensions.subjectAltName.value
+        fail_msg: >-
+          {{ cert.subject_alt_name }} !=
+          {{ cert_issued.extensions.subjectAltName.value }}
 
-- name: Verify certificate Extended Key Usage
-  vars:
-    default_eku:
-      - name: id-kp-serverAuth
-        oid: 1.3.6.1.5.5.7.3.1
-      - name: id-kp-clientAuth
-        oid: 1.3.6.1.5.5.7.3.2
-    expected: "{{ cert.extended_key_usage | d(default_eku) }}"
-    actual: "{{ cert_issued.extensions.extendedKeyUsage.value }}"
-  assert:
-    that: expected == actual
-    fail_msg: expected value {{ expected }} != {{ actual }}
+    - name: Verify key size
+      assert:
+        that:
+          - cert.key_size | default(2048) == cert_issued.key_size
+        fail_msg: >-
+          {{ cert.key_size | default(2048) }} != {{ cert_issued.key_size }}
 
-- name: Retrieve auto-renew flag
-  shell: >-
-    set -euo pipefail;
-    getcert list -f {{ cert['path'] }} |
-    grep 'auto-renew' |
-    sed 's/^\s\+auto-renew: //g'
-  register: result
-  changed_when: false
+    - name: Verify certificate Key Usage
+      vars:
+        default_ku:
+          - digital_signature
+          - key_encipherment
+        expected: "{{ cert.key_usage | d(default_ku) | sort }}"
+        actual: "{{ cert_issued.extensions.keyUsage.value | sort }}"
+      assert:
+        that: expected == actual
+        fail_msg: expected value {{ expected }} != {{ actual }}
 
-- name: Verify certificate auto-renew flag
-  assert:
-    that:
-      - (cert['auto_renew'] | default('yes') | bool) == (result.stdout | bool)
-    fail_msg: >-
-      {{ cert['auto_renew'] | default('yes') | bool }} !=
-      {{ result.stdout | bool }}
+    - name: Verify certificate Extended Key Usage
+      vars:
+        default_eku:
+          - name: id-kp-serverAuth
+            oid: 1.3.6.1.5.5.7.3.1
+          - name: id-kp-clientAuth
+            oid: 1.3.6.1.5.5.7.3.2
+        expected: "{{ cert.extended_key_usage | d(default_eku) }}"
+        actual: "{{ cert_issued.extensions.extendedKeyUsage.value }}"
+      assert:
+        that: expected == actual
+        fail_msg: expected value {{ expected }} != {{ actual }}
+
+    - name: Retrieve auto-renew flag
+      shell: >-
+        set -euo pipefail;
+        getcert list -f {{ cert['path'] }} |
+        grep 'auto-renew' |
+        sed 's/^\s\+auto-renew: //g'
+      register: result
+      changed_when: false
+
+    - name: Verify certificate auto-renew flag
+      assert:
+        that:
+          - (cert['auto_renew'] | default('yes') | bool) == (result.stdout | bool)
+        fail_msg: >-
+          {{ cert['auto_renew'] | default('yes') | bool }} !=
+          {{ result.stdout | bool }}
+
+    - name: Stat commands file
+      stat:
+        path: /var/lib/certmonger/system-roles-create.commands
+      register: commands_file_stat
+
+    - name: Assert that commands file got removed
+      assert:
+        that:
+          - not commands_file_stat.stat.exists
+
+- name: Verify certificate in container builds
+  when: ansible_connection == "buildah"
+  block:
+    - name: Stat first-boot unit file
+      stat:
+        path: /etc/systemd/system/system-roles-certmonger-create.service
+      register: first_boot_unit_stat
+
+    - name: Assert presence of first-boot unit
+      assert:
+        that:
+          - first_boot_unit_stat.stat.exists
+
+    - name: Assert that first-boot unit is enabled
+      # noqa command-instead-of-module
+      command: systemctl is-enabled system-roles-certmonger-create.service
+      register: first_boot_unit_enabled
+      changed_when: false
+      failed_when: first_boot_unit_enabled.stdout != "enabled"
+
+    - name: Stat commands file
+      stat:
+        path: /var/lib/certmonger/system-roles-create.commands
+      register: commands_file_stat
+
+    - name: Assert that commands file exists
+      assert:
+        that:
+          - commands_file_stat.stat.exists

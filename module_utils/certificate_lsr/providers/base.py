@@ -651,12 +651,17 @@ class CertificateRequestBaseProvider:
             msg=self.message,
         )
 
-    def _set_user_and_group_if_different(self):
+    def _get_permissions(self):
         owner = self.module.params.get("owner")
         group = self.module.params.get("group")
         mode = self.module.params.get("mode")
         if group and not mode:
             mode = "0640"
+
+        return (owner, group, mode)
+
+    def _set_user_and_group_if_different(self):
+        (owner, group, mode) = self._get_permissions()
 
         if not any([owner, group, mode]):
             return False

@@ -17,6 +17,27 @@
       set_fact:
         __certificate_is_ostree: "{{ __ostree_booted_stat.stat.exists }}"
 
+- name: Determine if system is booted with systemd
+  when: __certificate_is_booted is not defined
+  block:
+    - name: Run systemctl
+      # noqa command-instead-of-module
+      command: systemctl is-system-running
+      register: __is_system_running
+      changed_when: false
+      check_mode: false
+      failed_when: false
+
+    - name: Require installed systemd
+      fail:
+        msg: "Error: This role requires systemd to be installed."
+      when: '"No such file or directory" in __is_system_running.msg | d("")'
+
+    - name: Set flag to indicate that systemd runtime operations are available
+      set_fact:
+        # see https://www.man7.org/linux/man-pages/man1/systemctl.1.html#:~:text=is-system-running%20output
+        __certificate_is_booted: "{{ __is_system_running.stdout != 'offline' }}"
+
 - name: Set platform/version specific variables
   include_vars: "{{ __vars_file }}"
   loop:

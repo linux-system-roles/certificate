@@ -6,10 +6,13 @@
       user:
         name: user1
         uid: 1040
+      when: not __bootc_validation | d(false)
+
     - name: Ensure group "somegroup" exists
       group:
         name: somegroup
         gid: 1041
+      when: not __bootc_validation | d(false)
 
     - name: Issue certificate setting user/group
       include_role:
@@ -26,6 +29,7 @@
             owner: 1040
             group: 1041
             ca: self-sign
+      when: not __bootc_validation | d(false)
 
     - name: Verify each user/group certificate
       include_tasks: tasks/assert_certificate_parameters.yml
@@ -76,6 +80,14 @@
             # yamllint disable rule:octal-values
             mode: 0o600
             ca: self-sign
+      when: not __bootc_validation | d(false)
+
+    - name: Create QEMU deployment during bootc end-to-end test
+      delegate_to: localhost
+      become: false
+      command: "{{ lsr_scriptdir }}/bootc-buildah-qcow.sh {{ ansible_host }}"
+      changed_when: true
+      when: ansible_connection == "buildah"
 
     - name: Verify each fs_attrs_mode certificate
       include_tasks: tasks/assert_certificate_parameters.yml
