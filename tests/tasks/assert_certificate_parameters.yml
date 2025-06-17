@@ -15,7 +15,7 @@
       set_fact:
         __certificate_is_ostree: "{{ __ostree_booted_stat.stat.exists }}"
 
-- name: Ensure python3 is installed
+- name: Ensure python2 is installed
   package:
     name:
       - python2-cryptography
