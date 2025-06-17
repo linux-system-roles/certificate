@@ -5,6 +5,8 @@
   become: true
   tags:
     - tests::slow
+    # IPA setup does not work in system containers
+    - tests::reboot
   tasks:
     - name: Check if test is supported
       vars:
