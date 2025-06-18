@@ -72,7 +72,9 @@
             ca: self-sign
           - name: certid_mode
             dns: www.example.com
-            mode: "0600"
+            # octal numeric value is supported too
+            # yamllint disable rule:octal-values
+            mode: 0o600
             ca: self-sign
 
     - name: Verify each fs_attrs_mode certificate
