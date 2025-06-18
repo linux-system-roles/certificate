@@ -70,7 +70,7 @@ Alternative Names (SAN).
 | auto_renew           | Indicates if the certificate should be renewed automatically before it expires.                   | bool        | no       | yes                     |
 | owner                | User name (or user id) for the certificate and key files.                                         | str         | no       | *User running Ansible*  |
 | group                | Group name (or group id) for the certificate and key files.                                       | str         | no       | *Group running Ansible* |
-| mode                 | The file system permissions for the certificate and key files.                                    | raw         | no       | -                       |
+| mode                 | The file system permissions for the certificate and key files.                                    | str or octal| no       | -                       |
 | key\_size            | Generate keys with a specific keysize in bits.                                                    | int         | no       | 2048 - See [key\_size](#key_size) |
 | common\_name         | Common Name requested for the certificate subject.                                                | str         | no       | See [common\_name](#common_name)  |
 | country              | Country code requested for the certificate subject.                                               | str         | no       | -                       |
