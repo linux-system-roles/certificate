@@ -1,6 +1,13 @@
 Changelog
 =========
 
+[1.4.0] - 2025-06-23
+--------------------
+
+### New Features
+
+- feat: Support this role in container builds (#277)
+
 [1.3.12] - 2025-06-16
 --------------------
 
