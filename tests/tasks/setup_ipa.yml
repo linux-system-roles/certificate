@@ -89,7 +89,7 @@
     line: "{{ ansible_default_ipv4.address }}  ipaserver.test.local"
     state: present
     insertafter: EOF
-    create: True
+    create: true
     owner: root
     group: root
     mode: "0644"
