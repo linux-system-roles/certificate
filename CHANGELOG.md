@@ -1,6 +1,13 @@
 Changelog
 =========
 
+[1.4.1] - 2025-07-02
+--------------------
+
+### Other Changes
+
+- refactor: fix ansible-lint issue with setup_ipa (#279)
+
 [1.4.0] - 2025-06-23
 --------------------
 
