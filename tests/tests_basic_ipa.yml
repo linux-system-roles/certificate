@@ -99,3 +99,9 @@
               - content_commitment
               - key_encipherment
               - data_encipherment
+
+    - name: Reset hostname
+      hostname:
+        name: "{{ __saved_hostname.stdout }}"
+        use: systemd
+      when: ansible_facts.os_family == "RedHat"
