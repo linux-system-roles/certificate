@@ -48,8 +48,8 @@ __certificate_rh_distros:
 __certificate_rh_distros_fedora: "{{ __certificate_rh_distros + ['Fedora'] }}"
 
 # Use this in conditionals to check if distro is Red Hat or clone
-__certificate_is_rh_distro: "{{ ansible_distribution in __certificate_rh_distros }}"
+__certificate_is_rh_distro: "{{ ansible_facts['distribution'] in __certificate_rh_distros }}"
 
 # Use this in conditionals to check if distro is Red Hat or clone, or Fedora
-__certificate_is_rh_distro_fedora: "{{ ansible_distribution in __certificate_rh_distros_fedora }}"
+__certificate_is_rh_distro_fedora: "{{ ansible_facts['distribution'] in __certificate_rh_distros_fedora }}"
 # END - DO NOT EDIT THIS BLOCK - rh distros variables

@@ -67,7 +67,7 @@
   hostname:
     name: ipaserver.test.local
     use: systemd
-  when: ansible_facts.os_family == "RedHat"
+  when: ansible_facts["os_family"] == "RedHat"
 
 - name: Ensure nss package is up-to-date
   package:
@@ -75,12 +75,12 @@
     state: latest  # noqa package-latest
     use: "{{ (__certificate_is_ostree | d(false)) |
       ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
-  when: ansible_facts.os_family == "RedHat"
+  when: ansible_facts["os_family"] == "RedHat"
 
 - name: Sanitize /etc/hosts
   ansible.builtin.lineinfile:
     path: /etc/hosts
-    regexp: "{{ ansible_default_ipv4.address }}"
+    regexp: "{{ ansible_facts['default_ipv4'].address }}"
     state: absent
     owner: root
     group: root
@@ -91,7 +91,7 @@
 - name: Add host to /etc/hosts
   ansible.builtin.lineinfile:
     path: /etc/hosts
-    line: "{{ ansible_default_ipv4.address }}  ipaserver.test.local"
+    line: "{{ ansible_facts['default_ipv4'].address }}  ipaserver.test.local"
     state: present
     insertafter: EOF
     create: true
