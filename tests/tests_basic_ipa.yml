@@ -104,4 +104,4 @@
       hostname:
         name: "{{ __saved_hostname.stdout }}"
         use: systemd
-      when: ansible_facts.os_family == "RedHat"
+      when: ansible_facts["os_family"] == "RedHat"
