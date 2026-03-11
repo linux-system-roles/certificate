@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT
+---
+# openSUSE Leap 15.x specific values.
+# Leap 15.x uses python311 as the ansible interpreter since
+# ansible-core 2.18+ requires Python 3.8+ and system python3 is 3.6.
+
+__certificate_default_directory: /etc/ssl
+
+__certificate_packages:
+  - python311-cryptography
+  - python311-dbus-python
+  - python3-pyasn1
