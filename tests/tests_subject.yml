@@ -1,13 +1,6 @@
 ---
 - name: Issue simple self-signed certificate
   hosts: all
-  pre_tasks:
-    - name: Load certificate role platform variables
-      include_role:
-        name: linux-system-roles.certificate
-        tasks_from: set_vars.yml
-        public: true
-
   vars:
     certificate_requests:
       - name: mycert_subject
@@ -24,6 +17,12 @@
 
 - name: Verify certificate
   hosts: all
+  pre_tasks:
+    - name: Load certificate role platform variables
+      include_role:
+        name: linux-system-roles.certificate
+        tasks_from: set_vars.yml
+        public: true
   vars:
     certificates:
       - path: "{{ __certificate_default_directory }}/certs/mycert_subject.crt"

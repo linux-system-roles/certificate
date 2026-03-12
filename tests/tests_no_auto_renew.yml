@@ -1,13 +1,6 @@
 ---
 - name: Issue simple self-signed certificate
   hosts: all
-  pre_tasks:
-    - name: Load certificate role platform variables
-      include_role:
-        name: linux-system-roles.certificate
-        tasks_from: set_vars.yml
-        public: true
-
   vars:
     certificate_requests:
       - name: mycert_no_auto_renew
@@ -21,6 +14,12 @@
     - linux-system-roles.certificate
 
 - name: Verify certificate
+  pre_tasks:
+    - name: Load certificate role platform variables
+      include_role:
+        name: linux-system-roles.certificate
+        tasks_from: set_vars.yml
+        public: true
   hosts: all
   vars:
     certificates:
