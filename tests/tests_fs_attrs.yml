@@ -2,6 +2,23 @@
 - name: Ensure UID and GID exists
   hosts: all
   tasks:
+    - name: Ensure ftp group exists
+      group:
+        name: ftp
+        system: true
+      when:
+        - not __bootc_validation | d(false)
+        - ansible_facts['os_family'] == 'Suse'
+
+    - name: Ensure ftp user exists
+      user:
+        name: ftp
+        group: ftp
+        system: true
+      when:
+        - not __bootc_validation | d(false)
+        - ansible_facts['os_family'] == 'Suse'
+
     - name: Ensure user exists
       user:
         name: user1
@@ -38,8 +55,8 @@
         loop_var: cert
       vars:
         certificates:
-          - path: /etc/pki/tls/certs/mycert_fs_attrs.crt
-            key_path: /etc/pki/tls/private/mycert_fs_attrs.key
+          - path: "{{ __certificate_default_directory }}/certs/mycert_fs_attrs.crt"
+            key_path: "{{ __certificate_default_directory }}/private/mycert_fs_attrs.key"
             subject:
               - name: commonName
                 oid: 2.5.4.3
@@ -50,8 +67,8 @@
             owner: ftp
             group: ftp
             mode: "0640"
-          - path: /etc/pki/tls/certs/certid.crt
-            key_path: /etc/pki/tls/private/certid.key
+          - path: "{{ __certificate_default_directory }}/certs/certid.crt"
+            key_path: "{{ __certificate_default_directory }}/private/certid.key"
             subject:
               - name: commonName
                 oid: 2.5.4.3
@@ -96,8 +113,8 @@
         loop_var: cert
       vars:
         certificates:
-          - path: /etc/pki/tls/certs/mycert_fs_attrs_mode.crt
-            key_path: /etc/pki/tls/private/mycert_fs_attrs_mode.key
+          - path: "{{ __certificate_default_directory }}/certs/mycert_fs_attrs_mode.crt"
+            key_path: "{{ __certificate_default_directory }}/private/mycert_fs_attrs_mode.key"
             subject:
               - name: commonName
                 oid: 2.5.4.3
@@ -108,8 +125,8 @@
             owner: ftp
             group: ftp
             mode: "0620"
-          - path: /etc/pki/tls/certs/certid_mode.crt
-            key_path: /etc/pki/tls/private/certid_mode.key
+          - path: "{{ __certificate_default_directory }}/certs/certid_mode.crt"
+            key_path: "{{ __certificate_default_directory }}/private/certid_mode.key"
             subject:
               - name: commonName
                 oid: 2.5.4.3

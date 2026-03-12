@@ -21,8 +21,8 @@
             loop_var: cert
           vars:
             certificates:
-              - path: /etc/pki/tls/certs/mycert_key_size.crt
-                key_path: /etc/pki/tls/private/mycert_key_size.key
+              - path: "{{ __certificate_default_directory }}/certs/mycert_key_size.crt"
+                key_path: "{{ __certificate_default_directory }}/private/mycert_key_size.key"
                 subject:
                   - name: commonName
                     oid: 2.5.4.3

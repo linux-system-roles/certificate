@@ -1,6 +1,12 @@
 ---
 - name: Issue simple self-signed certificate
   hosts: all
+  pre_tasks:
+    - name: Load certificate role platform variables
+      include_role:
+        name: linux-system-roles.certificate
+        tasks_from: set_vars.yml
+        public: true
 
   vars:
     certificate_requests:
@@ -14,8 +20,8 @@
   hosts: all
   vars:
     certificates:
-      - path: /etc/pki/tls/certs/mycert_basic_self_signed.crt
-        key_path: /etc/pki/tls/private/mycert_basic_self_signed.key
+      - path: "{{ __certificate_default_directory }}/certs/mycert_basic_self_signed.crt"
+        key_path: "{{ __certificate_default_directory }}/private/mycert_basic_self_signed.key"
         subject:
           - name: commonName
             oid: 2.5.4.3

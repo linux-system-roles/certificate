@@ -2,6 +2,12 @@
 - name: Issue simple self-signed certificate
   hosts: all
   become: true
+  pre_tasks:
+    - name: Load certificate role platform variables
+      include_role:
+        name: linux-system-roles.certificate
+        tasks_from: set_vars.yml
+        public: true
 
   vars:
     certificate_requests:
@@ -19,8 +25,8 @@
   gather_facts: true
   vars:
     certificates:
-      - path: /etc/pki/tls/certs/mycert_subject_complex.crt
-        key_path: /etc/pki/tls/private/mycert_subject_complex.key
+      - path: "{{ __certificate_default_directory }}/certs/mycert_subject_complex.crt"
+        key_path: "{{ __certificate_default_directory }}/private/mycert_subject_complex.key"
         subject:
           - name: emailAddress
             oid: 1.2.840.113549.1.9.1

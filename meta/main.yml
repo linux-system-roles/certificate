@@ -27,6 +27,7 @@ galaxy_info:
     - fedora
     - redhat
     - rhel
+    - leap
     - ssl
     - system
     - tls

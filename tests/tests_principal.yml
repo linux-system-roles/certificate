@@ -1,6 +1,12 @@
 ---
 - name: Test issuing certificate with principal.
   hosts: all
+  pre_tasks:
+    - name: Load certificate role platform variables
+      include_role:
+        name: linux-system-roles.certificate
+        tasks_from: set_vars.yml
+        public: true
   vars:
     certificate_requests:
       - name: mycert_principal
@@ -14,8 +20,8 @@
   hosts: all
   vars:
     certificates:
-      - path: /etc/pki/tls/certs/mycert_principal.crt
-        key_path: /etc/pki/tls/private/mycert_principal.key
+      - path: "{{ __certificate_default_directory }}/certs/mycert_principal.crt"
+        key_path: "{{ __certificate_default_directory }}/private/mycert_principal.key"
         subject:
           - name: commonName
             oid: 2.5.4.3
@@ -35,7 +41,6 @@
       loop: "{{ certificates }}"
       loop_control:
         loop_var: cert
-
 
 - name: Test issuing certificate with invalid principal.
   hosts: all
