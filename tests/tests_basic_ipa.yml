@@ -20,7 +20,8 @@
 
         - name: Skip if not supported
           meta: end_host
-          when: __ostree_booted_stat.stat.exists
+          when: __ostree_booted_stat.stat.exists or
+            ansible_facts['os_family'] == 'Suse'
 
     - name: Setup IPA
       import_tasks: tasks/setup_ipa.yml
@@ -48,8 +49,8 @@
         loop_var: cert
       vars:
         certificates:
-          - path: /etc/pki/tls/certs/mycert_basic_ipa.crt
-            key_path: /etc/pki/tls/private/mycert_basic_ipa.key
+          - path: "{{ __certificate_default_directory }}/certs/mycert_basic_ipa.crt"
+            key_path: "{{ __certificate_default_directory }}/private/mycert_basic_ipa.key"
             subject:
               - name: commonName
                 oid: 2.5.4.3
@@ -73,8 +74,8 @@
               - key_encipherment
               - data_encipherment
 
-          - path: /etc/pki/tls/certs/groupcert.crt
-            key_path: /etc/pki/tls/private/groupcert.key
+          - path: "{{ __certificate_default_directory }}/certs/groupcert.crt"
+            key_path: "{{ __certificate_default_directory }}/private/groupcert.key"
             owner: root
             group: ftp
             mode: "0640"

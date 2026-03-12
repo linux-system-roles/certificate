@@ -9,4 +9,4 @@ __certificate_default_directory: /etc/ssl
 __certificate_packages:
   - python311-cryptography
   - python311-dbus-python
-  - python3-pyasn1
+  - python311-pyasn1

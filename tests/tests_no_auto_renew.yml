@@ -1,6 +1,12 @@
 ---
 - name: Issue simple self-signed certificate
   hosts: all
+  pre_tasks:
+    - name: Load certificate role platform variables
+      include_role:
+        name: linux-system-roles.certificate
+        tasks_from: set_vars.yml
+        public: true
 
   vars:
     certificate_requests:
@@ -18,8 +24,8 @@
   hosts: all
   vars:
     certificates:
-      - path: /etc/pki/tls/certs/mycert_no_auto_renew.crt
-        key_path: /etc/pki/tls/private/mycert_no_auto_renew.key
+      - path: "{{ __certificate_default_directory }}/certs/mycert_no_auto_renew.crt"
+        key_path: "{{ __certificate_default_directory }}/private/mycert_no_auto_renew.key"
         subject:
           - name: commonName
             oid: 2.5.4.3
@@ -28,8 +34,8 @@
           - name: DNS
             value: www.example.com
         auto_renew: false
-      - path: /etc/pki/tls/certs/defaultcert.crt
-        key_path: /etc/pki/tls/private/defaultcert.key
+      - path: "{{ __certificate_default_directory }}/certs/defaultcert.crt"
+        key_path: "{{ __certificate_default_directory }}/private/defaultcert.key"
         subject:
           - name: commonName
             oid: 2.5.4.3
