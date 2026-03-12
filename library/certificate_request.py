@@ -311,7 +311,6 @@ RETURN = ""
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.certificate_lsr.providers import providers
 
-
 KEY_USAGE_CHOICES = [
     "digitalSignature",
     "nonRepudiation",

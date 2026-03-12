@@ -245,7 +245,7 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
 
     def _set_user_and_group_if_different(self):
         if not self.module.params.get("booted"):
-            (owner, group, mode) = self._get_permissions()
+            owner, group, mode = self._get_permissions()
             if not any([owner, group, mode]):
                 return False
             if owner:
@@ -420,8 +420,7 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
             return
 
         with open(unit_path, "w") as f:
-            f.write(
-                """[Unit]
+            f.write("""[Unit]
 Description=Request certificates via certmonger from System Role
 Documentation=https://github.com/linux-system-roles/certificate/
 ConditionFileExists={commands_file}
@@ -435,10 +434,7 @@ ExecStartPost=/bin/rm {commands_file}
 
 [Install]
 WantedBy=multi-user.target
-""".format(
-                    commands_file=commands_file
-                )
-            )
+""".format(commands_file=commands_file))
 
         # Enable the service
         systemctl_cmd = ["systemctl", "enable", unit_name]

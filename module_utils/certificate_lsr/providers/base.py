@@ -661,7 +661,7 @@ class CertificateRequestBaseProvider:
         return (owner, group, mode)
 
     def _set_user_and_group_if_different(self):
-        (owner, group, mode) = self._get_permissions()
+        owner, group, mode = self._get_permissions()
 
         if not any([owner, group, mode]):
             return False
