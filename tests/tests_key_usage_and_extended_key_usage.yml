@@ -1,7 +1,6 @@
 ---
 - name: Issue simple self-signed certificate
   hosts: all
-  pre_tasks:
   vars:
     certificate_requests:
       - name: mycert_key_usage_and_extended_key_usage
