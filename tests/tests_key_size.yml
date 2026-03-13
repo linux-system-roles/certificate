@@ -14,6 +14,13 @@
                 dns: www.example.com
                 ca: self-sign
                 key_size: 1024
+
+        - name: Load certificate role platform variables
+          include_role:
+            name: linux-system-roles.certificate
+            tasks_from: set_vars.yml
+            public: true
+
         - name: Verify each certificate
           include_tasks: tasks/assert_certificate_parameters.yml
           loop: "{{ certificates }}"
@@ -21,8 +28,8 @@
             loop_var: cert
           vars:
             certificates:
-              - path: /etc/pki/tls/certs/mycert_key_size.crt
-                key_path: /etc/pki/tls/private/mycert_key_size.key
+              - path: "{{ __certificate_default_directory }}/certs/mycert_key_size.crt"
+                key_path: "{{ __certificate_default_directory }}/private/mycert_key_size.key"
                 subject:
                   - name: commonName
                     oid: 2.5.4.3

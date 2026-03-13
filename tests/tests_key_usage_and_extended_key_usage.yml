@@ -1,7 +1,6 @@
 ---
 - name: Issue simple self-signed certificate
   hosts: all
-
   vars:
     certificate_requests:
       - name: mycert_key_usage_and_extended_key_usage
@@ -21,11 +20,17 @@
 
 - name: Verify certificate
   hosts: all
+  pre_tasks:
+    - name: Load certificate role platform variables
+      include_role:
+        name: linux-system-roles.certificate
+        tasks_from: set_vars.yml
+        public: true
   vars:
     certificates:
-      - path: /etc/pki/tls/certs/mycert_key_usage_and_extended_key_usage.crt
+      - path: "{{ __certificate_default_directory }}/certs/mycert_key_usage_and_extended_key_usage.crt"
         key_path: >-
-          /etc/pki/tls/private/mycert_key_usage_and_extended_key_usage.key
+          {{ __certificate_default_directory }}/private/mycert_key_usage_and_extended_key_usage.key
         subject:
           - name: commonName
             oid: 2.5.4.3
