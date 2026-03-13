@@ -2,3 +2,5 @@
 ---
 collections:
   - name: ansible.posix
+  - name: community.general
+    version: '>=6.6.0,<12.0.0'
