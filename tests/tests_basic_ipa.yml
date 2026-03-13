@@ -42,6 +42,12 @@
             ca: ipa
             group: ftp
 
+    - name: Load certificate role platform variables
+      include_role:
+        name: linux-system-roles.certificate
+        tasks_from: set_vars.yml
+        public: true
+
     - name: Verify certificates
       include_tasks: tasks/assert_certificate_parameters.yml
       loop: "{{ certificates }}"
