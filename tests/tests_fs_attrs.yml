@@ -32,8 +32,7 @@
       when: not __bootc_validation | d(false)
 
     - name: Issue certificate setting user/group
-      include_role:
-        name: linux-system-roles.certificate
+      include_tasks: tasks/run_role_with_clear_facts.yml
       vars:
         certificate_requests:
           - name: mycert_fs_attrs
@@ -87,8 +86,7 @@
             mode: "0640"
 
     - name: Issue certificate setting user/group/mode
-      include_role:
-        name: linux-system-roles.certificate
+      include_tasks: tasks/run_role_with_clear_facts.yml
       vars:
         certificate_requests:
           - name: mycert_fs_attrs_mode

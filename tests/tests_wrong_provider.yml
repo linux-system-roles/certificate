@@ -15,8 +15,7 @@
           Chosen provider 'fake-provider' is not available.
       block:
         - name: Import certificate role
-          import_role:
-            name: linux-system-roles.certificate
+          include_tasks: tasks/run_role_with_clear_facts.yml
         - name: Failed
           fail:
             msg: "Certificate issued with nonexistent provider 'fake-provider'."

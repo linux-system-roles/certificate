@@ -9,8 +9,9 @@
         common_name: '# \\Every"thing+that,ne;eds<escap>ing\0 '
         contact_email: admin@example.com
         ca: self-sign
-  roles:
-    - linux-system-roles.certificate
+  tasks:
+    - name: Run the role
+      include_tasks: tasks/run_role_with_clear_facts.yml
 
 - name: Verify certificate
   hosts: all
@@ -21,7 +22,6 @@
         tasks_from: set_vars.yml
         public: true
   become: true
-  gather_facts: true
   vars:
     certificates:
       - path: "{{ __certificate_default_directory }}/certs/mycert_subject_complex.crt"

@@ -1,7 +1,6 @@
 ---
 - name: Test using IPA to issue certs
   hosts: all
-  gather_facts: true
   become: true
   tags:
     - tests::slow
@@ -27,8 +26,7 @@
       import_tasks: tasks/setup_ipa.yml
 
     - name: Issue IPA signed certificates
-      include_role:
-        name: linux-system-roles.certificate
+      include_tasks: tasks/run_role_with_clear_facts.yml
       vars:
         certificate_requests:
           - name: mycert_basic_ipa
