@@ -2,14 +2,11 @@
 - name: Test re-issue certificate if key size changes
   hosts: all
   become: false
-  gather_facts: false
-
   tasks:
     - name: Include role, ignore fail if certmonger version is not supported
       block:
         - name: Request certificate with key size
-          ansible.builtin.include_role:
-            name: linux-system-roles.certificate
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             certificate_requests:
               - name: mycert_key_size
@@ -55,8 +52,7 @@
               meta: end_play
 
     - name: Request certificate with key size 3072
-      ansible.builtin.include_role:
-        name: linux-system-roles.certificate
+      include_tasks: tasks/run_role_with_clear_facts.yml
       vars:
         certificate_requests:
           - name: mycert_key_size

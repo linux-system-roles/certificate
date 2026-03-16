@@ -10,8 +10,9 @@
           touch /etc/pki/before_cert.tmp
         run_after: >
           touch /etc/pki/after_cert.tmp
-  roles:
-    - linux-system-roles.certificate
+  tasks:
+    - name: Run the role
+      include_tasks: tasks/run_role_with_clear_facts.yml
 
 - name: Verify certificate
   hosts: all

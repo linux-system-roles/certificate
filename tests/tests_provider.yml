@@ -7,8 +7,9 @@
         dns: www.example.com
         ca: self-sign
         provider: certmonger
-  roles:
-    - linux-system-roles.certificate
+  tasks:
+    - name: Run the role
+      include_tasks: tasks/run_role_with_clear_facts.yml
 
 - name: Verify certificate
   hosts: all

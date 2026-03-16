@@ -18,8 +18,7 @@
     certificate_test_remove_files: true
   tasks:
     - name: Run the role in test mode
-      include_role:
-        name: linux-system-roles.certificate
+      include_tasks: tasks/run_role_with_clear_facts.yml
 
     - name: Verify test data
       assert:

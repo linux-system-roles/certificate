@@ -6,8 +6,9 @@
       - name: mycert_basic_self_signed
         dns: www.example.com
         ca: self-sign
-  roles:
-    - linux-system-roles.certificate
+  tasks:
+    - name: Run the role
+      include_tasks: tasks/run_role_with_clear_facts.yml
 
 - name: Verify certificate
   hosts: all
