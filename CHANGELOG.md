@@ -1,6 +1,28 @@
 Changelog
 =========
 
+[1.5.0] - 2026-03-16
+--------------------
+
+### New Features
+
+- feat: Add openSUSE Leap vars (#317)
+
+### Other Changes
+
+- ci: use ANSIBLE_INJECT_FACT_VARS=false by default for testing (#307)
+- ci: bump ansible/ansible-lint from 25 to 26 (#308)
+- ci: skip most CI checks if title contains citest skip [citest_skip] (#309)
+- ci: ansible-lint - remove .collection directory from converted collection [citest_skip] (#310)
+- ci: tox-lsr version 3.15.0 [citest_skip] (#311)
+- ci: Add Fedora 43, remove Fedora 41 from Testing Farm CI (#312)
+- ci: Ansible version must be string, not float [citest_skip] (#313)
+- ci: bump actions/upload-artifact from 6 to 7 (#314)
+- ci: tox-lsr 3.16.0 - fix qemu tox test failures - rename to qemu-ansible-core-X-Y [citest_skip] (#315)
+- ci: tox-lsr 3.17.0 - container test improvements, use ansible 2.20 for fedora 43 [citest_skip] (#316)
+- refactor: fix python black formatting (#318)
+- ci: tox-lsr 3.17.1 - previous update broke container tests, this fixes them [citest_skip] (#319)
+
 [1.4.4] - 2026-01-06
 --------------------
 
