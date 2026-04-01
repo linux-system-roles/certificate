@@ -8,6 +8,7 @@ __metaclass__ = type
 
 import hashlib
 import os
+import sys
 import traceback
 
 try:
@@ -87,10 +88,9 @@ else:
     HAS_PYASN1 = True
     PYASN1_IMPORT_ERROR = None
 
-from ansible.module_utils.six import PY2
 from ansible.module_utils._text import to_bytes, to_text
 
-if PY2:
+if sys.version_info[0] == 2:
     FileNotFoundError = IOError  # pylint: disable=redefined-builtin
 
 
