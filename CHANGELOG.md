@@ -1,6 +1,23 @@
 Changelog
 =========
 
+[1.6.0] - 2026-04-28
+--------------------
+
+### New Features
+
+- feat: add role fingerprints to syslog (#329)
+
+### Other Changes
+
+- ci: fix yum repos to use devel site instead of old site name [citest_skip] (#322)
+- ci: use codecov @v6 [citest_skip] (#323)
+- refactor: the ansible six PY2 is deprecated - just use sys.version_info instead (#324)
+- ci: update header for run_role_with_clear_facts [citest_skip] (#325)
+- test: support ansible-test milestone version 2.22 [citest_skip] (#326)
+- ci: Comply with Ansible partner certification checking [citest_skip] (#327)
+- ci: ansible-lint requires dependencies to be installed [citest_skip] (#328)
+
 [1.5.0] - 2026-03-16
 --------------------
 
