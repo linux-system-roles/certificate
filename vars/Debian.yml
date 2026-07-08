@@ -3,3 +3,8 @@
 # Put internal variables here with Debian 11 specific values.
 
 __certificate_default_directory: /etc/ssl
+
+__certificate_trust_dir: /usr/local/share/ca-certificates
+__certificate_update_trust_command: /usr/sbin/update-ca-certificates
+__certificate_trust_packages:
+  - ca-certificates

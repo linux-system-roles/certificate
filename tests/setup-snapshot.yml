@@ -10,5 +10,6 @@
 
     - name: Install test packages
       package:
-        name: "{{ __certificate_packages }}"
+        name: "{{ __certificate_packages + __certificate_trust_packages +
+          ['openssl'] }}"
         state: present

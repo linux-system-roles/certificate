@@ -5,3 +5,13 @@
 
 certificate_requests: []
 certificate_wait: true
+
+# A list of dicts describing certificates to install into the system
+# trust store.  Each item supports the following keys:
+#   name (required) - base file name of the trust anchor
+#   content - inline PEM content of the certificate
+#   src - path of a certificate file to copy to the trust store
+#   remote_src - if true, src is a path on the managed host
+#   url - URL to download the certificate from
+#   state - present (default) or absent to remove an anchor
+certificate_trust: []

@@ -45,6 +45,7 @@ ansible-galaxy collection install -vv -r meta/collection-requirements.yml
 |-------------------------|----------------------------------------------------------------------------------------------------------------|:----:|:--------:|-------------------|
 | certificate_wait        | If the task should wait for the certificate to be issued.                                                      | bool | no       | yes               |
 | certificate\_requests   | A list of dicts representing each certificate to be issued. See [certificate_requests](#certificate_requests). | list | no       | -                 |
+| certificate\_trust      | A list of dicts representing certificates to install into the system trust store. See [certificate_trust](#certificate_trust). | list | no | -    |
 
 ### certificate_requests
 
@@ -141,6 +142,35 @@ If `extended_key_usage` is not set the role will default to:
 * id-kp-serverAuth
 * id-kp-clientAuth
 
+### certificate_trust
+
+Each item in the `certificate_trust` list describes a certificate to install
+into (or remove from) the system trust store, so that TLS connections to
+services using those certificates are trusted system-wide.
+
+| Parameter   | Description                                                                                     | Type | Required | Default |
+|-------------|-------------------------------------------------------------------------------------------------|:----:|:--------:|---------|
+| name        | Base file name of the trust anchor. The certificate is installed as `<name>.crt` in the trust anchors directory. | str | yes | - |
+| content     | Inline PEM content of the certificate.                                                          | str  | no       | -       |
+| src         | Path of a certificate file on the control node to copy to the trust anchors directory.          | str  | no       | -       |
+| remote\_src | If `true`, `src` is a path on the managed host instead of the control node.                     | bool | no       | no      |
+| url         | URL to download the certificate from.                                                           | str  | no       | -       |
+| state       | `present` to install the certificate, `absent` to remove it from the trust store.               | str  | no       | present |
+
+Exactly one of `content`, `src`, or `url` must be given when `state` is
+`present`. Installed files are owned by `root:root` with mode `0644`. When
+any trust anchor is added or removed, the role updates the system trust
+store by running the platform specific update command.
+
+The trust anchors directory and update command per platform:
+
+* RHEL/CentOS/Fedora: `/etc/pki/ca-trust/source/anchors/`, updated with
+  `update-ca-trust extract`
+* SLES/openSUSE: `/etc/pki/trust/anchors/`, updated with
+  `update-ca-certificates`
+* Debian/Ubuntu: `/usr/local/share/ca-certificates/`, updated with
+  `update-ca-certificates`
+
 ### run hooks
 
 Sometimes you need to execute a command just before a certificate is
@@ -227,6 +257,43 @@ The example below creates a certificate file in
       - name: /another/path/mycert
         dns: *.example.com
         ca: self-sign
+
+  roles:
+    - linux-system-roles.certificate
+```
+
+### Adding certificates to the system trust store
+
+Install an internal CA certificate into the system trust store, one from
+inline PEM content and one from a file on the control node.
+
+```yaml
+---
+- hosts: webserver
+  vars:
+    certificate_trust:
+      - name: internal-ca
+        content: |
+          -----BEGIN CERTIFICATE-----
+          MIIDdTCCAl2gAwIBAgILBAAAAAABFUtaw5QwDQYJKoZIhvcNAQEFBQAwVzELMAkG
+          ...
+          -----END CERTIFICATE-----
+      - name: partner-ca
+        src: files/partner-ca.crt
+
+  roles:
+    - linux-system-roles.certificate
+```
+
+To remove a certificate from the trust store, use `state: absent`:
+
+```yaml
+---
+- hosts: webserver
+  vars:
+    certificate_trust:
+      - name: partner-ca
+        state: absent
 
   roles:
     - linux-system-roles.certificate
