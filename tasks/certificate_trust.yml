@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Ensure trust store packages are installed
+  package:
+    name: "{{ __certificate_trust_packages }}"
+    state: present
+    use: "{{ (__certificate_is_ostree | d(false)) |
+      ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
+
+- name: Install trust certificates
+  copy:
+    content: "{{ item.content | default(omit) }}"
+    src: "{{ item.src | default(omit) }}"
+    remote_src: "{{ item.remote_src | default(omit) }}"
+    dest: "{{ __certificate_trust_dir }}/{{ item.name }}.crt"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ certificate_trust }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - item.state | d('present') == 'present'
+    - item.content is defined or item.src is defined
+  register: __certificate_trust_copied
+
+- name: Install trust certificates from URL
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ __certificate_trust_dir }}/{{ item.name }}.crt"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ certificate_trust }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - item.state | d('present') == 'present'
+    - item.url is defined
+  register: __certificate_trust_downloaded
+
+- name: Remove trust certificates
+  file:
+    path: "{{ __certificate_trust_dir }}/{{ item.name }}.crt"
+    state: absent
+  loop: "{{ certificate_trust }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.state | d('present') == 'absent'
+  register: __certificate_trust_removed
+
+- name: Update system trust store
+  command: "{{ __certificate_update_trust_command }}"
+  changed_when: true
+  when: __certificate_trust_copied is changed
+    or __certificate_trust_downloaded is changed
+    or __certificate_trust_removed is changed

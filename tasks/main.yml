@@ -86,6 +86,10 @@
         loop_var: __certificate_provider
       when: __certificate_provider_vars[__certificate_provider].service is defined
 
+- name: Ensure certificates in the system trust store
+  include_tasks: tasks/certificate_trust.yml
+  when: certificate_trust | length > 0
+
 - name: Ensure certificate requests
   certificate_request:
     name: "{{ item.name | default(omit) }}"
