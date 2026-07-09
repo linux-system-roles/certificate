@@ -193,6 +193,10 @@ CA represents the CA certificates that will be used to issue and sign the
 requested certificate. Provider represents the method used to send the certificate
 request to the CA and then retrieve the signed certificate.
 
+The provider packages (for example `certmonger`) and services are only
+installed and configured when `certificate_requests` is not empty. Using
+only `certificate_trust` does not install any provider.
+
 If a user chooses `self-sign` CA, with `certmonger` as provider and, later on
 decide to change the provider to `openssl`, the CA certificates used in both
 cases needs to be the same. *Please note that `openssl` is **not yet a supported**

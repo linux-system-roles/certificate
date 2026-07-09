@@ -8,8 +8,10 @@
     state: present
     use: "{{ (__certificate_is_ostree | d(false)) |
       ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
+  when: certificate_requests | length > 0
 
 - name: Install and configure required providers
+  when: certificate_requests | length > 0
   vars:
     __certificate_providers: "{{ (certificate_requests | selectattr('provider', 'defined') | map(attribute='provider') | list) +
       [__certificate_provider_default] | unique | list }}"
