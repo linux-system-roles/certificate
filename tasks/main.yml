@@ -2,20 +2,19 @@
 - name: Set version specific variables
   include_tasks: tasks/set_vars.yml
 
-- name: Ensure certificate role dependencies are installed
-  package:
-    name: "{{ __certificate_packages }}"
-    state: present
-    use: "{{ (__certificate_is_ostree | d(false)) |
-      ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
-  when: certificate_requests | length > 0
-
-- name: Install and configure required providers
+- name: Install and configure requirements and providers
   when: certificate_requests | length > 0
   vars:
     __certificate_providers: "{{ (certificate_requests | selectattr('provider', 'defined') | map(attribute='provider') | list) +
       [__certificate_provider_default] | unique | list }}"
   block:
+    - name: Ensure certificate role dependencies are installed
+      package:
+        name: "{{ __certificate_packages }}"
+        state: present
+        use: "{{ (__certificate_is_ostree | d(false)) |
+          ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
+
     - name: Ensure provider packages are installed
       package:
         name: "{{ __certificate_provider_vars[__certificate_provider].packages }}"
