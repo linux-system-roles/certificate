@@ -1,5 +1,22 @@
 # SPDX-License-Identifier: MIT
 ---
+- name: Validate certificate_trust items
+  assert:
+    that:
+      - item.name is defined
+      - item.state | d('present') in ['present', 'absent']
+      - >-
+        item.state | d('present') == 'absent' or
+        [item.content is defined, item.src is defined, item.url is defined] |
+        select | list | length == 1
+    fail_msg: >-
+      Each certificate_trust item must have a name, state must be 'present'
+      or 'absent', and exactly one of content, src, or url must be given
+      when state is 'present'
+  loop: "{{ certificate_trust }}"
+  loop_control:
+    label: "{{ item.name | d('unnamed') }}"
+
 - name: Ensure trust store packages are installed
   package:
     name: "{{ __certificate_trust_packages }}"

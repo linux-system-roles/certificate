@@ -11,5 +11,3 @@ __certificate_packages:
 
 __certificate_trust_dir: /etc/pki/trust/anchors
 __certificate_update_trust_command: /usr/sbin/update-ca-certificates
-__certificate_trust_packages:
-  - ca-certificates

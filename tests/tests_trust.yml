@@ -1,156 +1,167 @@
 # SPDX-License-Identifier: MIT
 ---
-- name: Trust a certificate provided as a file on the managed host
+- name: Test adding certificates to the system trust store
   hosts: all
   vars:
     __trust_test_ca_cert: /tmp/lsr_trust_test_ca.crt
     __trust_test_ca_key: /tmp/lsr_trust_test_ca.key
-    certificate_trust:
-      - name: lsr-trust-test-src
-        src: "{{ __trust_test_ca_cert }}"
-        remote_src: true
   tasks:
-    - name: Ensure openssl is installed
-      package:
-        name: openssl
-        state: present
+    - name: Run certificate_trust tests
+      block:
+        - name: Ensure openssl is installed
+          package:
+            name: openssl
+            state: present
 
-    - name: Generate a self-signed test CA certificate
-      command: >-
-        openssl req -x509 -new -newkey rsa:2048 -nodes -days 3650
-        -subj /CN=LSR-Trust-Test-CA
-        -keyout {{ __trust_test_ca_key }}
-        -out {{ __trust_test_ca_cert }}
-      changed_when: true
+        - name: Generate a self-signed test CA certificate
+          command: >-
+            openssl req -x509 -new -newkey rsa:2048 -nodes -days 3650
+            -subj /CN=LSR-Trust-Test-CA
+            -keyout {{ __trust_test_ca_key }}
+            -out {{ __trust_test_ca_cert }}
+          changed_when: true
 
-    - name: Check that the test CA certificate is not yet trusted
-      command: openssl verify {{ __trust_test_ca_cert }}
-      register: __trust_verify_before
-      changed_when: false
-      failed_when: false
+        - name: Check that the test CA certificate is not yet trusted
+          command: openssl verify {{ __trust_test_ca_cert }}
+          register: __trust_verify_before
+          changed_when: false
+          failed_when: false
 
-    - name: Assert that the test CA certificate is not yet trusted
-      assert:
-        that: "__trust_verify_before.stdout is not search(': OK')"
+        - name: Assert that the test CA certificate is not yet trusted
+          assert:
+            that: "__trust_verify_before.stdout is not search(': OK')"
 
-    - name: Run the role
-      include_tasks: tasks/run_role_with_clear_facts.yml
+        - name: Run the role to trust a certificate file on the managed host
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
+            certificate_trust:
+              - name: lsr-trust-test-src
+                src: "{{ __trust_test_ca_cert }}"
+                remote_src: true
 
-    - name: Load certificate role platform variables
-      include_role:
-        name: linux-system-roles.certificate
-        tasks_from: set_vars.yml
-        public: true
+        - name: Get the trust anchor file attributes
+          stat:
+            path: "{{ __certificate_trust_dir }}/lsr-trust-test-src.crt"
+          register: __trust_anchor
 
-    - name: Get the trust anchor file attributes
-      stat:
-        path: "{{ __certificate_trust_dir }}/lsr-trust-test-src.crt"
-      register: __trust_anchor
+        - name: Assert that the trust anchor was installed
+          assert:
+            that:
+              - __trust_anchor.stat.exists
+              - __trust_anchor.stat.mode == '0644'
+              - __trust_anchor.stat.pw_name == 'root'
+              - __trust_anchor.stat.gr_name == 'root'
 
-    - name: Assert that the trust anchor was installed
-      assert:
-        that:
-          - __trust_anchor.stat.exists
-          - __trust_anchor.stat.mode == '0644'
-          - __trust_anchor.stat.pw_name == 'root'
-          - __trust_anchor.stat.gr_name == 'root'
+        - name: Check that the test CA certificate is now trusted
+          command: openssl verify {{ __trust_test_ca_cert }}
+          register: __trust_verify_after
+          changed_when: false
 
-    - name: Check that the test CA certificate is now trusted
-      command: openssl verify {{ __trust_test_ca_cert }}
-      register: __trust_verify_after
-      changed_when: false
+        - name: Assert that the test CA certificate is now trusted
+          assert:
+            that: "__trust_verify_after.stdout is search(': OK')"
 
-    - name: Assert that the test CA certificate is now trusted
-      assert:
-        that: "__trust_verify_after.stdout is search(': OK')"
+        - name: Slurp the test CA certificate
+          slurp:
+            path: "{{ __trust_test_ca_cert }}"
+          register: __trust_test_ca_slurp
 
-- name: Trust a certificate provided as inline content
-  hosts: all
-  vars:
-    __trust_test_ca_cert: /tmp/lsr_trust_test_ca.crt
-  tasks:
-    - name: Slurp the test CA certificate
-      slurp:
-        path: "{{ __trust_test_ca_cert }}"
-      register: __trust_test_ca_slurp
+        - name: Run the role to trust inline certificate content
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
+            certificate_trust:
+              - name: lsr-trust-test-content
+                content: "{{ __trust_test_ca_slurp.content | b64decode }}"
 
-    # Cannot use tasks/run_role_with_clear_facts.yml here - clear_facts
-    # would remove the registered __trust_test_ca_slurp variable before
-    # the role evaluates certificate_trust
-    - name: Run the role with inline certificate content
-      include_role:
-        name: linux-system-roles.certificate
-      vars:
-        certificate_trust:
-          - name: lsr-trust-test-content
-            content: "{{ __trust_test_ca_slurp.content | b64decode }}"
+        - name: Get the trust anchor file attributes
+          stat:
+            path: "{{ __certificate_trust_dir }}/lsr-trust-test-content.crt"
+          register: __trust_anchor_content
 
-    - name: Load certificate role platform variables
-      include_role:
-        name: linux-system-roles.certificate
-        tasks_from: set_vars.yml
-        public: true
+        - name: Assert that the trust anchor was installed
+          assert:
+            that:
+              - __trust_anchor_content.stat.exists
+              - __trust_anchor_content.stat.mode == '0644'
+              - __trust_anchor_content.stat.pw_name == 'root'
+              - __trust_anchor_content.stat.gr_name == 'root'
 
-    - name: Get the trust anchor file attributes
-      stat:
-        path: "{{ __certificate_trust_dir }}/lsr-trust-test-content.crt"
-      register: __trust_anchor_content
+        - name: Verify that conflicting certificate sources fail validation
+          block:
+            - name: Run the role with conflicting certificate sources
+              include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                certificate_trust:
+                  - name: lsr-trust-test-invalid
+                    content: not-a-certificate
+                    url: https://ca.example.com/ca.crt
 
-    - name: Assert that the trust anchor was installed
-      assert:
-        that:
-          - __trust_anchor_content.stat.exists
-          - __trust_anchor_content.stat.mode == '0644'
+            - name: Failed
+              fail:
+                msg: Role did not fail with conflicting certificate sources
+          rescue:
+            - name: Assert that the role failed in validation
+              assert:
+                that: >-
+                  ansible_failed_result | to_json is
+                  search('exactly one of content, src, or url')
+                fail_msg: >-
+                  The role failed for an unexpected reason:
+                  {{ ansible_failed_result }}
 
-- name: Remove the trust anchors
-  hosts: all
-  vars:
-    __trust_test_ca_cert: /tmp/lsr_trust_test_ca.crt
-    __trust_test_ca_key: /tmp/lsr_trust_test_ca.key
-    certificate_trust:
-      - name: lsr-trust-test-src
-        state: absent
-      - name: lsr-trust-test-content
-        state: absent
-  tasks:
-    - name: Run the role
-      include_tasks: tasks/run_role_with_clear_facts.yml
+        - name: Run the role to remove the trust anchors
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
+            certificate_trust:
+              - name: lsr-trust-test-src
+                state: absent
+              - name: lsr-trust-test-content
+                state: absent
 
-    - name: Load certificate role platform variables
-      include_role:
-        name: linux-system-roles.certificate
-        tasks_from: set_vars.yml
-        public: true
+        - name: Get the trust anchor file attributes
+          stat:
+            path: "{{ __certificate_trust_dir }}/{{ item }}.crt"
+          loop:
+            - lsr-trust-test-src
+            - lsr-trust-test-content
+          register: __trust_anchors_removed
 
-    - name: Get the trust anchor file attributes
-      stat:
-        path: "{{ __certificate_trust_dir }}/{{ item }}.crt"
-      loop:
-        - lsr-trust-test-src
-        - lsr-trust-test-content
-      register: __trust_anchors_removed
+        - name: Assert that the trust anchors were removed
+          assert:
+            that: not item.stat.exists
+          loop: "{{ __trust_anchors_removed.results }}"
+          loop_control:
+            label: "{{ item.item }}"
 
-    - name: Assert that the trust anchors were removed
-      assert:
-        that: not item.stat.exists
-      loop: "{{ __trust_anchors_removed.results }}"
-      loop_control:
-        label: "{{ item.item }}"
+        - name: Check that the test CA certificate is no longer trusted
+          command: openssl verify {{ __trust_test_ca_cert }}
+          register: __trust_verify_removed
+          changed_when: false
+          failed_when: false
 
-    - name: Check that the test CA certificate is no longer trusted
-      command: openssl verify {{ __trust_test_ca_cert }}
-      register: __trust_verify_removed
-      changed_when: false
-      failed_when: false
+        - name: Assert that the test CA certificate is no longer trusted
+          assert:
+            that: "__trust_verify_removed.stdout is not search(': OK')"
+      always:
+        - name: Run the role to clean up the trust anchors
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_failed_when: false
+            certificate_trust:
+              - name: lsr-trust-test-src
+                state: absent
+              - name: lsr-trust-test-content
+                state: absent
+          tags: tests::cleanup
 
-    - name: Assert that the test CA certificate is no longer trusted
-      assert:
-        that: "__trust_verify_removed.stdout is not search(': OK')"
-
-    - name: Clean up the test CA certificate and key
-      file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - "{{ __trust_test_ca_cert }}"
-        - "{{ __trust_test_ca_key }}"
+        - name: Clean up the test CA certificate and key
+          file:
+            path: "{{ item }}"
+            state: absent
+          loop:
+            - "{{ __trust_test_ca_cert }}"
+            - "{{ __trust_test_ca_key }}"
+          tags: tests::cleanup
