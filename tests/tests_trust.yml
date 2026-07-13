@@ -65,10 +65,7 @@
           command: openssl verify {{ __trust_test_ca_cert }}
           register: __trust_verify_after
           changed_when: false
-
-        - name: Assert that the test CA certificate is now trusted
-          assert:
-            that: "__trust_verify_after.stdout is search(': OK')"
+          failed_when: "{{ __trust_verify_after.stdout is not search(': OK') }}"
 
         - name: Slurp the test CA certificate
           slurp:
