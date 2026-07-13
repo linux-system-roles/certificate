@@ -25,7 +25,7 @@ __certificate_default_directory: /etc/pki/tls
 
 # System trust store settings - RedHat family defaults
 __certificate_trust_dir: /etc/pki/ca-trust/source/anchors
-__certificate_update_trust_command: /usr/bin/update-ca-trust extract
+__certificate_update_trust_cli: /usr/bin/update-ca-trust extract
 __certificate_trust_packages:
   - ca-certificates
 

@@ -67,7 +67,7 @@
   register: __certificate_trust_removed
 
 - name: Update system trust store
-  command: "{{ __certificate_update_trust_command }}"
+  command: "{{ __certificate_update_trust_cli }}"
   changed_when: true
   when: __certificate_trust_copied is changed
     or __certificate_trust_downloaded is changed
