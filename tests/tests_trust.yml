@@ -18,6 +18,8 @@
           package:
             name: openssl
             state: present
+            use: "{{ (__certificate_is_ostree | d(false)) |
+              ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
 
         - name: Generate a self-signed test CA certificate
           command: >-
