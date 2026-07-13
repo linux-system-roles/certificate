@@ -8,6 +8,12 @@
   tasks:
     - name: Run certificate_trust tests
       block:
+        - name: Get var __certificate_is_ostree and other role vars
+          include_role:
+            name: linux-system-roles.certificate
+            tasks_from: set_vars.yml
+            public: true
+
         - name: Ensure openssl is installed
           package:
             name: openssl
