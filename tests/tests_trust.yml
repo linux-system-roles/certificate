@@ -3,11 +3,17 @@
 - name: Test adding certificates to the system trust store
   hosts: all
   vars:
-    __trust_test_ca_cert: /tmp/lsr_trust_test_ca.crt
-    __trust_test_ca_key: /tmp/lsr_trust_test_ca.key
+    __trust_test_ca_cert: "{{ __trust_test_ca_tempdir.path }}/ca.crt"
+    __trust_test_ca_key: "{{ __trust_test_ca_tempdir.path }}/ca.key"
   tasks:
     - name: Run certificate_trust tests
       block:
+        - name: Create a temporary directory for the test CA certificate
+          tempfile:
+            prefix: lsr_trust_test_
+            state: directory
+          register: __trust_test_ca_tempdir
+
         - name: Get var __certificate_is_ostree and other role vars
           include_role:
             name: linux-system-roles.certificate
@@ -65,7 +71,7 @@
           command: openssl verify {{ __trust_test_ca_cert }}
           register: __trust_verify_after
           changed_when: false
-          failed_when: "{{ __trust_verify_after.stdout is not search(': OK') }}"
+          failed_when: "__trust_verify_after.stdout is not search(': OK')"
 
         - name: Slurp the test CA certificate
           slurp:
@@ -162,11 +168,11 @@
                 state: absent
           tags: tests::cleanup
 
-        - name: Clean up the test CA certificate and key
+        - name: Clean up the test CA temporary directory
           file:
-            path: "{{ item }}"
+            path: "{{ __trust_test_ca_tempdir.path }}"
             state: absent
-          loop:
-            - "{{ __trust_test_ca_cert }}"
-            - "{{ __trust_test_ca_key }}"
+          when:
+            - __trust_test_ca_tempdir is defined
+            - __trust_test_ca_tempdir.path is defined
           tags: tests::cleanup
