@@ -123,6 +123,7 @@
     run_before: "{{ item.run_before | default(omit) }}"
     run_after: "{{ item.run_after | default(omit) }}"
     ca: "{{ item.ca | default(omit) }}"
+    issuer: "{{ item.issuer | default(omit) }}"
     __header: "{{ __lsr_ansible_managed }}"
     booted: "{{ __certificate_is_booted }}"
   loop: "{{ certificate_requests }}"

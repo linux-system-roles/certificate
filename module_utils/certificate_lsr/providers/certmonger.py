@@ -328,6 +328,10 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
         # Set CA
         command += ["-c", self._get_certmonger_ca_from_params()]
 
+        # Set issuer
+        if self.module.params.get("issuer"):
+            command += ["-X", self.module.params.get("issuer")]
+
         # Wait for cert if required
         if self.module.params["wait"]:
             command += ["-w"]
