@@ -183,6 +183,12 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
     def _get_certmonger_ca_for_existing_cert(self):
         return self._certmonger_metadata.get("ca")
 
+    def _get_certmonger_issuer_from_params(self):
+        return self.module.params.get("issuer")
+
+    def _get_certmonger_issuer_for_existing_cert(self):
+        return self._certmonger_metadata.get("template-issuer")
+
     @property
     def cert_needs_update(self):
         """Check if the existing_certificate needs update.
@@ -200,7 +206,24 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
                 ca_from_params == ca_from_existing_cert
             )
         )
-        if needs_update or ca_from_params != ca_from_existing_cert:
+
+        issuer_from_params = self._get_certmonger_issuer_from_params()
+        issuer_from_existing_cert = self._get_certmonger_issuer_for_existing_cert()
+        issuer_needs_update = (
+            issuer_from_params is not None
+            and issuer_from_params != issuer_from_existing_cert
+        )
+        self.module.debug(
+            "issuer_from_params == issuer_from_existing_cert: {0}".format(
+                issuer_from_params == issuer_from_existing_cert
+            )
+        )
+
+        if (
+            needs_update
+            or ca_from_params != ca_from_existing_cert
+            or issuer_needs_update
+        ):
             return True
 
         return False
@@ -327,6 +350,10 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
 
         # Set CA
         command += ["-c", self._get_certmonger_ca_from_params()]
+
+        # Set issuer
+        if self.module.params.get("issuer"):
+            command += ["-X", self.module.params.get("issuer")]
 
         # Wait for cert if required
         if self.module.params["wait"]:
