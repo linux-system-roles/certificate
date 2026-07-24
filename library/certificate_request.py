@@ -78,6 +78,12 @@ options:
         will vary depending on each provider.
     type: str
     required: true
+  issuer:
+    description:
+      - The name of the issuer at the CA that will issue the certificate.
+        The interpretation of the issuer may vary depending on each provider,
+        and may be ignored if the CA only has one or a default issuer.
+    type: str
   provider:
     description:
       - The underlying method used to request and manage the
@@ -368,6 +374,7 @@ class CertificateRequestModule(AnsibleModule):
             organizational_unit=dict(type="str"),
             contact_email=dict(type="str"),
             ca=dict(type="str", required=True),
+            issuer=dict(type="str"),
             directory=dict(type="str", default="/etc/pki/tls"),
             provider_config_directory=dict(type="str", default="/etc/certmonger"),
             provider=dict(type="str", default="certmonger"),

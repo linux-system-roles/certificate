@@ -1,0 +1,52 @@
+---
+- name: Issue self-signed certificate
+  hosts: all
+  vars:
+    certificate_requests:
+      - name: mycert_subject
+        dns: www.example.com
+        ca: self-sign
+        issuer: mycert_issuer
+  tasks:
+    - name: Run the role
+      include_tasks: tasks/run_role_with_clear_facts.yml
+      vars:
+        __sr_public: true
+
+    - name: Check idempotency if system is booted
+      when: __certificate_is_booted
+      block:
+        - name: Run the role again to test idempotency
+          include_tasks: tasks/run_role_with_clear_facts.yml
+
+        - name: Assert no changes were made
+          assert:
+            that: not certificate_is_changed
+            fail_msg: "Certificate was changed when it should not have been"
+
+- name: Verify certificate
+  hosts: all
+  pre_tasks:
+    - name: Load certificate role platform variables
+      include_role:
+        name: linux-system-roles.certificate
+        tasks_from: set_vars.yml
+        public: true
+  vars:
+    certificates:
+      - path: "{{ __certificate_default_directory }}/certs/mycert_subject.crt"
+        key_path: "{{ __certificate_default_directory }}/private/mycert_subject.key"
+        subject:
+          - name: commonName
+            oid: 2.5.4.3
+            value: www.example.com
+        subject_alt_name:
+          - name: DNS
+            value: www.example.com
+        issuer_template: mycert_issuer
+  tasks:
+    - name: Verify each certificate
+      include_tasks: tasks/assert_certificate_parameters.yml
+      loop: "{{ certificates }}"
+      loop_control:
+        loop_var: cert

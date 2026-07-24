@@ -193,6 +193,25 @@
           {{ cert['auto_renew'] | default('yes') | bool }} !=
           {{ result.stdout | bool }}
 
+    - name: Retrieve issuer template
+      shell: >-
+        set -euo pipefail;
+        getcert list -f {{ cert['path'] }} |
+        grep 'issuer template' |
+        sed 's/^\s\+issuer template: //g'
+      register: result
+      changed_when: false
+      when: cert.issuer_template is defined
+
+    - name: Verify certificate issuer template
+      assert:
+        that:
+          - cert['issuer_template'] | trim == result.stdout | trim
+        fail_msg: >-
+          {{ cert['issuer_template'] | trim }} !=
+          {{ result.stdout | trim }}
+      when: cert.issuer_template is defined
+
     - name: Stat commands file
       stat:
         path: /var/lib/certmonger/system-roles-create.commands

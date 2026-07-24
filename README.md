@@ -65,6 +65,7 @@ Alternative Names (SAN).
 |----------------------|---------------------------------------------------------------------------------------------------|:-----------:|:--------:|-------------------------|
 | name                 | Name of the certificate. A full path can be used to choose the directory where files will be stored.| str       | yes      | -                       |
 | ca                   | CA that will issue the certificate. See [CAs and Providers](#cas-and-providers).                  | str         | yes      | -                       |
+| issuer               | The name of the issuer at the CA that will issue the certificate. The interpretation of the issuer may vary depending on each provider, and may be ignored if the CA only has one or a default issuer. | str | no | - |
 | dns                  | Domain (or list of domains) to be included in the certificate. Also can provide the default value for [common\_name](#common_name). | str or list | no | - |
 | email                | Email (or list of emails) to be included in the certificate.                                      | str or list | no       | -                       |
 | ip                   | IP, or list of IPs, to be included in the certificate. IPs can be IPv4, IPv6 or both. Also can provide the default value for [common\_name](#common_name). | str or list | no | - |
