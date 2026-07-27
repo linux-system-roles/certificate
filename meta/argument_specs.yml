@@ -1,0 +1,148 @@
+# SPDX-License-Identifier: MIT
+---
+argument_specs:
+  main:
+    short_description: Manage TLS/SSL certificate issuance and renewal
+    options:
+      certificate_requests:
+        type: list
+        elements: dict
+        description: >-
+          List of certificate request specifications.
+        options:
+          name:
+            type: str
+            required: true
+            description: >-
+              Name of the certificate.  A full path can be used to choose the
+              directory where files will be stored.
+          ca:
+            type: str
+            required: true
+            description: >-
+              CA that will issue the certificate (e.g. self-sign, ipa).
+          dns:
+            type: raw
+            description: >-
+              Domain or list of domains to include in the certificate SAN.
+          email:
+            type: raw
+            description: >-
+              Email or list of emails to include in the certificate SAN.
+          ip:
+            type: raw
+            description: >-
+              IP or list of IPs to include in the certificate SAN.
+          auto_renew:
+            type: bool
+            description: >-
+              Whether the certificate should be renewed automatically before
+              it expires.
+          owner:
+            type: str
+            description: >-
+              User name or user id for the certificate and key files.
+          group:
+            type: str
+            description: >-
+              Group name or group id for the certificate and key files.
+          mode:
+            type: raw
+            description: >-
+              File system permissions for the certificate and key files.
+          key_size:
+            type: int
+            description: >-
+              Key size in bits.
+          common_name:
+            type: str
+            description: >-
+              Common Name requested for the certificate subject.
+          country:
+            type: str
+            description: >-
+              Country code requested for the certificate subject.
+          state:
+            type: str
+            description: >-
+              State requested for the certificate subject.
+          locality:
+            type: str
+            description: >-
+              Locality requested for the certificate subject.
+          organization:
+            type: str
+            description: >-
+              Organization requested for the certificate subject.
+          organizational_unit:
+            type: str
+            description: >-
+              Organizational unit requested for the certificate subject.
+          contact_email:
+            type: str
+            description: >-
+              Contact email requested for the certificate subject.
+          key_usage:
+            type: list
+            elements: str
+            description: >-
+              Allowed Key Usage extensions for the certificate.
+          extended_key_usage:
+            type: list
+            elements: str
+            description: >-
+              Extended Key Usage attributes for the certificate.
+          run_before:
+            type: str
+            description: >-
+              Command to run before saving the certificate.
+          run_after:
+            type: str
+            description: >-
+              Command to run after saving the certificate.
+          principal:
+            type: raw
+            description: >-
+              Kerberos principal or list of principals.
+          provider:
+            type: str
+            description: >-
+              The underlying method used to request and manage the certificate.
+      certificate_wait:
+        type: bool
+        description: >-
+          Whether the task should wait for the certificate to be issued.
+      certificate_trust:
+        type: list
+        elements: dict
+        description: >-
+          List of certificates to install into the system trust store.
+        options:
+          name:
+            type: str
+            required: true
+            description: >-
+              Base file name of the trust anchor.
+          content:
+            type: str
+            description: >-
+              Inline PEM content of the certificate.
+          src:
+            type: str
+            description: >-
+              Path of a certificate file to copy to the trust store.
+          remote_src:
+            type: bool
+            description: >-
+              If true, src is a path on the managed host.
+          url:
+            type: str
+            description: >-
+              URL to download the certificate from.
+          state:
+            type: str
+            choices:
+              - present
+              - absent
+            description: >-
+              Whether the trust anchor should be present or absent.
