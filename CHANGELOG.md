@@ -1,6 +1,21 @@
 Changelog
 =========
 
+[1.7.0] - 2026-07-27
+--------------------
+
+### New Features
+
+- feat: manage system certificate trust, CA certificates (#341)
+
+### Other Changes
+
+- ci: use gha checkout v7, codecov v7 [citest_skip] (#337)
+- ci: Use our own pr_title_lint.py instead of NPM commitlint [citest_skip] (#338)
+- test: trust test should use tempfile for temp certs/keys (#342)
+- ci: bump tox-lsr version to 3.20.0 to fix tox 4.58 api breakage [citest_skip] (#343)
+- ci: Add support for Fedora 44 and drop Fedora 42 - use ansible-core 2.21 [citest_skip] (#345)
+
 [1.6.1] - 2026-06-24
 --------------------
 
