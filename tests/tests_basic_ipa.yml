@@ -7,6 +7,18 @@
     # can't run IPA in a buildah system
     # this is a test restriction, not a role restriction
     - tests::booted
+  vars:
+    certificate_requests:
+      - name: mycert_basic_ipa
+        dns: ipaserver.test.local
+        principal: HTTP/ipaserver.test.local@TEST.LOCAL
+        ca: ipa
+
+      - name: groupcert
+        dns: ipaserver.test.local
+        principal: HTTP/ipaserver.test.local@TEST.LOCAL
+        ca: ipa
+        group: ftp
   tasks:
     - name: Check if test is supported
       vars:
@@ -28,17 +40,18 @@
     - name: Issue IPA signed certificates
       include_tasks: tasks/run_role_with_clear_facts.yml
       vars:
-        certificate_requests:
-          - name: mycert_basic_ipa
-            dns: ipaserver.test.local
-            principal: HTTP/ipaserver.test.local@TEST.LOCAL
-            ca: ipa
+        __sr_public: true
 
-          - name: groupcert
-            dns: ipaserver.test.local
-            principal: HTTP/ipaserver.test.local@TEST.LOCAL
-            ca: ipa
-            group: ftp
+    - name: Check idempotency if system is booted
+      when: __certificate_is_booted
+      block:
+        - name: Run the role again to test idempotency
+          include_tasks: tasks/run_role_with_clear_facts.yml
+
+        - name: Assert no changes were made
+          assert:
+            that: not certificate_is_changed
+            fail_msg: "Certificate was changed when it should not have been"
 
     - name: Load certificate role platform variables
       include_role:

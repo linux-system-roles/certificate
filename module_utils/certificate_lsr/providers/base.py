@@ -480,15 +480,18 @@ class CertificateProxy:
             return []
         return ext
 
-    def __eq__(self, other):
+    def __eq__(self, cert_request):
         """Compare two instances of CertificateProxy for idempotency purposes."""
+        # NOTE: This only works if the cert_request is the cert requested by the user.
+        # that is - cert_from_pem != cert_from_module_params
+        # it will not work if the cert_request is a certificate from the pem file
         # TODO: compare CA here
         #   Currently each provider is responsible for implementing the CA
         #   comparison.
-        if not isinstance(other, CertificateProxy):
+        if not isinstance(cert_request, CertificateProxy):
             raise TypeError(
                 "Cannot compare 'CertificateProxy' with '{0}'".format(
-                    type(other),
+                    type(cert_request),
                 )
             )
 
@@ -496,20 +499,36 @@ class CertificateProxy:
             "Preparing CertificateProxy objects for comparison: "
             "some keys might be added and/or removed."
         )
-        self._module.debug("Original A: {0}".format(pformat(self.cert_data)))
-        self._module.debug("Original B: {0}".format(pformat(other.cert_data)))
+        self._module.debug(
+            "Original cert_from_pem: {0}".format(pformat(self.cert_data))
+        )
+        self._module.debug(
+            "Original cert_from_module_params: {0}".format(
+                pformat(cert_request.cert_data)
+            )
+        )
 
         # Remove empty sequences and strings, false and None values
         #   before comparison happens
-        self_info = {k: v for k, v in self.cert_data.items() if v}
-        other_info = {k: v for k, v in other.cert_data.items() if v}
+        cert_request_info = {k: v for k, v in cert_request.cert_data.items() if v}
+        cert_from_pem_info = {k: v for k, v in self.cert_data.items() if v}
+        # remove key_size if it is empty in the cert_request - if key_size is in the request
+        # it will have a real non-null and non-zero value e.g. 4096
+        if not cert_request.cert_data.get("key_size") and cert_from_pem_info.get(
+            "key_size"
+        ):
+            del cert_from_pem_info["key_size"]
 
         self._module.debug("Comparing CertificateProxy objects:")
-        self._module.debug("A: {0}".format(pformat(self_info)))
-        self._module.debug("B: {0}".format(pformat(other_info)))
+        self._module.debug("cert_from_pem: {0}".format(pformat(cert_from_pem_info)))
+        self._module.debug(
+            "cert_from_module_params: {0}".format(pformat(cert_request_info))
+        )
 
-        equals = self_info == other_info
-        self._module.debug("A == B: {0}".format(equals))
+        equals = cert_from_pem_info == cert_request_info
+        self._module.debug(
+            "cert_from_pem == cert_from_module_params: {0}".format(equals)
+        )
         return equals
 
     def __ne__(self, other):

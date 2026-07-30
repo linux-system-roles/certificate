@@ -106,7 +106,7 @@
       changed_when: false
       failed_when:
         - certificate_data is failed
-        - not _is_affected or certificate_data.msg is not search(_msg)
+        - not _is_affected or certificate_data.msg is not search(_msg | regex_escape)
       vars:
         _msg: >-
           ParseError { kind: UnexpectedTag { actual: Tag { value: 13, constructed: true, class: Universal } } }

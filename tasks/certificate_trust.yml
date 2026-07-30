@@ -16,6 +16,12 @@
   loop: "{{ certificate_trust }}"
   loop_control:
     label: "{{ item.name | d('unnamed') }}"
+  register: __certificate_trust_validated
+
+- name: Set certificate_is_changed
+  set_fact:
+    certificate_is_changed: true
+  when: __certificate_trust_validated is changed  # noqa no-handler
 
 - name: Ensure trust store packages are installed
   package:
@@ -23,6 +29,12 @@
     state: present
     use: "{{ (__certificate_is_ostree | d(false)) |
       ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
+  register: __certificate_trust_packages_installed
+
+- name: Set certificate_is_changed
+  set_fact:
+    certificate_is_changed: true
+  when: __certificate_trust_packages_installed is changed  # noqa no-handler
 
 - name: Install trust certificates
   copy:
@@ -41,6 +53,11 @@
     - item.content is defined or item.src is defined
   register: __certificate_trust_copied
 
+- name: Set certificate_is_changed
+  set_fact:
+    certificate_is_changed: true
+  when: __certificate_trust_copied is changed  # noqa no-handler
+
 - name: Install trust certificates from URL
   get_url:
     url: "{{ item.url }}"
@@ -56,6 +73,11 @@
     - item.url is defined
   register: __certificate_trust_downloaded
 
+- name: Set certificate_is_changed
+  set_fact:
+    certificate_is_changed: true
+  when: __certificate_trust_downloaded is changed  # noqa no-handler
+
 - name: Remove trust certificates
   file:
     path: "{{ __certificate_trust_dir }}/{{ item.name }}.crt"
@@ -66,9 +88,20 @@
   when: item.state | d('present') == 'absent'
   register: __certificate_trust_removed
 
+- name: Set certificate_is_changed
+  set_fact:
+    certificate_is_changed: true
+  when: __certificate_trust_removed is changed  # noqa no-handler
+
 - name: Update system trust store
   command: "{{ __certificate_update_trust_cli }}"
   changed_when: true
   when: __certificate_trust_copied is changed
     or __certificate_trust_downloaded is changed
-    or __certificate_trust_removed is changed
+    or __certificate_trust_removed is changed  # noqa no-handler
+  register: __certificate_trust_updated
+
+- name: Set certificate_is_changed
+  set_fact:
+    certificate_is_changed: true
+  when: __certificate_trust_updated is changed  # noqa no-handler

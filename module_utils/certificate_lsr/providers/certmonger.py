@@ -420,6 +420,7 @@ class CertificateRequestCertmongerProvider(base.CertificateRequestBaseProvider):
             return
 
         with open(unit_path, "w") as f:
+            # fmt: off
             f.write("""[Unit]
 Description=Request certificates via certmonger from System Role
 Documentation=https://github.com/linux-system-roles/certificate/

@@ -1,6 +1,12 @@
 ---
 - name: Test certificate generation with key_size
   hosts: all
+  vars:
+    certificate_requests:
+      - name: mycert_key_size
+        dns: www.example.com
+        ca: self-sign
+        key_size: 1024
 
   tasks:
     - name: Include role, ignore fail if certmonger version is not supported
@@ -8,11 +14,18 @@
         - name: Request certificate with key size
           include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
-            certificate_requests:
-              - name: mycert_key_size
-                dns: www.example.com
-                ca: self-sign
-                key_size: 1024
+            __sr_public: true
+
+        - name: Check idempotency if system is booted
+          when: __certificate_is_booted
+          block:
+            - name: Run the role again to test idempotency
+              include_tasks: tasks/run_role_with_clear_facts.yml
+
+            - name: Assert no changes were made
+              assert:
+                that: not certificate_is_changed
+                fail_msg: "Certificate was changed when it should not have been"
 
         - name: Load certificate role platform variables
           include_role:
