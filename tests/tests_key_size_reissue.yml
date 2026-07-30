@@ -2,17 +2,37 @@
 - name: Test re-issue certificate if key size changes
   hosts: all
   become: false
+  vars:
+    __certificate_requests_4096:
+      - name: mycert_key_size
+        dns: www.example.com
+        ca: self-sign
+        key_size: 4096
+    __certificate_requests_3072:
+      - name: mycert_key_size
+        dns: www.example.com
+        ca: self-sign
+        key_size: 3072
   tasks:
     - name: Include role, ignore fail if certmonger version is not supported
+      vars:
+        certificate_requests: "{{ __certificate_requests_4096 }}"
       block:
         - name: Request certificate with key size
           include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
-            certificate_requests:
-              - name: mycert_key_size
-                dns: www.example.com
-                ca: self-sign
-                key_size: 4096
+            __sr_public: true
+
+        - name: Check idempotency if system is booted
+          when: __certificate_is_booted
+          block:
+            - name: Run the role again to test idempotency
+              include_tasks: tasks/run_role_with_clear_facts.yml
+
+            - name: Assert no changes were made
+              assert:
+                that: not certificate_is_changed
+                fail_msg: "Certificate was changed when it should not have been"
 
         - name: Load certificate role platform variables
           include_role:
@@ -52,13 +72,24 @@
               meta: end_play
 
     - name: Request certificate with key size 3072
-      include_tasks: tasks/run_role_with_clear_facts.yml
       vars:
-        certificate_requests:
-          - name: mycert_key_size
-            dns: www.example.com
-            ca: self-sign
-            key_size: 3072
+        certificate_requests: "{{ __certificate_requests_3072 }}"
+      block:
+        - name: Request certificate with key size 3072
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
+
+        - name: Check idempotency if system is booted
+          when: __certificate_is_booted
+          block:
+            - name: Run the role again to test idempotency
+              include_tasks: tasks/run_role_with_clear_facts.yml
+
+            - name: Assert no changes were made
+              assert:
+                that: not certificate_is_changed
+                fail_msg: "Certificate was changed when it should not have been"
 
     - name: Fail if certificate was not updated.
       fail:

@@ -3,8 +3,21 @@
 - name: Test adding certificates to the system trust store
   hosts: all
   vars:
+    __sr_public: true
     __trust_test_ca_cert: "{{ __trust_test_ca_tempdir.path }}/ca.crt"
     __trust_test_ca_key: "{{ __trust_test_ca_tempdir.path }}/ca.key"
+    __certificate_trust_src:
+      - name: lsr-trust-test-src
+        src: "{{ __trust_test_ca_cert }}"
+        remote_src: true
+    __certificate_trust_content:
+      - name: lsr-trust-test-content
+        content: "{{ __trust_test_ca_slurp.content | b64decode }}"
+    __certificate_trust_absent:
+      - name: lsr-trust-test-src
+        state: absent
+      - name: lsr-trust-test-content
+        state: absent
   tasks:
     - name: Run certificate_trust tests
       block:
@@ -45,14 +58,25 @@
           assert:
             that: "__trust_verify_before.stdout is not search(': OK')"
 
-        - name: Run the role to trust a certificate file on the managed host
-          include_tasks: tasks/run_role_with_clear_facts.yml
+        - name: Trust a certificate file on the managed host
           vars:
-            __sr_public: true
-            certificate_trust:
-              - name: lsr-trust-test-src
-                src: "{{ __trust_test_ca_cert }}"
-                remote_src: true
+            certificate_trust: "{{ __certificate_trust_src }}"
+          block:
+            - name: Run the role to trust a certificate file on the managed host
+              include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                __sr_public: true
+
+            - name: Check idempotency if system is booted
+              when: __certificate_is_booted
+              block:
+                - name: Run the role again to test idempotency
+                  include_tasks: tasks/run_role_with_clear_facts.yml
+
+                - name: Assert no changes were made
+                  assert:
+                    that: not certificate_is_changed
+                    fail_msg: "Certificate was changed when it should not have been"
 
         - name: Get the trust anchor file attributes
           stat:
@@ -78,13 +102,25 @@
             path: "{{ __trust_test_ca_cert }}"
           register: __trust_test_ca_slurp
 
-        - name: Run the role to trust inline certificate content
-          include_tasks: tasks/run_role_with_clear_facts.yml
+        - name: Trust inline certificate content
           vars:
-            __sr_public: true
-            certificate_trust:
-              - name: lsr-trust-test-content
-                content: "{{ __trust_test_ca_slurp.content | b64decode }}"
+            certificate_trust: "{{ __certificate_trust_content }}"
+          block:
+            - name: Run the role to trust inline certificate content
+              include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                __sr_public: true
+
+            - name: Check idempotency if system is booted
+              when: __certificate_is_booted
+              block:
+                - name: Run the role again to test idempotency
+                  include_tasks: tasks/run_role_with_clear_facts.yml
+
+                - name: Assert no changes were made
+                  assert:
+                    that: not certificate_is_changed
+                    fail_msg: "Certificate was changed when it should not have been"
 
         - name: Get the trust anchor file attributes
           stat:
@@ -100,14 +136,14 @@
               - __trust_anchor_content.stat.gr_name == 'root'
 
         - name: Verify that conflicting certificate sources fail validation
+          vars:
+            certificate_trust:
+              - name: lsr-trust-test-invalid
+                content: not-a-certificate
+                url: https://ca.example.com/ca.crt
           block:
             - name: Run the role with conflicting certificate sources
               include_tasks: tasks/run_role_with_clear_facts.yml
-              vars:
-                certificate_trust:
-                  - name: lsr-trust-test-invalid
-                    content: not-a-certificate
-                    url: https://ca.example.com/ca.crt
 
             - name: Failed
               fail:
@@ -122,15 +158,25 @@
                   The role failed for an unexpected reason:
                   {{ ansible_failed_result }}
 
-        - name: Run the role to remove the trust anchors
-          include_tasks: tasks/run_role_with_clear_facts.yml
+        - name: Remove the trust anchors
           vars:
-            __sr_public: true
-            certificate_trust:
-              - name: lsr-trust-test-src
-                state: absent
-              - name: lsr-trust-test-content
-                state: absent
+            certificate_trust: "{{ __certificate_trust_absent }}"
+          block:
+            - name: Run the role to remove the trust anchors
+              include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                __sr_public: true
+
+            - name: Check idempotency if system is booted
+              when: __certificate_is_booted
+              block:
+                - name: Run the role again to test idempotency
+                  include_tasks: tasks/run_role_with_clear_facts.yml
+
+                - name: Assert no changes were made
+                  assert:
+                    that: not certificate_is_changed
+                    fail_msg: "Certificate was changed when it should not have been"
 
         - name: Get the trust anchor file attributes
           stat:
@@ -161,11 +207,7 @@
           include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             __sr_failed_when: false
-            certificate_trust:
-              - name: lsr-trust-test-src
-                state: absent
-              - name: lsr-trust-test-content
-                state: absent
+            certificate_trust: "{{ __certificate_trust_absent }}"
           tags: tests::cleanup
 
         - name: Clean up the test CA temporary directory

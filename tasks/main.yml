@@ -2,6 +2,10 @@
 - name: Set version specific variables
   include_tasks: tasks/set_vars.yml
 
+- name: Set/reset certificate_is_changed
+  set_fact:
+    certificate_is_changed: false
+
 - name: Install and configure requirements and providers
   when: certificate_requests | length > 0
   vars:
@@ -14,6 +18,12 @@
         state: present
         use: "{{ (__certificate_is_ostree | d(false)) |
           ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
+      register: __certificate_packages_result
+
+    - name: Set certificate_is_changed
+      set_fact:
+        certificate_is_changed: true
+      when: __certificate_packages_result is changed  # noqa no-handler
 
     - name: Ensure provider packages are installed
       package:
@@ -25,6 +35,12 @@
       loop_control:
         loop_var: __certificate_provider
       when: __certificate_provider_vars[__certificate_provider].packages is defined
+      register: __certificate_provider_packages
+
+    - name: Set certificate_is_changed
+      set_fact:
+        certificate_is_changed: true
+      when: __certificate_provider_packages is changed  # noqa no-handler
 
     - name: Ensure pre-scripts hooks directory exists
       file:
@@ -49,6 +65,12 @@
       loop_control:
         loop_var: __certificate_provider
       when: __certificate_provider_vars[__certificate_provider].config_dir is defined
+      register: __certificate_pre_scripts_dirs
+
+    - name: Set certificate_is_changed
+      set_fact:
+        certificate_is_changed: true
+      when: __certificate_pre_scripts_dirs is changed  # noqa no-handler
 
     - name: Ensure post-scripts hooks directory exists
       file:
@@ -73,6 +95,12 @@
       loop_control:
         loop_var: __certificate_provider
       when: __certificate_provider_vars[__certificate_provider].config_dir is defined
+      register: __certificate_post_scripts_dirs
+
+    - name: Set certificate_is_changed
+      set_fact:
+        certificate_is_changed: true
+      when: __certificate_post_scripts_dirs is changed  # noqa no-handler
 
     # While most Linux system roles have a list of services
     #   this role doesn't need it. In fact some providers
@@ -86,6 +114,12 @@
       loop_control:
         loop_var: __certificate_provider
       when: __certificate_provider_vars[__certificate_provider].service is defined
+      register: __certificate_provider_service
+
+    - name: Set certificate_is_changed
+      set_fact:
+        certificate_is_changed: true
+      when: __certificate_provider_service is changed  # noqa no-handler
 
 - name: Ensure certificates in the system trust store
   include_tasks: tasks/certificate_trust.yml
@@ -129,6 +163,12 @@
   vars:
     __lsr_ansible_managed: "{{
       lookup('template', 'get_ansible_managed.j2') }}"
+  register: __certificate_requests
+
+- name: Set certificate_is_changed
+  set_fact:
+    certificate_is_changed: true
+  when: __certificate_requests is changed  # noqa no-handler
 
 # For using this role to issue certs for tests for other
 # system roles.  Assumes that the calling role wants

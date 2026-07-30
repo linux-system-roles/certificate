@@ -1,6 +1,31 @@
 ---
 - name: Ensure UID and GID exists
   hosts: all
+  vars:
+    __certificate_requests_fs_attrs:
+      - name: mycert_fs_attrs
+        dns: www.example.com
+        owner: ftp
+        group: ftp
+        ca: self-sign
+      - name: certid
+        dns: www.example.com
+        owner: 1040
+        group: 1041
+        ca: self-sign
+    __certificate_requests_fs_attrs_mode:
+      - name: mycert_fs_attrs_mode
+        dns: www.example.com
+        owner: ftp
+        group: ftp
+        mode: "0620"
+        ca: self-sign
+      - name: certid_mode
+        dns: www.example.com
+        # octal numeric value is supported too
+        # yamllint disable rule:octal-values
+        mode: 0o600
+        ca: self-sign
   tasks:
     - name: Ensure ftp group exists
       group:
@@ -32,20 +57,25 @@
       when: not __bootc_validation | d(false)
 
     - name: Issue certificate setting user/group
-      include_tasks: tasks/run_role_with_clear_facts.yml
-      vars:
-        certificate_requests:
-          - name: mycert_fs_attrs
-            dns: www.example.com
-            owner: ftp
-            group: ftp
-            ca: self-sign
-          - name: certid
-            dns: www.example.com
-            owner: 1040
-            group: 1041
-            ca: self-sign
       when: not __bootc_validation | d(false)
+      vars:
+        certificate_requests: "{{ __certificate_requests_fs_attrs }}"
+      block:
+        - name: Issue certificate setting user/group
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
+
+        - name: Check idempotency if system is booted
+          when: __certificate_is_booted
+          block:
+            - name: Run the role again to test idempotency
+              include_tasks: tasks/run_role_with_clear_facts.yml
+
+            - name: Assert no changes were made
+              assert:
+                that: not certificate_is_changed
+                fail_msg: "Certificate was changed when it should not have been"
 
     - name: Load certificate role platform variables
       include_role:
@@ -86,22 +116,25 @@
             mode: "0640"
 
     - name: Issue certificate setting user/group/mode
-      include_tasks: tasks/run_role_with_clear_facts.yml
-      vars:
-        certificate_requests:
-          - name: mycert_fs_attrs_mode
-            dns: www.example.com
-            owner: ftp
-            group: ftp
-            mode: "0620"
-            ca: self-sign
-          - name: certid_mode
-            dns: www.example.com
-            # octal numeric value is supported too
-            # yamllint disable rule:octal-values
-            mode: 0o600
-            ca: self-sign
       when: not __bootc_validation | d(false)
+      vars:
+        certificate_requests: "{{ __certificate_requests_fs_attrs_mode }}"
+      block:
+        - name: Issue certificate setting user/group/mode
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
+
+        - name: Check idempotency if system is booted
+          when: __certificate_is_booted
+          block:
+            - name: Run the role again to test idempotency
+              include_tasks: tasks/run_role_with_clear_facts.yml
+
+            - name: Assert no changes were made
+              assert:
+                that: not certificate_is_changed
+                fail_msg: "Certificate was changed when it should not have been"
 
     - name: Create QEMU deployment during bootc end-to-end test
       delegate_to: localhost

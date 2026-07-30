@@ -18,6 +18,19 @@
   tasks:
     - name: Run the role
       include_tasks: tasks/run_role_with_clear_facts.yml
+      vars:
+        __sr_public: true
+
+    - name: Check idempotency if system is booted
+      when: __certificate_is_booted
+      block:
+        - name: Run the role again to test idempotency
+          include_tasks: tasks/run_role_with_clear_facts.yml
+
+        - name: Assert no changes were made
+          assert:
+            that: not certificate_is_changed
+            fail_msg: "Certificate was changed when it should not have been"
 
 - name: Verify certificate
   hosts: all

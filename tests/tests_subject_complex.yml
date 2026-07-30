@@ -9,13 +9,63 @@
         common_name: '# \\Every"thing+that,ne;eds<escap>ing\0 '
         contact_email: admin@example.com
         ca: self-sign
+  vars_files:
+    - vars/rh_distros_vars.yml
   tasks:
-    - name: Run the role
-      include_tasks: tasks/run_role_with_clear_facts.yml
+    - name: Run the role and handle errors
+      block:
+        - name: Run the role
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
+
+        - name: Set fact __is_el7
+          set_fact:
+            __is_el7: __certificate_is_rh_distro and ansible_facts['distribution_major_version'] == '7'
+
+        # The el7 issue is different but related to the el10 certmonger encoding - the comma
+        # causes certmonger to encode the subject as two different values.
+        - name: Check idempotency if system is booted
+          when:
+            - __certificate_is_booted
+            - not __is_el7
+          block:
+            - name: Run the role again to test idempotency
+              include_tasks: tasks/run_role_with_clear_facts.yml
+
+            - name: Assert no changes were made
+              assert:
+                that: not certificate_is_changed
+                fail_msg: "Certificate was changed when it should not have been"
+      rescue:
+        - name: Check for expected error and fail otherwise
+          fail:
+            msg: >-
+              Certificate parsing failed - this is likely due to a bug in certmonger which
+              is fixed by https://codeberg.org/freeipa/certmonger/pulls/309 -
+              message: {{ ansible_failed_result.msg }}
+          when: not _is_affected or ansible_failed_result.results |
+            selectattr('msg', 'search', _msg | regex_escape) | list | length == 0
+          vars:
+            _msg: >-
+              ParseError { kind: InvalidValue, location: [1, 0, "AttributeTypeValue::value", "AttributeValue::PrintableString"] }
+            _is_affected: "{{ ((ansible_facts['distribution_major_version'] == '10' and
+              ansible_facts['os_family'] == 'RedHat'))
+              or ansible_facts['distribution'] == 'Fedora' }}"
+
+        - name: Tell remaining tasks to skip
+          set_fact:
+            skip_remaining_tasks: true
 
 - name: Verify certificate
   hosts: all
+  vars_files:
+    - vars/rh_distros_vars.yml
   pre_tasks:
+    - name: Skip tasks if expected error occurred
+      when: skip_remaining_tasks | default(false)
+      meta: end_play
+
     - name: Load certificate role platform variables
       include_role:
         name: linux-system-roles.certificate
@@ -38,11 +88,7 @@
             value: www.example.com
   tasks:
     - name: Verify certs if not CentOS/RedHat 7
-      when: |
-        not (
-            ansible_facts["distribution"] in ['CentOS', 'RedHat'] and
-            ansible_facts["distribution_major_version"] == "7"
-        )
+      when: not (__certificate_is_rh_distro and ansible_facts['distribution_major_version'] == '7')
       block:
         - name: Verify each certificate
           include_tasks: tasks/assert_certificate_parameters.yml

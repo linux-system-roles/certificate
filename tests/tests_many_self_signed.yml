@@ -1,22 +1,35 @@
 ---
 - name: Issue many self-signed certificates
   hosts: all
+  vars:
+    certificate_requests:
+      - name: mycert_many_self_signed
+        dns: www.example.com
+        ca: self-sign
+      - name: other-cert
+        dns: www.example.org
+        ca: self-sign
+      - name: another-cert
+        dns: www.example.net
+        ca: self-sign
 
   tasks:
     - name: Run the role
       include_tasks: tasks/run_role_with_clear_facts.yml
-      vars:
-        certificate_requests:
-          - name: mycert_many_self_signed
-            dns: www.example.com
-            ca: self-sign
-          - name: other-cert
-            dns: www.example.org
-            ca: self-sign
-          - name: another-cert
-            dns: www.example.net
-            ca: self-sign
       when: not __bootc_validation | d(false)
+      vars:
+        __sr_public: true
+
+    - name: Check idempotency if system is booted
+      when: __bootc_validation | default(false) or __certificate_is_booted
+      block:
+        - name: Run the role again to test idempotency
+          include_tasks: tasks/run_role_with_clear_facts.yml
+
+        - name: Assert no changes were made
+          assert:
+            that: not certificate_is_changed
+            fail_msg: "Certificate was changed when it should not have been"
 
     - name: Create QEMU deployment during bootc end-to-end test
       delegate_to: localhost
