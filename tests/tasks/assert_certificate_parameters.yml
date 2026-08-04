@@ -92,64 +92,89 @@
           {{ cert['owner'] | default('root') }}:
           {{ cert['group'] | default('root') }}
 
+    # NOTE: Due a bug in certmonger which is fixed by
+    # https://codeberg.org/freeipa/certmonger/pulls/309
+    # certmonger does not use the proper encoding for subject/common name
+    # values which contain non-printable characters, such as used in
+    # tests_subject_complex.yml. And the pyca parser used by certtojson
+    # in EL10 and Fedora is much stricter and does not like the encoding.
+    # So ignore for now.
     - name: Parse certificate
       certtojson:
         filename: "{{ cert['path'] }}"
       register: certificate_data
       changed_when: false
+      failed_when:
+        - certificate_data is failed
+        - not _is_affected or certificate_data.msg is not search(_msg)
+      vars:
+        _msg: >-
+          ParseError { kind: UnexpectedTag { actual: Tag { value: 13, constructed: true, class: Universal } } }
+        _is_affected: "{{ ((ansible_facts['distribution_major_version'] == '10' and
+          ansible_facts['os_family'] == 'RedHat'))
+          or ansible_facts['distribution'] == 'Fedora' }}"
 
-    - name: Load certificate YAML to cert_issued variable
-      set_fact:
+    - name: Report error when certificate parsing failed
+      debug:
+        msg: >-
+          Certificate parsing failed - this is likely due to a bug in certmonger which
+          is fixed by https://codeberg.org/freeipa/certmonger/pulls/309 -
+          message: {{ certificate_data.msg }}
+      when: certificate_data.certificate is none
+
+    - name: Ignore other checks if certificate parsing failed
+      when: certificate_data.certificate is not none
+      vars:
         cert_issued: "{{ certificate_data.certificate }}"
+      block:
+        - name: Verify certificate subject
+          assert:
+            that:
+              - cert.subject | sort(attribute="name") ==
+                cert_issued.subject | sort(attribute="name")
+            fail_msg: >-
+              {{ cert.subject | sort(attribute="name") }} !=
+              {{ cert_issued.subject | sort(attribute="name") }}
 
-    - name: Verify certificate subject
-      assert:
-        that:
-          - cert.subject | sort(attribute="name") ==
-            cert_issued.subject | sort(attribute="name")
-        fail_msg: >-
-          {{ cert.subject | sort(attribute="name") }} !=
-          {{ cert_issued.subject | sort(attribute="name") }}
+        - name: Verify certificate SAN
+          assert:
+            that:
+              - cert.subject_alt_name ==
+                cert_issued.extensions.subjectAltName.value
+            fail_msg: >-
+              {{ cert.subject_alt_name }} !=
+              {{ cert_issued.extensions.subjectAltName.value }}
 
-    - name: Verify certificate SAN
-      assert:
-        that:
-          - cert.subject_alt_name ==
-            cert_issued.extensions.subjectAltName.value
-        fail_msg: >-
-          {{ cert.subject_alt_name }} !=
-          {{ cert_issued.extensions.subjectAltName.value }}
+        - name: Verify key size
+          assert:
+            that:
+              - cert.key_size | default(2048) == cert_issued.key_size
+            fail_msg: >-
+              {{ cert.key_size | default(2048) }} != {{ cert_issued.key_size }}
 
-    - name: Verify key size
-      assert:
-        that:
-          - cert.key_size | default(2048) == cert_issued.key_size
-        fail_msg: >-
-          {{ cert.key_size | default(2048) }} != {{ cert_issued.key_size }}
+        - name: Verify certificate Key Usage
+          vars:
+            default_ku:
+              - digital_signature
+              - key_encipherment
+            expected: "{{ cert.key_usage | d(default_ku) | sort }}"
+            actual: "{{ cert_issued.extensions.keyUsage.value | sort }}"
+          assert:
+            that: expected == actual
+            fail_msg: expected value {{ expected }} != {{ actual }}
 
-    - name: Verify certificate Key Usage
-      vars:
-        default_ku:
-          - digital_signature
-          - key_encipherment
-        expected: "{{ cert.key_usage | d(default_ku) | sort }}"
-        actual: "{{ cert_issued.extensions.keyUsage.value | sort }}"
-      assert:
-        that: expected == actual
-        fail_msg: expected value {{ expected }} != {{ actual }}
-
-    - name: Verify certificate Extended Key Usage
-      vars:
-        default_eku:
-          - name: id-kp-serverAuth
-            oid: 1.3.6.1.5.5.7.3.1
-          - name: id-kp-clientAuth
-            oid: 1.3.6.1.5.5.7.3.2
-        expected: "{{ cert.extended_key_usage | d(default_eku) }}"
-        actual: "{{ cert_issued.extensions.extendedKeyUsage.value }}"
-      assert:
-        that: expected == actual
-        fail_msg: expected value {{ expected }} != {{ actual }}
+        - name: Verify certificate Extended Key Usage
+          vars:
+            default_eku:
+              - name: id-kp-serverAuth
+                oid: 1.3.6.1.5.5.7.3.1
+              - name: id-kp-clientAuth
+                oid: 1.3.6.1.5.5.7.3.2
+            expected: "{{ cert.extended_key_usage | d(default_eku) }}"
+            actual: "{{ cert_issued.extensions.extendedKeyUsage.value }}"
+          assert:
+            that: expected == actual
+            fail_msg: expected value {{ expected }} != {{ actual }}
 
     - name: Retrieve auto-renew flag
       shell: >-
