@@ -249,10 +249,14 @@ def main():
         argument_spec={"filename": {"type": "str", "required": True}},
         supports_check_mode=False,
     )
-    module.exit_json(
-        changed=False,
-        certificate=decode_certificate(module.params.get("filename")),
-    )
+    result = {"changed": False, "certificate": None}
+    try:
+        certificate = decode_certificate(module.params.get("filename"))
+        result["certificate"] = certificate
+    except Exception as exc:
+        result["msg"] = str(exc)
+        module.fail_json(**result)
+    module.exit_json(**result)
 
 
 if __name__ == "__main__":
