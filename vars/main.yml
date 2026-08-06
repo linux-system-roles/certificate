@@ -42,6 +42,8 @@ __certificate_required_facts:
 __certificate_required_facts_subsets: "{{ ['!all', '!min'] +
   __certificate_required_facts }}"
 
+__certificate_write_log_file: false
+
 # BEGIN - DO NOT EDIT THIS BLOCK - rh distros variables
 # Ansible distribution identifiers that the role treats like RHEL
 __certificate_rh_distros:
