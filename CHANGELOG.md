@@ -1,6 +1,21 @@
 Changelog
 =========
 
+[1.9.0] - 2026-08-07
+--------------------
+
+### New Features
+
+- feat: Implement support for passing an issuer argument to the provider. (#346)
+
+### Bug Fixes
+
+- fix: ensure role is idempotent (#355)
+
+### Other Changes
+
+- test: ignore Fedora and EL10 cert parsing error due to certmonger 309 (#350)
+
 [1.8.0] - 2026-08-06
 --------------------
 
