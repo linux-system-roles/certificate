@@ -178,3 +178,27 @@
         fail_msg: >-
           meta/argument_specs should reject certificate_trust state
           values outside the allowed set (present, absent)
+
+    # --- certificate_trust cross-field validation (assert in tasks, not argument_specs) ---
+
+    - name: Assert rejects trust entry with no source when state is present
+      block:
+        - name: Run role with trust entry missing content, src, and url
+          ansible.builtin.include_role:
+            name: linux-system-roles.certificate
+          vars:
+            certificate_trust:
+              - name: mycert
+                state: present
+      rescue:
+        - name: Mark missing trust source rejected
+          ansible.builtin.set_fact:
+            __invalid_input_trust_no_source_failed: true
+
+    - name: Assert trust entry with no source failed validation
+      ansible.builtin.assert:
+        that:
+          - __invalid_input_trust_no_source_failed | default(false)
+        fail_msg: >-
+          certificate_trust should reject entries with state present
+          that do not specify exactly one of content, src, or url
