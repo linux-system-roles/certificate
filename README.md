@@ -41,6 +41,8 @@ ansible-galaxy collection install -vv -r meta/collection-requirements.yml
 
 ## Variables
 
+Validation is enforced by `meta/argument_specs.yml`.
+
 | Parameter               | Description                                                                                                    | Type | Required | Default           |
 |-------------------------|----------------------------------------------------------------------------------------------------------------|:----:|:--------:|-------------------|
 | certificate_wait        | If the task should wait for the certificate to be issued.                                                      | bool | no       | yes               |
