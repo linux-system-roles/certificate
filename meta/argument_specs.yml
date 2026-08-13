@@ -108,6 +108,10 @@ argument_specs:
             type: str
             description: >-
               The underlying method used to request and manage the certificate.
+          issuer:
+            type: str
+            description: >-
+              Issuer certificate nickname or template name.
       certificate_wait:
         type: bool
         description: >-

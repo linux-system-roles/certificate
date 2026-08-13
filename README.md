@@ -41,7 +41,8 @@ ansible-galaxy collection install -vv -r meta/collection-requirements.yml
 
 ## Variables
 
-Validation is enforced by `meta/argument_specs.yml`.
+Type, required-field, and choice validation is enforced by
+`meta/argument_specs.yml`. Role tasks enforce cross-field validation.
 
 | Parameter               | Description                                                                                                    | Type | Required | Default           |
 |-------------------------|----------------------------------------------------------------------------------------------------------------|:----:|:--------:|-------------------|
