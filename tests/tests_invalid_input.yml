@@ -246,6 +246,30 @@
               assert_role_vars should reject dns values that are not
               a string or list
 
+        - name: Assert rejects dns list with non-string element
+          block:
+            - name: Run role with dns list containing integer
+              ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                certificate_requests:
+                  - name: mycert
+                    ca: self-sign
+                    dns:
+                      - www.example.com
+                      - 12345
+          rescue:
+            - name: Mark dns list element rejected
+              ansible.builtin.set_fact:
+                __invalid_input_dns_element_failed: true
+
+        - name: Assert dns list with non-string element failed validation
+          ansible.builtin.assert:
+            that:
+              - __invalid_input_dns_element_failed | default(false)
+            fail_msg: >-
+              assert_role_vars should reject dns lists containing
+              non-string elements
+
         - name: Assert rejects ip as boolean
           block:
             - name: Run role with ip as boolean
@@ -304,6 +328,7 @@
             __invalid_input_trust_state_failed:
             __invalid_input_trust_no_source_failed:
             __invalid_input_dns_type_failed:
+            __invalid_input_dns_element_failed:
             __invalid_input_ip_type_failed:
             __invalid_input_mode_type_failed:
           tags: tests::cleanup
