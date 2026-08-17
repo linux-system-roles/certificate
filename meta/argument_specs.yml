@@ -2,151 +2,181 @@
 ---
 argument_specs:
   main:
-    short_description: Manage TLS/SSL certificate issuance and renewal
+    short_description: The certificate role.
+    description: >
+      The certificate role allows you to issue and manage TLS/SSL
+      certificates using various CA providers such as self-sign and IPA.
+
+      This role will install necessary packages, configure the certificate
+      provider, and issue or renew certificates as specified in
+      `certificate_requests`. It can also manage system trust store
+      entries via `certificate_trust`.
     options:
       certificate_requests:
         type: list
         elements: dict
-        description: >-
-          List of certificate request specifications.
+        description: >
+          A list of certificate request specifications. Each item describes
+          a certificate to be issued or renewed. Defaults to an empty list.
         options:
           name:
             type: str
             required: true
-            description: >-
-              Name of the certificate.  A full path can be used to choose the
-              directory where files will be stored.
+            description: >
+              The name of the certificate. A full path can be used to
+              choose the directory where files will be stored.
           ca:
             type: str
             required: true
-            description: >-
-              CA that will issue the certificate (e.g. self-sign, ipa).
+            description: >
+              The CA that will issue the certificate (e.g. self-sign, ipa).
           dns:
             type: raw
-            description: >-
-              Domain or list of domains to include in the certificate SAN.
+            description: >
+              A domain name or list of domain names to include in the
+              certificate Subject Alternative Name (SAN).
           email:
             type: raw
-            description: >-
-              Email or list of emails to include in the certificate SAN.
+            description: >
+              An email address or list of email addresses to include in the
+              certificate Subject Alternative Name (SAN).
           ip:
             type: raw
-            description: >-
-              IP or list of IPs to include in the certificate SAN.
+            description: >
+              An IP address or list of IP addresses to include in the
+              certificate Subject Alternative Name (SAN).
           auto_renew:
             type: bool
-            description: >-
-              Whether the certificate should be renewed automatically before
-              it expires.
+            description: >
+              Whether the certificate should be renewed automatically
+              before it expires. Defaults to `true`.
           owner:
             type: str
-            description: >-
-              User name or user id for the certificate and key files.
+            description: >
+              The user name or user id for the certificate and key files.
           group:
             type: str
-            description: >-
-              Group name or group id for the certificate and key files.
+            description: >
+              The group name or group id for the certificate and key files.
           mode:
             type: raw
-            description: >-
-              File system permissions for the certificate and key files.
+            description: >
+              The file system permissions for the certificate and key
+              files. Accepts a string (e.g. '0644') or an integer.
           key_size:
             type: int
-            description: >-
-              Key size in bits.
+            description: >
+              The key size in bits.
           common_name:
             type: str
-            description: >-
-              Common Name requested for the certificate subject.
+            description: >
+              The Common Name requested for the certificate subject.
           country:
             type: str
-            description: >-
-              Country code requested for the certificate subject.
+            description: >
+              The country code requested for the certificate subject.
           state:
             type: str
-            description: >-
-              State requested for the certificate subject.
+            description: >
+              The state requested for the certificate subject.
           locality:
             type: str
-            description: >-
-              Locality requested for the certificate subject.
+            description: >
+              The locality requested for the certificate subject.
           organization:
             type: str
-            description: >-
-              Organization requested for the certificate subject.
+            description: >
+              The organization requested for the certificate subject.
           organizational_unit:
             type: str
-            description: >-
-              Organizational unit requested for the certificate subject.
+            description: >
+              The organizational unit requested for the certificate subject.
           contact_email:
             type: str
-            description: >-
-              Contact email requested for the certificate subject.
+            description: >
+              The contact email requested for the certificate subject.
           key_usage:
             type: list
             elements: str
-            description: >-
-              Allowed Key Usage extensions for the certificate.
+            choices:
+              - digitalSignature
+              - nonRepudiation
+              - keyEncipherment
+              - dataEncipherment
+              - keyAgreement
+              - keyCertSign
+              - cRLSign
+              - encipherOnly
+              - decipherOnly
+            description: >
+              The allowed Key Usage extensions for the certificate.
+              Defaults to `digitalSignature` and `keyEncipherment`.
           extended_key_usage:
             type: list
             elements: str
-            description: >-
-              Extended Key Usage attributes for the certificate.
+            description: >
+              The Extended Key Usage attributes for the certificate.
+              Defaults to `id-kp-serverAuth` and `id-kp-clientAuth`.
           run_before:
             type: str
-            description: >-
-              Command to run before saving the certificate.
+            description: >
+              A command to run before saving the certificate.
           run_after:
             type: str
-            description: >-
-              Command to run after saving the certificate.
+            description: >
+              A command to run after saving the certificate.
           principal:
             type: raw
-            description: >-
-              Kerberos principal or list of principals.
+            description: >
+              A Kerberos principal or list of Kerberos principals.
           provider:
             type: str
-            description: >-
-              The underlying method used to request and manage the certificate.
+            description: >
+              The underlying method used to request and manage the
+              certificate. Defaults to `certmonger`.
           issuer:
             type: str
-            description: >-
-              Issuer certificate nickname or template name.
+            description: >
+              The issuer certificate nickname or template name.
       certificate_wait:
         type: bool
-        description: >-
+        description: >
           Whether the task should wait for the certificate to be issued.
+          Defaults to `true`.
       certificate_trust:
         type: list
         elements: dict
-        description: >-
-          List of certificates to install into the system trust store.
+        description: >
+          A list of certificates to install into or remove from the system
+          trust store. Defaults to an empty list.
         options:
           name:
             type: str
             required: true
-            description: >-
-              Base file name of the trust anchor.
+            description: >
+              The base file name of the trust anchor.
           content:
             type: str
-            description: >-
-              Inline PEM content of the certificate.
+            description: >
+              The inline PEM content of the certificate.
           src:
             type: str
-            description: >-
-              Path of a certificate file to copy to the trust store.
+            description: >
+              The path of a certificate file to copy to the trust store.
           remote_src:
             type: bool
-            description: >-
-              If true, src is a path on the managed host.
+            description: >
+              If true, `src` is a path on the managed host rather than
+              the controller.
           url:
             type: str
-            description: >-
-              URL to download the certificate from.
+            description: >
+              The URL to download the certificate from.
           state:
             type: str
             choices:
               - present
               - absent
-            description: >-
+            description: >
               Whether the trust anchor should be present or absent.
+              Defaults to `present`.
