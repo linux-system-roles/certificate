@@ -2,6 +2,10 @@
 - name: Set version specific variables
   include_tasks: tasks/set_vars.yml
 
+- name: Validate certificate_requests fields
+  ansible.builtin.include_tasks: tasks/assert_role_vars.yml
+  when: certificate_requests | length > 0
+
 - name: Set/reset certificate_is_changed
   set_fact:
     certificate_is_changed: false

@@ -1,0 +1,70 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Assert dns is a string or list
+  ansible.builtin.assert:
+    that:
+      - item.dns is sequence and item.dns is not mapping
+    fail_msg: >-
+      certificate_requests[{{ idx }}].dns must be a string or list,
+      got {{ item.dns | type_debug }}
+  loop: "{{ certificate_requests }}"
+  loop_control:
+    index_var: idx
+    label: "{{ item.name | d('unnamed') }}"
+  when: item.dns is defined
+
+- name: Assert email is a string or list
+  ansible.builtin.assert:
+    that:
+      - item.email is sequence and item.email is not mapping
+    fail_msg: >-
+      certificate_requests[{{ idx }}].email must be a string or list,
+      got {{ item.email | type_debug }}
+  loop: "{{ certificate_requests }}"
+  loop_control:
+    index_var: idx
+    label: "{{ item.name | d('unnamed') }}"
+  when: item.email is defined
+
+- name: Assert ip is a string or list
+  ansible.builtin.assert:
+    that:
+      - item.ip is sequence and item.ip is not mapping
+    fail_msg: >-
+      certificate_requests[{{ idx }}].ip must be a string or list,
+      got {{ item.ip | type_debug }}
+  loop: "{{ certificate_requests }}"
+  loop_control:
+    index_var: idx
+    label: "{{ item.name | d('unnamed') }}"
+  when: item.ip is defined
+
+- name: Assert principal is a string or list
+  ansible.builtin.assert:
+    that:
+      - item.principal is sequence and item.principal is not mapping
+    fail_msg: >-
+      certificate_requests[{{ idx }}].principal must be a string or list,
+      got {{ item.principal | type_debug }}
+  loop: "{{ certificate_requests }}"
+  loop_control:
+    index_var: idx
+    label: "{{ item.name | d('unnamed') }}"
+  when: item.principal is defined
+
+- name: Assert mode is a string or integer
+  ansible.builtin.assert:
+    that:
+      - >-
+        item.mode is string
+        or (item.mode is integer
+            and item.mode is not sameas true
+            and item.mode is not sameas false)
+    fail_msg: >-
+      certificate_requests[{{ idx }}].mode must be a string or integer,
+      got {{ item.mode | type_debug }}
+  loop: "{{ certificate_requests }}"
+  loop_control:
+    index_var: idx
+    label: "{{ item.name | d('unnamed') }}"
+  when: item.mode is defined
