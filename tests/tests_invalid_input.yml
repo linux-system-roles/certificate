@@ -153,6 +153,30 @@
                   meta/argument_specs should reject certificate_trust entries
                   without the required name field
 
+            - name: Argument specs reject invalid key_usage choice
+              block:
+                - name: Run role with invalid key_usage value
+                  ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+                  vars:
+                    certificate_requests:
+                      - name: mycert
+                        ca: self-sign
+                        key_usage:
+                          - digitalSignature
+                          - invalidUsage
+              rescue:
+                - name: Mark invalid key_usage rejected
+                  ansible.builtin.set_fact:
+                    __invalid_input_key_usage_choice_failed: true
+
+            - name: Assert invalid key_usage choice failed validation
+              ansible.builtin.assert:
+                that:
+                  - __invalid_input_key_usage_choice_failed | default(false)
+                fail_msg: >-
+                  meta/argument_specs should reject key_usage values
+                  not in the allowed choices list
+
             - name: Argument specs reject invalid state in certificate_trust
               block:
                 - name: Run role with invalid trust state
@@ -276,6 +300,7 @@
             __invalid_input_auto_renew_type_failed:
             __invalid_input_wait_type_failed:
             __invalid_input_trust_missing_name_failed:
+            __invalid_input_key_usage_choice_failed:
             __invalid_input_trust_state_failed:
             __invalid_input_trust_no_source_failed:
             __invalid_input_dns_type_failed:
