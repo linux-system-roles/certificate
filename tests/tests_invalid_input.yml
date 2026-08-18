@@ -39,6 +39,9 @@
                 - name: Mark missing name rejected
                   ansible.builtin.set_fact:
                     __invalid_input_missing_name_failed: true
+                  when: >-
+                    'missing required arguments' in
+                    (ansible_failed_result | default({}) | to_json)
 
             - name: Assert missing name in certificate_requests failed validation
               ansible.builtin.assert:
@@ -60,6 +63,9 @@
                 - name: Mark missing ca rejected
                   ansible.builtin.set_fact:
                     __invalid_input_missing_ca_failed: true
+                  when: >-
+                    'missing required arguments' in
+                    (ansible_failed_result | default({}) | to_json)
 
             - name: Assert missing ca in certificate_requests failed validation
               ansible.builtin.assert:
@@ -82,6 +88,9 @@
                 - name: Mark invalid key_size rejected
                   ansible.builtin.set_fact:
                     __invalid_input_key_size_type_failed: true
+                  when: >-
+                    'key_size' in
+                    (ansible_failed_result | default({}) | to_json)
 
             - name: Assert invalid key_size type failed validation
               ansible.builtin.assert:
@@ -104,6 +113,9 @@
                 - name: Mark invalid auto_renew rejected
                   ansible.builtin.set_fact:
                     __invalid_input_auto_renew_type_failed: true
+                  when: >-
+                    'auto_renew' in
+                    (ansible_failed_result | default({}) | to_json)
 
             - name: Assert invalid auto_renew type failed validation
               ansible.builtin.assert:
@@ -123,6 +135,9 @@
                 - name: Mark invalid certificate_wait rejected
                   ansible.builtin.set_fact:
                     __invalid_input_wait_type_failed: true
+                  when: >-
+                    'certificate_wait' in
+                    (ansible_failed_result | default({}) | to_json)
 
             - name: Assert invalid certificate_wait type failed validation
               ansible.builtin.assert:
@@ -144,6 +159,9 @@
                 - name: Mark missing trust name rejected
                   ansible.builtin.set_fact:
                     __invalid_input_trust_missing_name_failed: true
+                  when: >-
+                    'missing required arguments' in
+                    (ansible_failed_result | default({}) | to_json)
 
             - name: Assert missing name in certificate_trust failed validation
               ansible.builtin.assert:
@@ -168,6 +186,9 @@
                 - name: Mark invalid key_usage rejected
                   ansible.builtin.set_fact:
                     __invalid_input_key_usage_choice_failed: true
+                  when: >-
+                    'key_usage' in
+                    (ansible_failed_result | default({}) | to_json)
 
             - name: Assert invalid key_usage choice failed validation
               ansible.builtin.assert:
@@ -190,6 +211,9 @@
                 - name: Mark invalid trust state rejected
                   ansible.builtin.set_fact:
                     __invalid_input_trust_state_failed: true
+                  when: >-
+                    'invalid_state' in
+                    (ansible_failed_result | default({}) | to_json)
 
             - name: Assert invalid state in certificate_trust failed validation
               ansible.builtin.assert:
@@ -213,6 +237,9 @@
             - name: Mark missing trust source rejected
               ansible.builtin.set_fact:
                 __invalid_input_trust_no_source_failed: true
+              when: >-
+                'exactly one' in
+                (ansible_failed_result | default({}) | to_json)
 
         - name: Assert trust entry with no source failed validation
           ansible.builtin.assert:
@@ -221,6 +248,32 @@
             fail_msg: >-
               certificate_trust should reject entries with state present
               that do not specify exactly one of content, src, or url
+
+        - name: Assert rejects trust entry with multiple sources
+          block:
+            - name: Run role with trust entry having both content and src
+              ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                certificate_trust:
+                  - name: mycert
+                    content: not-a-certificate
+                    src: /tmp/cert.pem
+                    state: present
+          rescue:
+            - name: Mark multiple trust sources rejected
+              ansible.builtin.set_fact:
+                __invalid_input_trust_multiple_sources_failed: true
+              when: >-
+                'exactly one' in
+                (ansible_failed_result | default({}) | to_json)
+
+        - name: Assert trust entry with multiple sources failed validation
+          ansible.builtin.assert:
+            that:
+              - __invalid_input_trust_multiple_sources_failed | default(false)
+            fail_msg: >-
+              certificate_trust should reject entries with state present
+              that specify more than one of content, src, or url
 
         # --- assert_role_vars validation (raw type fields) ---
 
@@ -237,6 +290,9 @@
             - name: Mark invalid dns type rejected
               ansible.builtin.set_fact:
                 __invalid_input_dns_type_failed: true
+              when: >-
+                'dns must be a string' in
+                (ansible_failed_result | default({}) | to_json)
 
         - name: Assert dns as integer failed validation
           ansible.builtin.assert:
@@ -261,6 +317,9 @@
             - name: Mark dns list element rejected
               ansible.builtin.set_fact:
                 __invalid_input_dns_element_failed: true
+              when: >-
+                'dns must be a string' in
+                (ansible_failed_result | default({}) | to_json)
 
         - name: Assert dns list with non-string element failed validation
           ansible.builtin.assert:
@@ -283,6 +342,9 @@
             - name: Mark invalid ip type rejected
               ansible.builtin.set_fact:
                 __invalid_input_ip_type_failed: true
+              when: >-
+                'ip must be a string' in
+                (ansible_failed_result | default({}) | to_json)
 
         - name: Assert ip as boolean failed validation
           ansible.builtin.assert:
@@ -305,6 +367,9 @@
             - name: Mark invalid mode type rejected
               ansible.builtin.set_fact:
                 __invalid_input_mode_type_failed: true
+              when: >-
+                'mode must be a string' in
+                (ansible_failed_result | default({}) | to_json)
 
         - name: Assert mode as boolean failed validation
           ansible.builtin.assert:
@@ -327,6 +392,7 @@
             __invalid_input_key_usage_choice_failed:
             __invalid_input_trust_state_failed:
             __invalid_input_trust_no_source_failed:
+            __invalid_input_trust_multiple_sources_failed:
             __invalid_input_dns_type_failed:
             __invalid_input_dns_element_failed:
             __invalid_input_ip_type_failed:
