@@ -69,9 +69,7 @@
     that:
       - >-
         item.mode is string
-        or (item.mode is integer
-            and item.mode is not sameas true
-            and item.mode is not sameas false)
+        or (item.mode | type_debug) == 'int'
     fail_msg: >-
       certificate_requests[{{ idx }}].mode must be a string or integer,
       got {{ item.mode | type_debug }}
