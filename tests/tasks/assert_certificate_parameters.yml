@@ -193,6 +193,7 @@
           {{ cert['auto_renew'] | default('yes') | bool }} !=
           {{ result.stdout | bool }}
 
+    # getcert on el7 does not show issuer template, so skip this check
     - name: Retrieve issuer template
       shell: >-
         set -euo pipefail;
@@ -201,7 +202,9 @@
         sed 's/^\s\+issuer template: //g'
       register: result
       changed_when: false
-      when: cert.issuer_template is defined
+      when:
+        - cert.issuer_template is defined
+        - ansible_facts["os_family"] != "RedHat" or ansible_facts["distribution_major_version"] is version("7", ">")
 
     - name: Verify certificate issuer template
       assert:
@@ -210,7 +213,9 @@
         fail_msg: >-
           {{ cert['issuer_template'] | trim }} !=
           {{ result.stdout | trim }}
-      when: cert.issuer_template is defined
+      when:
+        - cert.issuer_template is defined
+        - ansible_facts["os_family"] != "RedHat" or ansible_facts["distribution_major_version"] is version("7", ">")
 
     - name: Stat commands file
       stat:
