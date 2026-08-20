@@ -1,6 +1,16 @@
 Changelog
 =========
 
+[1.9.1] - 2026-08-20
+--------------------
+
+### Other Changes
+
+- ci: use commit hash for github action, add persist-credentials false [citest_skip] (#358)
+- ci: refactor build_docs so that pandoc runs in isolated read-only job [citest_skip] (#360)
+- ci: use exact match for systemroller instead of contains [citest_skip] (#361)
+- test: getcert list on el7 does not show issuer_template (#362)
+
 [1.9.0] - 2026-08-07
 --------------------
 
