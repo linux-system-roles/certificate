@@ -41,6 +41,9 @@ ansible-galaxy collection install -vv -r meta/collection-requirements.yml
 
 ## Variables
 
+Type, required-field, and choice validation is enforced by
+`meta/argument_specs.yml`. Role tasks enforce cross-field validation.
+
 | Parameter               | Description                                                                                                    | Type | Required | Default           |
 |-------------------------|----------------------------------------------------------------------------------------------------------------|:----:|:--------:|-------------------|
 | certificate_wait        | If the task should wait for the certificate to be issued.                                                      | bool | no       | yes               |
