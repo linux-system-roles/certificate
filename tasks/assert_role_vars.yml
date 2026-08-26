@@ -67,7 +67,7 @@
 - name: Assert mode is a string or integer
   ansible.builtin.assert:
     that:
-      - (item.mode | type_debug) in ['str', 'int']
+      - (item.mode | type_debug) in ['str', 'int', 'unicode']
     fail_msg: >-
       certificate_requests[{{ idx }}].mode must be a string or integer,
       got {{ item.mode | type_debug }}
