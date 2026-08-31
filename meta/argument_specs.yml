@@ -15,9 +15,10 @@ argument_specs:
       certificate_requests:
         type: list
         elements: dict
+        default: []
         description: >
           A list of certificate request specifications. Each item describes
-          a certificate to be issued or renewed. Defaults to an empty list.
+          a certificate to be issued or renewed.
         options:
           name:
             type: str
@@ -47,9 +48,10 @@ argument_specs:
               certificate Subject Alternative Name (SAN).
           auto_renew:
             type: bool
+            default: true
             description: >
               Whether the certificate should be renewed automatically
-              before it expires. Defaults to `true`.
+              before it expires.
           owner:
             type: str
             description: >
@@ -108,15 +110,19 @@ argument_specs:
               - cRLSign
               - encipherOnly
               - decipherOnly
+            default:
+              - digitalSignature
+              - keyEncipherment
             description: >
               The allowed Key Usage extensions for the certificate.
-              Defaults to `digitalSignature` and `keyEncipherment`.
           extended_key_usage:
             type: list
             elements: str
+            default:
+              - id-kp-serverAuth
+              - id-kp-clientAuth
             description: >
               The Extended Key Usage attributes for the certificate.
-              Defaults to `id-kp-serverAuth` and `id-kp-clientAuth`.
           run_before:
             type: str
             description: >
@@ -131,24 +137,26 @@ argument_specs:
               A Kerberos principal or list of Kerberos principals.
           provider:
             type: str
+            default: certmonger
             description: >
               The underlying method used to request and manage the
-              certificate. Defaults to `certmonger`.
+              certificate.
           issuer:
             type: str
             description: >
               The issuer certificate nickname or template name.
       certificate_wait:
         type: bool
+        default: true
         description: >
           Whether the task should wait for the certificate to be issued.
-          Defaults to `true`.
       certificate_trust:
         type: list
         elements: dict
+        default: []
         description: >
           A list of certificates to install into or remove from the system
-          trust store. Defaults to an empty list.
+          trust store.
         options:
           name:
             type: str
@@ -177,6 +185,6 @@ argument_specs:
             choices:
               - present
               - absent
+            default: present
             description: >
               Whether the trust anchor should be present or absent.
-              Defaults to `present`.
