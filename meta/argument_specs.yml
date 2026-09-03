@@ -1,0 +1,190 @@
+# SPDX-License-Identifier: MIT
+---
+argument_specs:
+  main:
+    short_description: The certificate role.
+    description: >
+      The certificate role allows you to issue and manage TLS/SSL
+      certificates using various CA providers such as self-sign and IPA.
+
+      This role will install necessary packages, configure the certificate
+      provider, and issue or renew certificates as specified in
+      `certificate_requests`. It can also manage system trust store
+      entries via `certificate_trust`.
+    options:
+      certificate_requests:
+        type: list
+        elements: dict
+        default: []
+        description: >
+          A list of certificate request specifications. Each item describes
+          a certificate to be issued or renewed.
+        options:
+          name:
+            type: str
+            required: true
+            description: >
+              The name of the certificate. A full path can be used to
+              choose the directory where files will be stored.
+          ca:
+            type: str
+            required: true
+            description: >
+              The CA that will issue the certificate (e.g. self-sign, ipa).
+          dns:
+            type: raw
+            description: >
+              A domain name or list of domain names to include in the
+              certificate Subject Alternative Name (SAN).
+          email:
+            type: raw
+            description: >
+              An email address or list of email addresses to include in the
+              certificate Subject Alternative Name (SAN).
+          ip:
+            type: raw
+            description: >
+              An IP address or list of IP addresses to include in the
+              certificate Subject Alternative Name (SAN).
+          auto_renew:
+            type: bool
+            default: true
+            description: >
+              Whether the certificate should be renewed automatically
+              before it expires.
+          owner:
+            type: str
+            description: >
+              The user name or user id for the certificate and key files.
+          group:
+            type: str
+            description: >
+              The group name or group id for the certificate and key files.
+          mode:
+            type: raw
+            description: >
+              The file system permissions for the certificate and key
+              files. Accepts a string (e.g. '0644') or an integer.
+          key_size:
+            type: int
+            description: >
+              The key size in bits.
+          common_name:
+            type: str
+            description: >
+              The Common Name requested for the certificate subject.
+          country:
+            type: str
+            description: >
+              The country code requested for the certificate subject.
+          state:
+            type: str
+            description: >
+              The state requested for the certificate subject.
+          locality:
+            type: str
+            description: >
+              The locality requested for the certificate subject.
+          organization:
+            type: str
+            description: >
+              The organization requested for the certificate subject.
+          organizational_unit:
+            type: str
+            description: >
+              The organizational unit requested for the certificate subject.
+          contact_email:
+            type: str
+            description: >
+              The contact email requested for the certificate subject.
+          key_usage:
+            type: list
+            elements: str
+            choices:
+              - digitalSignature
+              - nonRepudiation
+              - keyEncipherment
+              - dataEncipherment
+              - keyAgreement
+              - keyCertSign
+              - cRLSign
+              - encipherOnly
+              - decipherOnly
+            default:
+              - digitalSignature
+              - keyEncipherment
+            description: >
+              The allowed Key Usage extensions for the certificate.
+          extended_key_usage:
+            type: list
+            elements: str
+            default:
+              - id-kp-serverAuth
+              - id-kp-clientAuth
+            description: >
+              The Extended Key Usage attributes for the certificate.
+          run_before:
+            type: str
+            description: >
+              A command to run before saving the certificate.
+          run_after:
+            type: str
+            description: >
+              A command to run after saving the certificate.
+          principal:
+            type: raw
+            description: >
+              A Kerberos principal or list of Kerberos principals.
+          provider:
+            type: str
+            default: certmonger
+            description: >
+              The underlying method used to request and manage the
+              certificate.
+          issuer:
+            type: str
+            description: >
+              The issuer certificate nickname or template name.
+      certificate_wait:
+        type: bool
+        default: true
+        description: >
+          Whether the task should wait for the certificate to be issued.
+      certificate_trust:
+        type: list
+        elements: dict
+        default: []
+        description: >
+          A list of certificates to install into or remove from the system
+          trust store.
+        options:
+          name:
+            type: str
+            required: true
+            description: >
+              The base file name of the trust anchor.
+          content:
+            type: str
+            description: >
+              The inline PEM content of the certificate.
+          src:
+            type: str
+            description: >
+              The path of a certificate file to copy to the trust store.
+          remote_src:
+            type: bool
+            description: >
+              If true, `src` is a path on the managed host rather than
+              the controller.
+          url:
+            type: str
+            description: >
+              The URL to download the certificate from.
+          state:
+            type: str
+            choices:
+              - present
+              - absent
+            default: present
+            description: >
+              Whether the trust anchor should be present or absent.
