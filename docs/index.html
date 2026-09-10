@@ -237,6 +237,9 @@ install them if you need to manage <code>rpm-ostree</code> nodes:</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ansible-galaxy</span> collection install <span class="at">-vv</span> <span class="at">-r</span> meta/collection-requirements.yml</span></code></pre></div>
 <h1 id="variables">Variables</h1>
+<p>Type, required-field, and choice validation is enforced by
+<code>meta/argument_specs.yml</code>. Role tasks enforce cross-field
+validation.</p>
 <table>
 <thead>
 <tr>
