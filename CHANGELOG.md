@@ -1,6 +1,21 @@
 Changelog
 =========
 
+[1.10.0] - 2026-09-17
+--------------------
+
+### New Features
+
+- feat: Add argument spec validation to Certificate role (#359)
+
+### Other Changes
+
+- ci(build_docs): fix pandoc container syntax [citest_skip] (#364)
+- refactor: Relax collection constraints, gate vendored modules by python version, update ci versions [citest_skip] (#370)
+- ci: do not run ci tests by default, require citest comment or label [citest_skip] (#371)
+- ci: replace weekly_ci with periodic_ci, stagger schedules [citest_skip] (#372)
+- ci: update status when action triggered by issue comment (#373)
+
 [1.9.1] - 2026-08-20
 --------------------
 
