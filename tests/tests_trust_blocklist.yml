@@ -1,0 +1,236 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Test certificate blocklisting
+  hosts: all
+  vars:
+    __sr_public: true
+    __certificate_test_name: lsr-blocklist-test
+    __certificate_test_anchor:
+      - name: "{{ __certificate_test_name }}"
+        src: "{{ __certificate_test_dir.path }}/ca.crt"
+        remote_src: true
+    __certificate_test_block:
+      - name: "{{ __certificate_test_name }}"
+        type: blocklist
+        content: "{{ __certificate_test_pem.content | b64decode }}"
+    __certificate_test_unblock:
+      - name: "{{ __certificate_test_name }}"
+        type: blocklist
+        state: absent
+  tasks:
+    - name: Skip platforms without blocklist support
+      ansible.builtin.meta: end_host
+      when: ansible_facts['os_family'] != 'RedHat'
+
+    - name: Test blocklist operations and clean up afterwards
+      block:
+        - name: Initialize role platform variables
+          ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+
+        - name: Ensure openssl is installed
+          ansible.builtin.package:
+            name: openssl
+            state: present
+            use: "{{ (__certificate_is_ostree | d(false)) |
+              ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
+
+        - name: Create a temporary certificate directory
+          ansible.builtin.tempfile:
+            state: directory
+            prefix: lsr-blocklist-
+          register: __certificate_test_dir
+
+        - name: Generate a test CA
+          ansible.builtin.command: >-
+            openssl req -x509 -newkey rsa:2048 -nodes -days 1
+            -subj /CN=LSR-Blocklist-Test-CA
+            -keyout {{ __certificate_test_dir.path }}/ca.key
+            -out {{ __certificate_test_dir.path }}/ca.crt
+          changed_when: true
+
+        - name: Read test CA certificate
+          ansible.builtin.slurp:
+            src: "{{ __certificate_test_dir.path }}/ca.crt"
+          register: __certificate_test_pem
+
+        - name: Install the test trust anchor
+          ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            certificate_trust: "{{ __certificate_test_anchor }}"
+
+        - name: Verify the test CA is trusted
+          ansible.builtin.command: >-
+            openssl verify {{ __certificate_test_dir.path }}/ca.crt
+          changed_when: false
+
+        - name: Predict blocklisting in check mode
+          ansible.builtin.include_tasks:
+            file: tasks/run_role_with_clear_facts.yml
+            apply:
+              check_mode: true
+              diff: true
+          vars:
+            certificate_trust: "{{ __certificate_test_block }}"
+
+        - name: Check for blocklist file after check mode
+          ansible.builtin.stat:
+            path: >-
+              {{ __certificate_trust_blocklist_dir }}/{{
+              __certificate_test_name }}.crt
+          register: __certificate_test_stat
+
+        - name: Verify check mode did not install the blocklist file
+          ansible.builtin.assert:
+            that: not __certificate_test_stat.stat.exists
+
+        - name: Blocklist the test CA using inline content
+          ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            certificate_trust: "{{ __certificate_test_block }}"
+
+        - name: Verify blocklist change was reported
+          ansible.builtin.assert:
+            that: certificate_is_changed
+
+        - name: Check blocklist file attributes
+          ansible.builtin.stat:
+            path: >-
+              {{ __certificate_trust_blocklist_dir }}/{{
+              __certificate_test_name }}.crt
+          register: __certificate_test_stat
+
+        - name: Verify blocklist file attributes
+          ansible.builtin.assert:
+            that:
+              - __certificate_test_stat.stat.exists
+              - __certificate_test_stat.stat.mode == '0644'
+              - __certificate_test_stat.stat.pw_name == 'root'
+              - __certificate_test_stat.stat.gr_name == 'root'
+
+        - name: Verify the test CA is blocklisted on EL7
+          when: >-
+            ansible_facts["os_family"] == "RedHat" and
+            ansible_facts["distribution_major_version"] == "7"
+          block:
+            - name: List blocklisted certificates
+              # wokeignore:rule=blacklist
+              ansible.builtin.command: trust list --filter=blacklist
+              register: __certificate_test_blocklist
+              changed_when: false
+
+            - name: Assert the test CA is in the blocklist
+              ansible.builtin.assert:
+                that:
+                  - >-
+                    'label: LSR-Blocklist-Test-CA' in
+                    (__certificate_test_blocklist.stdout_lines |
+                    map('trim') | list)
+
+        - name: Verify the test CA is distrusted on other platforms
+          when: >-
+            not (ansible_facts["os_family"] == "RedHat" and
+            ansible_facts["distribution_major_version"] == "7")
+          block:
+            - name: Check that the test CA is distrusted
+              ansible.builtin.command: >-
+                openssl verify {{ __certificate_test_dir.path }}/ca.crt
+              register: __certificate_test_verify
+              changed_when: false
+              failed_when: false
+
+            - name: Assert that verification failed for the blocked CA
+              ansible.builtin.assert:
+                that: __certificate_test_verify.rc != 0
+
+        - name: Apply the same blocklist entry from a remote file
+          ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            certificate_trust:
+              - name: "{{ __certificate_test_name }}"
+                type: blocklist
+                src: "{{ __certificate_test_dir.path }}/ca.crt"
+                remote_src: true
+
+        - name: Verify blocklisting is idempotent
+          ansible.builtin.assert:
+            that: not certificate_is_changed
+
+        - name: Predict removal in check mode
+          ansible.builtin.include_tasks:
+            file: tasks/run_role_with_clear_facts.yml
+            apply:
+              check_mode: true
+              diff: true
+          vars:
+            certificate_trust: "{{ __certificate_test_unblock }}"
+
+        - name: Verify check mode preserved the blocklist file
+          ansible.builtin.stat:
+            path: >-
+              {{ __certificate_trust_blocklist_dir }}/{{
+              __certificate_test_name }}.crt
+          register: __certificate_test_stat
+          failed_when: not __certificate_test_stat.stat.exists
+
+        - name: Remove the blocklist entry
+          ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            certificate_trust: "{{ __certificate_test_unblock }}"
+
+        - name: Verify removal change was reported
+          ansible.builtin.assert:
+            that: certificate_is_changed
+
+        - name: Verify the test CA is no longer blocklisted on EL7
+          when: >-
+            ansible_facts["os_family"] == "RedHat" and
+            ansible_facts["distribution_major_version"] == "7"
+          block:
+            - name: List blocklisted certificates after removal
+              # wokeignore:rule=blacklist
+              ansible.builtin.command: trust list --filter=blacklist
+              register: __certificate_test_blocklist
+              changed_when: false
+
+            - name: Assert the test CA is no longer in the blocklist
+              ansible.builtin.assert:
+                that:
+                  - >-
+                    'label: LSR-Blocklist-Test-CA' not in
+                    (__certificate_test_blocklist.stdout_lines |
+                    map('trim') | list)
+
+        - name: Verify trust was restored without replacing the anchor
+          ansible.builtin.command: >-
+            openssl verify {{ __certificate_test_dir.path }}/ca.crt
+          changed_when: false
+          when: >-
+            not (ansible_facts["os_family"] == "RedHat" and
+            ansible_facts["distribution_major_version"] == "7")
+
+        - name: Remove the blocklist entry again
+          ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            certificate_trust: "{{ __certificate_test_unblock }}"
+
+        - name: Verify removal is idempotent
+          ansible.builtin.assert:
+            that: not certificate_is_changed
+      always:
+        - name: Remove test trust entries
+          ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            certificate_trust:
+              - name: "{{ __certificate_test_name }}"
+                state: absent
+              - name: "{{ __certificate_test_name }}"
+                type: blocklist
+                state: absent
+          tags: tests::cleanup
+
+        - name: Remove temporary certificate directory
+          ansible.builtin.file:
+            path: "{{ __certificate_test_dir.path }}"
+            state: absent
+          when: __certificate_test_dir.path is defined
+          tags: tests::cleanup
