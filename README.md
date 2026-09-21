@@ -150,20 +150,22 @@ If `extended_key_usage` is not set the role will default to:
 
 Each item in the `certificate_trust` list describes a certificate to install
 into (or remove from) the system trust store, so that TLS connections to
-services using those certificates are trusted system-wide.
+services using those certificates are trusted system-wide. On Red Hat family
+systems, entries can also explicitly distrust certificates using `type: blocklist`.
 
 | Parameter   | Description                                                                                     | Type | Required | Default |
 |-------------|-------------------------------------------------------------------------------------------------|:----:|:--------:|---------|
-| name        | Base file name of the trust anchor. The certificate is installed as `<name>.crt` in the trust anchors directory. | str | yes | - |
+| name        | Base file name of the certificate. Installed as `<name>.crt` in the directory selected by `type`. | str | yes | - |
+| type        | `anchor` to trust a certificate, or `blocklist` to distrust it (Red Hat family only). | str | no | anchor |
 | content     | Inline PEM content of the certificate.                                                          | str  | no       | -       |
-| src         | Path of a certificate file on the control node to copy to the trust anchors directory.          | str  | no       | -       |
+| src         | Path of a certificate file on the control node to copy to the selected trust store directory.          | str  | no       | -       |
 | remote\_src | If `true`, `src` is a path on the managed host instead of the control node.                     | bool | no       | no      |
 | url         | URL to download the certificate from.                                                           | str  | no       | -       |
 | state       | `present` to install the certificate, `absent` to remove it from the trust store.               | str  | no       | present |
 
 Exactly one of `content`, `src`, or `url` must be given when `state` is
 `present`. Installed files are owned by `root:root` with mode `0644`. When
-any trust anchor is added or removed, the role updates the system trust
+any anchor or blocklist entry is added, changed, or removed, the role updates the system trust
 store by running the platform specific update command.
 
 The trust anchors directory and update command per platform:
@@ -174,6 +176,26 @@ The trust anchors directory and update command per platform:
   `update-ca-certificates`
 * Debian/Ubuntu: `/usr/local/share/ca-certificates/`, updated with
   `update-ca-certificates`
+
+Blocklist entries use `/etc/pki/ca-trust/source/blacklist/` <!--- wokeignore:rule=blacklist ---> on RHEL 7/8
+and their derivatives, and `/etc/pki/ca-trust/source/blocklist/` on RHEL 9+
+and Fedora. Blocklisting is not currently supported by this role on
+SLES/openSUSE or Debian/Ubuntu; requesting it fails before trust files change.
+All three input methods (`content`, `src`, and `url`) support blocklist entries.
+
+For example:
+
+```yaml
+certificate_trust:
+  - name: unwanted-ca
+    src: files/unwanted-ca.pem
+    type: blocklist
+```
+
+To remove that blocklist entry, specify the same `name` and `type` with
+`state: absent`. An anchor with the same name is a separate entry and is
+not removed. Changing `type` does not move or remove an existing entry of
+the other type; remove that entry explicitly when needed.
 
 ### run hooks
 

@@ -8,10 +8,11 @@ certificate_wait: true
 
 # A list of dicts describing certificates to install into the system
 # trust store.  Each item supports the following keys:
-#   name (required) - base file name of the trust anchor
+#   name (required) - base file name of the certificate
+#   type - anchor (default) or blocklist (Red Hat family only)
 #   content - inline PEM content of the certificate
 #   src - path of a certificate file to copy to the trust store
 #   remote_src - if true, src is a path on the managed host
 #   url - URL to download the certificate from
-#   state - present (default) or absent to remove an anchor
+#   state - present (default) or absent to remove the selected entry
 certificate_trust: []

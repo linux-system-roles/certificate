@@ -162,7 +162,16 @@ argument_specs:
             type: str
             required: true
             description: >
-              The base file name of the trust anchor.
+              The base file name of the certificate.
+          type:
+            type: str
+            choices:
+              - anchor
+              - blocklist
+            default: anchor
+            description: >
+              Install a trust anchor or a blocklist entry. Blocklisting
+              is supported only on Red Hat family systems.
           content:
             type: str
             description: >
@@ -187,4 +196,4 @@ argument_specs:
               - absent
             default: present
             description: >
-              Whether the trust anchor should be present or absent.
+              Whether the selected trust store entry should be present or absent.

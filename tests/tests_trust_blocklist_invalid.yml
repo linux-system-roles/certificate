@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Test invalid blocklist settings before modifying the trust store
+  hosts: all
+  tasks:
+    - name: Test validation failures
+      block:
+        - name: Reject an invalid trust entry type
+          block:
+            - name: Validate an invalid type
+              ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                __sr_tasks_from: certificate_trust.yml
+                certificate_trust:
+                  - name: lsr-invalid-type
+                    type: invalid
+                    state: absent
+
+            - name: Fail if invalid type was accepted
+              ansible.builtin.fail:
+                msg: Invalid trust entry type was accepted
+          rescue:
+            - name: Verify type validation caused the failure
+              ansible.builtin.assert:
+                that:
+                  - >-
+                    ansible_failed_result | to_json is
+                    search("type must be 'anchor' or 'blocklist'")
+
+        # Invoke trust tasks directly, without platform setup, to exercise
+        # an unsupported-platform setting on every test platform.
+        - name: Reject blocklisting on unsupported platforms
+          block:
+            - name: Validate unsupported blocklist operation
+              ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                __sr_tasks_from: certificate_trust.yml
+                __certificate_trust_blocklist_dir: null
+                certificate_trust:
+                  - name: lsr-unsupported-blocklist
+                    type: blocklist
+                    state: absent
+
+            - name: Fail if unsupported blocklisting was accepted
+              ansible.builtin.fail:
+                msg: Unsupported blocklisting was accepted
+          rescue:
+            - name: Verify platform validation caused the failure
+              ansible.builtin.assert:
+                that:
+                  - >-
+                    ansible_failed_result | to_json is
+                    search('Certificate blocklisting is not supported')
+      always:
+        - name: Clear gathered facts
+          ansible.builtin.meta: clear_facts
+          tags: tests::cleanup

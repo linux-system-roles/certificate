@@ -1,10 +1,12 @@
 # SPDX-License-Identifier: MIT
+# The blocklist feature was added by ChatGPT using model Astra Light 6.
 ---
 - name: Validate certificate_trust items
   assert:
     that:
       - item.name is defined
       - item.state | d('present') in ['present', 'absent']
+      - item.type | d('anchor') in ['anchor', 'blocklist']
       - >-
         item.state | d('present') == 'absent' or
         [item.content is defined, item.src is defined, item.url is defined] |
@@ -12,7 +14,7 @@
     fail_msg: >-
       Each certificate_trust item must have a name, state must be 'present'
       or 'absent', and exactly one of content, src, or url must be given
-      when state is 'present'
+      when state is 'present'; type must be 'anchor' or 'blocklist'
   loop: "{{ certificate_trust }}"
   loop_control:
     label: "{{ item.name | d('unnamed') }}"
@@ -22,6 +24,17 @@
   set_fact:
     certificate_is_changed: true
   when: __certificate_trust_validated is changed  # noqa no-handler
+
+- name: Validate certificate blocklist support
+  ansible.builtin.assert:
+    that:
+      - >-
+        item.type | d('anchor') != 'blocklist'
+        or __certificate_trust_blocklist_dir is not none
+    fail_msg: Certificate blocklisting is not supported on this platform
+  loop: "{{ certificate_trust }}"
+  loop_control:
+    label: "{{ item.name }}"
 
 - name: Ensure trust store packages are installed
   package:
@@ -41,7 +54,8 @@
     content: "{{ item.content | default(omit) }}"
     src: "{{ item.src | default(omit) }}"
     remote_src: "{{ item.remote_src | default(omit) }}"
-    dest: "{{ __certificate_trust_dir }}/{{ item.name }}.crt"
+    dest: >-
+      {{ __certificate_trust_dirs[item.type | d('anchor')] }}/{{ item.name }}.crt
     owner: root
     group: root
     mode: "0644"
@@ -61,7 +75,8 @@
 - name: Install trust certificates from URL
   get_url:
     url: "{{ item.url }}"
-    dest: "{{ __certificate_trust_dir }}/{{ item.name }}.crt"
+    dest: >-
+      {{ __certificate_trust_dirs[item.type | d('anchor')] }}/{{ item.name }}.crt
     owner: root
     group: root
     mode: "0644"
@@ -80,7 +95,8 @@
 
 - name: Remove trust certificates
   file:
-    path: "{{ __certificate_trust_dir }}/{{ item.name }}.crt"
+    path: >-
+      {{ __certificate_trust_dirs[item.type | d('anchor')] }}/{{ item.name }}.crt
     state: absent
   loop: "{{ certificate_trust }}"
   loop_control:

@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT
+---
+
+__certificate_trust_blocklist_dir: >-
+  {#- wokeignore:rule=blacklist -#}{{ '/etc/pki/ca-trust/source/blacklist'
+     if ansible_facts['distribution_major_version'] | int < 9
+     else '/etc/pki/ca-trust/source/blocklist' }}
