@@ -156,7 +156,7 @@ systems, entries can also explicitly distrust certificates using `type: blocklis
 | Parameter   | Description                                                                                     | Type | Required | Default |
 |-------------|-------------------------------------------------------------------------------------------------|:----:|:--------:|---------|
 | name        | Base file name of the certificate. Installed as `<name>.crt` in the directory selected by `type`. | str | yes | - |
-| type        | `anchor` to trust a certificate, or `blocklist` to distrust it (Red Hat family only). | str | no | anchor |
+| type        | `anchor` to trust a certificate, `blocklist` to distrust it, or `extended` to install a file with trust flags. The last two types require a Red Hat family system. | str | no | anchor |
 | content     | Inline PEM content of the certificate.                                                          | str  | no       | -       |
 | src         | Path of a certificate file on the control node to copy to the selected trust store directory.          | str  | no       | -       |
 | remote\_src | If `true`, `src` is a path on the managed host instead of the control node.                     | bool | no       | no      |
@@ -165,8 +165,8 @@ systems, entries can also explicitly distrust certificates using `type: blocklis
 
 Exactly one of `content`, `src`, or `url` must be given when `state` is
 `present`. Installed files are owned by `root:root` with mode `0644`. When
-any anchor or blocklist entry is added, changed, or removed, the role updates the system trust
-store by running the platform specific update command.
+any trust entry is added, changed, or removed, the role updates the system
+trust store by running the platform specific update command.
 
 The trust anchors directory and update command per platform:
 
@@ -196,6 +196,31 @@ To remove that blocklist entry, specify the same `name` and `type` with
 `state: absent`. An anchor with the same name is a separate entry and is
 not removed. Changing `type` does not move or remove an existing entry of
 the other type; remove that entry explicitly when needed.
+
+#### Extended-format trust files
+
+Use `type: extended` to install a file containing explicit trust settings,
+for example PEM data with `BEGIN TRUSTED CERTIFICATE` markers and
+purpose-specific trust or rejection flags. The role copies the file unchanged
+to `/etc/pki/ca-trust/source/<name>.crt`, outside the anchors and blocklist
+directories, and runs `update-ca-trust extract` when it changes.
+The role does not generate or infer trust flags from the file name.
+
+This type is supported only on Red Hat family systems. As with other trust
+entries, supply exactly one of `content`, `src`, or `url`; `remote_src` is
+available with `src`. The existing `<name>.crt` filename convention applies
+regardless of the source file's extension.
+
+```yaml
+certificate_trust:
+  - name: internal-ca-policy
+    type: extended
+    src: files/internal-ca-trust.pem
+```
+
+To remove this file, use the same `name` and `type: extended` with
+`state: absent`. Anchors and blocklist entries with the same name are
+separate entries and are not removed.
 
 ### run hooks
 

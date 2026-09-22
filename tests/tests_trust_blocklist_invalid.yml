@@ -25,7 +25,7 @@
                 that:
                   - >-
                     ansible_failed_result | to_json is
-                    search("type must be 'anchor' or 'blocklist'")
+                    search("type must be 'anchor', 'blocklist', or 'extended'")
 
         # Invoke trust tasks directly, without platform setup, to exercise
         # an unsupported-platform setting on every test platform.
@@ -51,6 +51,29 @@
                   - >-
                     ansible_failed_result | to_json is
                     search('Certificate blocklisting is not supported')
+
+        - name: Reject extended-format trust files on unsupported platforms
+          block:
+            - name: Validate unsupported extended-format operation
+              ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                __sr_tasks_from: certificate_trust.yml
+                __certificate_trust_extended_dir: null
+                certificate_trust:
+                  - name: lsr-unsupported-extended
+                    type: extended
+                    state: absent
+
+            - name: Fail if unsupported extended-format trust files were accepted
+              ansible.builtin.fail:
+                msg: Unsupported extended-format trust files were accepted
+          rescue:
+            - name: Verify platform validation caused the failure
+              ansible.builtin.assert:
+                that:
+                  - >-
+                    ansible_failed_result | to_json is
+                    search('Extended-format trust files are not supported')
       always:
         - name: Clear gathered facts
           ansible.builtin.meta: clear_facts

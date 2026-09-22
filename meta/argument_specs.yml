@@ -168,10 +168,14 @@ argument_specs:
             choices:
               - anchor
               - blocklist
+              - extended
             default: anchor
             description: >
-              Install a trust anchor or a blocklist entry. Blocklisting
-              is supported only on Red Hat family systems.
+              Install a trust anchor, a blocklist entry, or an extended-format
+              trust file. Blocklist and extended entries are supported only
+              on Red Hat family systems. Extended files preserve the supplied
+              trust flags and are installed as <name>.crt in
+              /etc/pki/ca-trust/source/.
           content:
             type: str
             description: >

@@ -27,9 +27,11 @@ __certificate_default_directory: /etc/pki/tls
 __certificate_trust_dir: /etc/pki/ca-trust/source/anchors
 # Blocklisting is enabled only on platforms with a supported blocklist store.
 __certificate_trust_blocklist_dir: null
+__certificate_trust_extended_dir: null
 __certificate_trust_dirs:
   anchor: "{{ __certificate_trust_dir }}"
   blocklist: "{{ __certificate_trust_blocklist_dir }}"
+  extended: "{{ __certificate_trust_extended_dir }}"
 __certificate_update_trust_cli: /usr/bin/update-ca-trust extract
 __certificate_trust_packages:
   - ca-certificates
