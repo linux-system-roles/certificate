@@ -6,7 +6,7 @@
     that:
       - item.name is defined
       - item.state | d('present') in ['present', 'absent']
-      - item.type | d('anchor') in ['anchor', 'blocklist']
+      - item.type | d('anchor') in ['anchor', 'blocklist', 'extended']
       - >-
         item.state | d('present') == 'absent' or
         [item.content is defined, item.src is defined, item.url is defined] |
@@ -14,7 +14,7 @@
     fail_msg: >-
       Each certificate_trust item must have a name, state must be 'present'
       or 'absent', and exactly one of content, src, or url must be given
-      when state is 'present'; type must be 'anchor' or 'blocklist'
+      when state is 'present'; type must be 'anchor', 'blocklist', or 'extended'
   loop: "{{ certificate_trust }}"
   loop_control:
     label: "{{ item.name | d('unnamed') }}"
@@ -32,6 +32,17 @@
         item.type | d('anchor') != 'blocklist'
         or __certificate_trust_blocklist_dir is not none
     fail_msg: Certificate blocklisting is not supported on this platform
+  loop: "{{ certificate_trust }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Validate extended-format trust support
+  ansible.builtin.assert:
+    that:
+      - >-
+        item.type | d('anchor') != 'extended'
+        or __certificate_trust_extended_dir is not none
+    fail_msg: Extended-format trust files are not supported on this platform
   loop: "{{ certificate_trust }}"
   loop_control:
     label: "{{ item.name }}"
