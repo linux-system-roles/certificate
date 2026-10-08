@@ -17,3 +17,6 @@ certificate_wait: true
 #   url - URL to download the certificate from
 #   state - present (default) or absent to remove the selected entry
 certificate_trust: []
+
+# Transactional update reboot: true reboots, false only notifies, null fails
+certificate_transactional_update_reboot_ok: null
