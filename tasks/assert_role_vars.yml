@@ -76,3 +76,14 @@
     index_var: idx
     label: "{{ item.name | d('unnamed') }}"
   when: item.mode is defined
+
+- name: Assert certificate_transactional_update_reboot_ok is null or a boolean
+  ansible.builtin.assert:
+    that:
+      - >-
+        (certificate_transactional_update_reboot_ok is none)
+        or (certificate_transactional_update_reboot_ok is sameas true)
+        or (certificate_transactional_update_reboot_ok is sameas false)
+    fail_msg: >-
+      certificate_transactional_update_reboot_ok must be null or a boolean,
+      got {{ certificate_transactional_update_reboot_ok | type_debug }}

@@ -46,6 +46,46 @@
         certificate_is_changed: true
       when: __certificate_provider_packages is changed  # noqa no-handler
 
+    # A staged install reports ok on re-runs, so ask rpm (by provides) if it is live.
+    - name: Check whether the packages are live on a transactional update system
+      command:  # noqa command-instead-of-module
+        argv: "{{ ['rpm', '-q', '--whatprovides'] + __certificate_packages +
+          (__certificate_providers |
+           map('extract', __certificate_provider_vars) |
+           selectattr('packages', 'defined') |
+           map(attribute='packages') | flatten | list) }}"
+      register: __certificate_packages_live
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      when: __certificate_is_transactional | d(false)
+
+    - name: Handle reboot for transactional update systems
+      when:
+        - __certificate_is_transactional | d(false)
+        - __certificate_packages_result is changed or
+          __certificate_provider_packages is changed or
+          (__certificate_packages_live.rc | d(0)) != 0
+      block:
+        - name: Notify user that reboot is needed to apply changes
+          debug:
+            msg: >
+              Reboot required to apply changes due to transactional updates.
+
+        - name: Reboot transactional update systems
+          reboot:
+            msg: Rebooting the system to apply transactional update changes.
+          when:
+            - certificate_transactional_update_reboot_ok is not none
+            - certificate_transactional_update_reboot_ok | bool
+
+        - name: Fail if reboot is needed and not set
+          fail:
+            msg: >
+              Reboot is required but not allowed. Please set 'certificate_transactional_update_reboot_ok' to proceed.
+          when:
+            - certificate_transactional_update_reboot_ok is none
+
     - name: Ensure pre-scripts hooks directory exists
       file:
         name: >-

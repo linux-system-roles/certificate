@@ -49,6 +49,7 @@ Type, required-field, and choice validation is enforced by
 | certificate_wait        | If the task should wait for the certificate to be issued.                                                      | bool | no       | yes               |
 | certificate\_requests   | A list of dicts representing each certificate to be issued. See [certificate_requests](#certificate_requests). | list | no       | -                 |
 | certificate\_trust      | A list of dicts representing certificates to install into the system trust store. See [certificate_trust](#certificate_trust). | list | no | -    |
+| certificate\_transactional\_update\_reboot\_ok | Handle reboots required by transactional updates. See [certificate_transactional_update_reboot_ok](#certificate_transactional_update_reboot_ok). | raw | no | null |
 
 ### certificate_requests
 
@@ -221,6 +222,18 @@ certificate_trust:
 To remove this file, use the same `name` and `type: extended` with
 `state: absent`. Anchors and blocklist entries with the same name are
 separate entries and are not removed.
+
+### certificate_transactional_update_reboot_ok
+
+This variable is used to handle reboots required by transactional updates. If a
+transactional update requires a reboot, the role will proceed with the reboot
+if `certificate_transactional_update_reboot_ok` is set to `true`. If set to
+`false`, the role will notify the user that a reboot is required, allowing for
+custom handling of the reboot requirement. If this variable is not set, the
+role will fail to ensure the reboot requirement is not overlooked. For
+non-transactional update systems, this variable is ignored.
+
+Default: `null`
 
 ### run hooks
 
