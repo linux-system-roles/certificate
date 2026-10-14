@@ -157,6 +157,8 @@ id="toc-certificate_trust">certificate_trust</a>
 id="toc-extended-format-trust-files">Extended-format trust
 files</a></li>
 </ul></li>
+<li><a href="#certificate_transactional_update_reboot_ok"
+id="toc-certificate_transactional_update_reboot_ok">certificate_transactional_update_reboot_ok</a></li>
 <li><a href="#run-hooks" id="toc-run-hooks">run hooks</a></li>
 </ul></li>
 <li><a href="#cas-and-providers" id="toc-cas-and-providers">CAs and
@@ -279,6 +281,14 @@ href="#certificate_trust">certificate_trust</a>.</td>
 <td style="text-align: center;">list</td>
 <td style="text-align: center;">no</td>
 <td>-</td>
+</tr>
+<tr>
+<td>certificate_transactional_update_reboot_ok</td>
+<td>Handle reboots required by transactional updates. See <a
+href="#certificate_transactional_update_reboot_ok">certificate_transactional_update_reboot_ok</a>.</td>
+<td style="text-align: center;">raw</td>
+<td style="text-align: center;">no</td>
+<td>null</td>
 </tr>
 </tbody>
 </table>
@@ -676,6 +686,18 @@ class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="
 <code>type: extended</code> with <code>state: absent</code>. Anchors and
 blocklist entries with the same name are separate entries and are not
 removed.</p>
+<h2
+id="certificate_transactional_update_reboot_ok">certificate_transactional_update_reboot_ok</h2>
+<p>This variable is used to handle reboots required by transactional
+updates. If a transactional update requires a reboot, the role will
+proceed with the reboot if
+<code>certificate_transactional_update_reboot_ok</code> is set to
+<code>true</code>. If set to <code>false</code>, the role will notify
+the user that a reboot is required, allowing for custom handling of the
+reboot requirement. If this variable is not set, the role will fail to
+ensure the reboot requirement is not overlooked. For non-transactional
+update systems, this variable is ignored.</p>
+<p>Default: <code>null</code></p>
 <h2 id="run-hooks">run hooks</h2>
 <p>Sometimes you need to execute a command just before a certificate is
 renewed and another command just after. In order to do that use
