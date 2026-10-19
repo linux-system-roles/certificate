@@ -2,6 +2,13 @@
 ---
 - name: Verify invalid parameters are rejected
   hosts: all
+  vars:
+    __invalid_input_failure_messages: >-
+      {{ ([ansible_failed_result.msg | default(''),
+           ansible_failed_result.msg.msg | default('')]
+          + (ansible_failed_result.results | default([])
+             | map(attribute='msg') | map('default', '') | list))
+         | join(' ') }}
   tasks:
     - name: Run invalid input tests
       block:
@@ -40,8 +47,8 @@
                   ansible.builtin.set_fact:
                     __invalid_input_missing_name_failed: true
                   when: >-
-                    'missing required arguments' in
-                    (ansible_failed_result | default({}) | to_json)
+                    'missing required arguments: name found in certificate_requests'
+                    in __invalid_input_failure_messages
 
             - name: Assert missing name in certificate_requests failed validation
               ansible.builtin.assert:
@@ -64,8 +71,8 @@
                   ansible.builtin.set_fact:
                     __invalid_input_missing_ca_failed: true
                   when: >-
-                    'missing required arguments' in
-                    (ansible_failed_result | default({}) | to_json)
+                    'missing required arguments: ca found in certificate_requests'
+                    in __invalid_input_failure_messages
 
             - name: Assert missing ca in certificate_requests failed validation
               ansible.builtin.assert:
@@ -89,8 +96,10 @@
                   ansible.builtin.set_fact:
                     __invalid_input_key_size_type_failed: true
                   when: >-
-                    'key_size' in
-                    (ansible_failed_result | default({}) | to_json)
+                    "argument 'key_size' is of type" in
+                    __invalid_input_failure_messages and
+                    'we were unable to convert to int' in
+                    __invalid_input_failure_messages
 
             - name: Assert invalid key_size type failed validation
               ansible.builtin.assert:
@@ -114,8 +123,10 @@
                   ansible.builtin.set_fact:
                     __invalid_input_auto_renew_type_failed: true
                   when: >-
-                    'auto_renew' in
-                    (ansible_failed_result | default({}) | to_json)
+                    "argument 'auto_renew' is of type" in
+                    __invalid_input_failure_messages and
+                    'we were unable to convert to bool' in
+                    __invalid_input_failure_messages
 
             - name: Assert invalid auto_renew type failed validation
               ansible.builtin.assert:
@@ -136,8 +147,10 @@
                   ansible.builtin.set_fact:
                     __invalid_input_wait_type_failed: true
                   when: >-
-                    'certificate_wait' in
-                    (ansible_failed_result | default({}) | to_json)
+                    "argument 'certificate_wait' is of type" in
+                    __invalid_input_failure_messages and
+                    'we were unable to convert to bool' in
+                    __invalid_input_failure_messages
 
             - name: Assert invalid certificate_wait type failed validation
               ansible.builtin.assert:
@@ -160,8 +173,8 @@
                   ansible.builtin.set_fact:
                     __invalid_input_trust_missing_name_failed: true
                   when: >-
-                    'missing required arguments' in
-                    (ansible_failed_result | default({}) | to_json)
+                    'missing required arguments: name found in certificate_trust'
+                    in __invalid_input_failure_messages
 
             - name: Assert missing name in certificate_trust failed validation
               ansible.builtin.assert:
@@ -187,8 +200,10 @@
                   ansible.builtin.set_fact:
                     __invalid_input_key_usage_choice_failed: true
                   when: >-
-                    'key_usage' in
-                    (ansible_failed_result | default({}) | to_json)
+                    'value of key_usage must be one or more of:' in
+                    __invalid_input_failure_messages and
+                    'Got no match for: invalidUsage found in certificate_requests'
+                    in __invalid_input_failure_messages
 
             - name: Assert invalid key_usage choice failed validation
               ansible.builtin.assert:
@@ -212,8 +227,8 @@
                   ansible.builtin.set_fact:
                     __invalid_input_trust_state_failed: true
                   when: >-
-                    'invalid_state' in
-                    (ansible_failed_result | default({}) | to_json)
+                    'value of state must be one of: present, absent, got: invalid_state found in certificate_trust'
+                    in __invalid_input_failure_messages
 
             - name: Assert invalid state in certificate_trust failed validation
               ansible.builtin.assert:
@@ -238,8 +253,8 @@
               ansible.builtin.set_fact:
                 __invalid_input_trust_no_source_failed: true
               when: >-
-                'exactly one' in
-                (ansible_failed_result | default({}) | to_json)
+                'exactly one of content, src, or url must be given'
+                in __invalid_input_failure_messages
 
         - name: Assert trust entry with no source failed validation
           ansible.builtin.assert:
@@ -264,8 +279,8 @@
               ansible.builtin.set_fact:
                 __invalid_input_trust_multiple_sources_failed: true
               when: >-
-                'exactly one' in
-                (ansible_failed_result | default({}) | to_json)
+                'exactly one of content, src, or url must be given'
+                in __invalid_input_failure_messages
 
         - name: Assert trust entry with multiple sources failed validation
           ansible.builtin.assert:
@@ -291,8 +306,8 @@
               ansible.builtin.set_fact:
                 __invalid_input_dns_type_failed: true
               when: >-
-                'dns must be a string' in
-                (ansible_failed_result | default({}) | to_json)
+                'certificate_requests[0].dns must be a string or list of strings, got int'
+                in __invalid_input_failure_messages
 
         - name: Assert dns as integer failed validation
           ansible.builtin.assert:
@@ -318,8 +333,8 @@
               ansible.builtin.set_fact:
                 __invalid_input_dns_element_failed: true
               when: >-
-                'dns must be a string' in
-                (ansible_failed_result | default({}) | to_json)
+                'certificate_requests[0].dns must be a string or list of strings, got list'
+                in __invalid_input_failure_messages
 
         - name: Assert dns list with non-string element failed validation
           ansible.builtin.assert:
@@ -343,8 +358,8 @@
               ansible.builtin.set_fact:
                 __invalid_input_ip_type_failed: true
               when: >-
-                'ip must be a string' in
-                (ansible_failed_result | default({}) | to_json)
+                'certificate_requests[0].ip must be a string or list of strings, got bool'
+                in __invalid_input_failure_messages
 
         - name: Assert ip as boolean failed validation
           ansible.builtin.assert:
@@ -368,8 +383,8 @@
               ansible.builtin.set_fact:
                 __invalid_input_mode_type_failed: true
               when: >-
-                'mode must be a string' in
-                (ansible_failed_result | default({}) | to_json)
+                'certificate_requests[0].mode must be a string or integer, got bool'
+                in __invalid_input_failure_messages
 
         - name: Assert mode as boolean failed validation
           ansible.builtin.assert:
