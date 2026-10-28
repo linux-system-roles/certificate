@@ -10,4 +10,6 @@ __certificate_packages:
   - python3-pyasn1
 
 __certificate_trust_dir: /etc/pki/trust/anchors
+__certificate_trust_blocklist_dir: /etc/pki/trust/blocklist
+__certificate_trust_extended_dir: /etc/pki/trust
 __certificate_update_trust_cli: /usr/sbin/update-ca-certificates

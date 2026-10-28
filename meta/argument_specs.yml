@@ -173,9 +173,10 @@ argument_specs:
             description: >
               Install a trust anchor, a blocklist entry, or an extended-format
               trust file. Blocklist and extended entries are supported only
-              on Red Hat family systems. Extended files preserve the supplied
-              trust flags and are installed as <name>.crt in
-              /etc/pki/ca-trust/source/.
+              on Red Hat family systems and SLES/openSUSE 16 or later.
+              Extended files preserve the supplied trust flags and are
+              installed as <name>.crt in /etc/pki/ca-trust/source/
+              (/etc/pki/trust/ on SLES/openSUSE).
           content:
             type: str
             description: >

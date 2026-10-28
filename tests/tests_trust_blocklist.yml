@@ -20,7 +20,10 @@
   tasks:
     - name: Skip platforms without blocklist support
       ansible.builtin.meta: end_host
-      when: ansible_facts['os_family'] != 'RedHat'
+      when: >-
+        ansible_facts['os_family'] != 'RedHat' and
+        not (ansible_facts['os_family'] == 'Suse' and
+        ansible_facts['distribution_major_version'] | int >= 16)
 
     - name: Test blocklist operations and clean up afterwards
       block:

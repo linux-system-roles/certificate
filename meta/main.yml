@@ -28,6 +28,8 @@ galaxy_info:
     - redhat
     - rhel
     - leap
+    - sles
+    - sles16
     - ssl
     - system
     - tls

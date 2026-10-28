@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 ---
-# Put internal variables here with SLES_15 specific values.
+# SUSE 15 values; the other SUSE 15 vars files link here. Ansible runs there
+# on python 3.11 (system python3 is 3.6), hence the python311 packages.
 
 __certificate_default_directory: /etc/ssl
 
@@ -8,3 +9,7 @@ __certificate_packages:
   - python311-cryptography
   - python311-dbus-python
   - python311-pyasn1
+
+# Not yet verified on SUSE 15 (p11-kit 0.23), so both types stay unsupported.
+__certificate_trust_blocklist_dir: null
+__certificate_trust_extended_dir: null
