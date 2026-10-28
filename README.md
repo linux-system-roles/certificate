@@ -152,12 +152,13 @@ If `extended_key_usage` is not set the role will default to:
 Each item in the `certificate_trust` list describes a certificate to install
 into (or remove from) the system trust store, so that TLS connections to
 services using those certificates are trusted system-wide. On Red Hat family
-systems, entries can also explicitly distrust certificates using `type: blocklist`.
+systems and SLES/openSUSE 16 or later, entries can also explicitly distrust
+certificates using `type: blocklist`.
 
 | Parameter   | Description                                                                                     | Type | Required | Default |
 |-------------|-------------------------------------------------------------------------------------------------|:----:|:--------:|---------|
 | name        | Base file name of the certificate. Installed as `<name>.crt` in the directory selected by `type`. | str | yes | - |
-| type        | `anchor` to trust a certificate, `blocklist` to distrust it, or `extended` to install a file with trust flags. The last two types require a Red Hat family system. | str | no | anchor |
+| type        | `anchor` to trust a certificate, `blocklist` to distrust it, or `extended` to install a file with trust flags. The last two types require a Red Hat family system or SLES/openSUSE 16 or later. | str | no | anchor |
 | content     | Inline PEM content of the certificate.                                                          | str  | no       | -       |
 | src         | Path of a certificate file on the control node to copy to the selected trust store directory.          | str  | no       | -       |
 | remote\_src | If `true`, `src` is a path on the managed host instead of the control node.                     | bool | no       | no      |
@@ -178,10 +179,15 @@ The trust anchors directory and update command per platform:
 * Debian/Ubuntu: `/usr/local/share/ca-certificates/`, updated with
   `update-ca-certificates`
 
+On SLES/openSUSE, applications that use NSS with its built-in root list
+(`mozilla-nss-certs`) do not read the system trust store, so trust entries,
+including blocklist entries, do not affect them.
+
 Blocklist entries use `/etc/pki/ca-trust/source/blacklist/` <!--- wokeignore:rule=blacklist ---> on RHEL 7/8
-and their derivatives, and `/etc/pki/ca-trust/source/blocklist/` on RHEL 9+
-and Fedora. Blocklisting is not currently supported by this role on
-SLES/openSUSE or Debian/Ubuntu; requesting it fails before trust files change.
+and their derivatives, `/etc/pki/ca-trust/source/blocklist/` on RHEL 9+
+and Fedora, and `/etc/pki/trust/blocklist/` on SLES/openSUSE 16 or later.
+Blocklisting is not currently supported by this role on SLES/openSUSE 15 or
+Debian/Ubuntu; requesting it fails before trust files change.
 All three input methods (`content`, `src`, and `url`) support blocklist entries.
 
 For example:
@@ -203,14 +209,16 @@ the other type; remove that entry explicitly when needed.
 Use `type: extended` to install a file containing explicit trust settings,
 for example PEM data with `BEGIN TRUSTED CERTIFICATE` markers and
 purpose-specific trust or rejection flags. The role copies the file unchanged
-to `/etc/pki/ca-trust/source/<name>.crt`, outside the anchors and blocklist
-directories, and runs `update-ca-trust extract` when it changes.
+to `/etc/pki/ca-trust/source/<name>.crt` (`/etc/pki/trust/<name>.crt` on
+SLES/openSUSE 16 or later), outside the anchors and blocklist directories,
+and runs the platform specific update command when it changes.
 The role does not generate or infer trust flags from the file name.
 
-This type is supported only on Red Hat family systems. As with other trust
-entries, supply exactly one of `content`, `src`, or `url`; `remote_src` is
-available with `src`. The existing `<name>.crt` filename convention applies
-regardless of the source file's extension.
+This type is supported only on Red Hat family systems and SLES/openSUSE 16
+or later. As with other trust entries, supply exactly one of `content`,
+`src`, or `url`; `remote_src` is available with `src`. The existing
+`<name>.crt` filename convention applies regardless of the source file's
+extension.
 
 ```yaml
 certificate_trust:

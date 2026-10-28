@@ -26,6 +26,11 @@
         # yamllint disable rule:octal-values
         mode: 0o600
         ca: self-sign
+      - name: mycert_mode_registered
+        dns: www.example.com
+        # ansible-core 2.18 and earlier mark a registered value unsafe
+        mode: "{{ __certificate_registered_mode.stdout }}"
+        ca: self-sign
   tasks:
     - name: Ensure ftp group exists
       group:
@@ -120,6 +125,11 @@
       vars:
         certificate_requests: "{{ __certificate_requests_fs_attrs_mode }}"
       block:
+        - name: Register a mode for a request
+          command: echo 0640
+          changed_when: false
+          register: __certificate_registered_mode
+
         - name: Issue certificate setting user/group/mode
           include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
@@ -172,3 +182,13 @@
               - name: DNS
                 value: www.example.com
             mode: "0600"
+          - path: "{{ __certificate_default_directory }}/certs/mycert_mode_registered.crt"
+            key_path: "{{ __certificate_default_directory }}/private/mycert_mode_registered.key"
+            subject:
+              - name: commonName
+                oid: 2.5.4.3
+                value: www.example.com
+            subject_alt_name:
+              - name: DNS
+                value: www.example.com
+            mode: "0640"
