@@ -557,8 +557,9 @@ to:</p>
 <p>Each item in the <code>certificate_trust</code> list describes a
 certificate to install into (or remove from) the system trust store, so
 that TLS connections to services using those certificates are trusted
-system-wide. On Red Hat family systems, entries can also explicitly
-distrust certificates using <code>type: blocklist</code>.</p>
+system-wide. On Red Hat family systems and SLES/openSUSE 16 or later,
+entries can also explicitly distrust certificates using
+<code>type: blocklist</code>.</p>
 <table>
 <thead>
 <tr>
@@ -583,7 +584,8 @@ distrust certificates using <code>type: blocklist</code>.</p>
 <td>type</td>
 <td><code>anchor</code> to trust a certificate, <code>blocklist</code>
 to distrust it, or <code>extended</code> to install a file with trust
-flags. The last two types require a Red Hat family system.</td>
+flags. The last two types require a Red Hat family system or
+SLES/openSUSE 16 or later.</td>
 <td style="text-align: center;">str</td>
 <td style="text-align: center;">no</td>
 <td>anchor</td>
@@ -643,14 +645,19 @@ updated with <code>update-ca-trust extract</code></li>
 <li>Debian/Ubuntu: <code>/usr/local/share/ca-certificates/</code>,
 updated with <code>update-ca-certificates</code></li>
 </ul>
+<p>On SLES/openSUSE, applications that use NSS with its built-in root
+list (<code>mozilla-nss-certs</code>) do not read the system trust
+store, so trust entries, including blocklist entries, do not affect
+them.</p>
 <p>Blocklist entries use
 <code>/etc/pki/ca-trust/source/blacklist/</code>
 <!--- wokeignore:rule=blacklist ---> on RHEL 7/8 and their derivatives,
-and <code>/etc/pki/ca-trust/source/blocklist/</code> on RHEL 9+ and
-Fedora. Blocklisting is not currently supported by this role on
-SLES/openSUSE or Debian/Ubuntu; requesting it fails before trust files
-change. All three input methods (<code>content</code>, <code>src</code>,
-and <code>url</code>) support blocklist entries.</p>
+<code>/etc/pki/ca-trust/source/blocklist/</code> on RHEL 9+ and Fedora,
+and <code>/etc/pki/trust/blocklist/</code> on SLES/openSUSE 16 or later.
+Blocklisting is not currently supported by this role on SLES/openSUSE 15
+or Debian/Ubuntu; requesting it fails before trust files change. All
+three input methods (<code>content</code>, <code>src</code>, and
+<code>url</code>) support blocklist entries.</p>
 <p>For example:</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">certificate_trust</span><span class="kw">:</span></span>
@@ -667,14 +674,15 @@ type; remove that entry explicitly when needed.</p>
 trust settings, for example PEM data with
 <code>BEGIN TRUSTED CERTIFICATE</code> markers and purpose-specific
 trust or rejection flags. The role copies the file unchanged to
-<code>/etc/pki/ca-trust/source/&lt;name&gt;.crt</code>, outside the
-anchors and blocklist directories, and runs
-<code>update-ca-trust extract</code> when it changes. The role does not
+<code>/etc/pki/ca-trust/source/&lt;name&gt;.crt</code>
+(<code>/etc/pki/trust/&lt;name&gt;.crt</code> on SLES/openSUSE 16 or
+later), outside the anchors and blocklist directories, and runs the
+platform specific update command when it changes. The role does not
 generate or infer trust flags from the file name.</p>
-<p>This type is supported only on Red Hat family systems. As with other
-trust entries, supply exactly one of <code>content</code>,
-<code>src</code>, or <code>url</code>; <code>remote_src</code> is
-available with <code>src</code>. The existing
+<p>This type is supported only on Red Hat family systems and
+SLES/openSUSE 16 or later. As with other trust entries, supply exactly
+one of <code>content</code>, <code>src</code>, or <code>url</code>;
+<code>remote_src</code> is available with <code>src</code>. The existing
 <code>&lt;name&gt;.crt</code> filename convention applies regardless of
 the source file's extension.</p>
 <div class="sourceCode" id="cb4"><pre
